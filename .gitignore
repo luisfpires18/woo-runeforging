@@ -1,0 +1,75 @@
+# ---------------------------------------------------------------------------
+# .NET
+# ---------------------------------------------------------------------------
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+*.dotCover
+.vs/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json.example
+*.nupkg
+*.snupkg
+artifacts/
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+BenchmarkDotNet.Artifacts/
+
+# ---------------------------------------------------------------------------
+# Node / frontend
+# ---------------------------------------------------------------------------
+node_modules/
+dist/
+dist-ssr/
+.vite/
+*.tsbuildinfo
+playwright-report/
+test-results/
+blob-report/
+.playwright/
+
+# ---------------------------------------------------------------------------
+# Secrets and local configuration
+#   Never commit real configuration values. .env.example is the committed
+#   template; every other .env variant stays local.
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+appsettings.*.local.json
+appsettings.Local.json
+secrets.json
+*.pfx
+*.p12
+*.pem
+*.key
+azure.local.*
+
+# ---------------------------------------------------------------------------
+# Local infrastructure state
+# ---------------------------------------------------------------------------
+.docker-data/
+__azurite*
+*.azurite
+pgdata/
+
+# ---------------------------------------------------------------------------
+# OS and editor noise
+# ---------------------------------------------------------------------------
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+*.swp
+*~

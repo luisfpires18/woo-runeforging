@@ -1,0 +1,28 @@
+# Normalise line endings so Windows development and Linux CI/containers agree.
+* text=auto eol=lf
+
+# Windows-only tooling that must keep CRLF.
+*.ps1   text eol=crlf
+*.cmd   text eol=crlf
+*.bat   text eol=crlf
+
+# Shell scripts and container files must stay LF even on Windows checkouts.
+*.sh            text eol=lf
+Dockerfile      text eol=lf
+*.Dockerfile    text eol=lf
+
+# Binary assets — never diff, never normalise.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.webp  binary
+*.avif  binary
+*.gif   binary
+*.ico   binary
+*.woff  binary
+*.woff2 binary
+*.pdf   binary
+*.zip   binary
+
+# Generated lockfiles: keep them in the repo but out of code review diffs.
+package-lock.json  linguist-generated=true -diff
