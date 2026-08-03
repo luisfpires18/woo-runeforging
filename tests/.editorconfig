@@ -1,0 +1,9 @@
+# Test-project overrides. Everything else is inherited from the repository root.
+
+[*.cs]
+
+# The root rule requires an Async suffix so a blocking call is visible in
+# review. That reasoning does not apply to test methods, whose names are read as
+# sentences describing the behaviour under test ("Health_reports_healthy_when_..."),
+# and which are never called by other code.
+dotnet_naming_rule.async_methods_end_in_async.severity = none

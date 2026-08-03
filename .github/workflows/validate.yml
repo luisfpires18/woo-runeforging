@@ -1,0 +1,85 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: woo
+          POSTGRES_USER: woo
+          POSTGRES_PASSWORD: woo
+        ports:
+          # 5433 on the runner, matching docker/docker-compose.yml, so the
+          # default connection string is the same locally and in CI.
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U woo -d woo"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      ConnectionStrings__Woo: Host=localhost;Port=5433;Database=woo;Username=woo;Password=woo
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - run: dotnet restore
+
+      - run: dotnet format --verify-no-changes
+
+      - run: dotnet build -c Release --no-restore
+
+      - run: dotnet test -c Release --no-build
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      - run: npm run typecheck
+
+      - run: npm run build
+
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: bash scripts/check-adrs.sh
+
+      - run: bash scripts/check-doc-links.sh

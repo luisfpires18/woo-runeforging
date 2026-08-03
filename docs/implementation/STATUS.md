@@ -1,31 +1,81 @@
 # Implementation status
 
-**Last updated:** 1 August 2026
-**Current stage:** Prompt 1 — Tech stack and architecture · **complete**
-**Next:** Prompt 2 — Create the platform and bootstrap the repository ·
-**awaiting product owner instruction**
+**Last updated:** 3 August 2026
+**Current stage:** Prompt 2 — simplified architecture and platform bootstrap ·
+**complete, uncommitted, awaiting review**
+**Next:** Prompt 3 — Foundations of Iron domain model · **blocked** by the
+`project_sources/` gate (§5.1)
 
 ---
 
 ## 1. Scope of this change
 
-Prompt 1 is **architecture only**. This change set produced the architecture
-package and the accepted decision records, and nothing else.
+Two things: **cut the architecture documentation back to what is being built**,
+and **build the smallest working empty platform**.
 
-**Delivered**
+### 1.1 Why the documentation was cut
 
-- Git repository initialised with baseline hygiene files
-- `AGENTS.md` — repository instructions and the standing agent contract
-- `docs/architecture/ARCHITECTURE.md` — 15 sections, 9 diagrams
-- `docs/architecture/SLICES.md` — Prompt 2–32 traceability
-- `docs/adr/0001`–`0010` plus an index
-- `docs/domain/GLOSSARY.md` — vocabulary and the open canon register
-- `docs/operations/RUNBOOK.md`, `RESTORE.md`, `COST.md`
-- `scripts/check-doc-links.sh`, `scripts/check-adrs.sh`
+The planning documents were replaced. Diffing the committed copies against the
+new ones shows the product source of truth deliberately shrank the technical
+baseline:
 
-**Deliberately not delivered** — no application code, no `package.json`, no
-`.csproj`, no `global.json`, no Dockerfile, no CI workflow, no installed
-dependency, no provisioned infrastructure. Those are Prompt 2.
+| Prompt 1 built to this | The new documents say |
+|---|---|
+| API plus a separate .NET worker | One application; background work stays in-process until measured need |
+| Durable jobs, leases, retries, transactional outbox | Not mentioned; elapsed time resolved from stored timestamps |
+| S3-compatible object storage and an asset manifest | Art stored with the application; a manifest "when the library needs one" |
+| PixiJS from the start | "Added when the first battle replay genuinely needs it" |
+| ~18 modules named up front | 6 feature folders, for the first slice only |
+| Azure Container Apps topology as a deliverable | Deployment deferred until a local playable slice exists |
+
+The Prompt 1 commit (`5142962`) encoded the older, larger baseline: a 1,391-line
+`ARCHITECTURE.md` specifying a worker, `app.due_job` with `SKIP LOCKED` leases,
+an outbox, Azurite, six PostgreSQL schemas, a full Azure and Bicep topology, an
+OpenTelemetry metric catalogue, a 30-row invariant register, and a TypeScript
+7 + 6 dual-compiler alias pair.
+
+**None of it had been built**, so nothing was rolled back. What changed is the
+documentation and the decision record.
+
+### 1.2 Delivered
+
+**Documentation**
+
+- `docs/architecture/ARCHITECTURE.md` rewritten — 1,391 → 288 lines
+- `docs/architecture/SLICES.md` trimmed to Prompts 2–8 — 309 → 103 lines
+- `docs/adr/0001`–`0010` marked **Superseded**, bodies left unedited as the
+  record of what was over-designed
+- `docs/adr/0011`–`0014` written: platform shape, frontend stack, persistence,
+  local development and CI
+- `docs/adr/README.md` rewritten — current decisions, superseded decisions,
+  revisit thresholds
+- `docs/operations/` **deleted** (`RUNBOOK.md`, `RESTORE.md`, `COST.md`) —
+  procedures for infrastructure that will not exist for many prompts
+- `AGENTS.md` §1, §4, §7, §8 updated
+- `README.md` created with the exact local start commands
+
+**Platform**
+
+- `global.json` (SDK 10.0.200), `Directory.Build.props`,
+  `Directory.Packages.props`, `Woo.slnx`, `.nvmrc`, `.env.example`
+- `src/Woo.Api` — one ASP.NET Core 10 application; `Features/Health/`,
+  `Features/Platform/`, `Persistence/WooDbContext.cs`
+- `tests/Woo.Tests` — one test project, xunit.v3, 6 tests
+- `web/` — React 19, Vite 8, **one** `typescript@6.0.3`
+- `docker/docker-compose.yml` — PostgreSQL only
+- `.github/workflows/validate.yml` — backend, frontend and docs jobs
+
+### 1.3 Deliberately not delivered
+
+Gameplay · lore data · authentication · a separate worker · background-job
+infrastructure · a transactional outbox · object storage or Azurite · PixiJS ·
+Redis or a message broker · a second `DbContext` or per-feature schemas ·
+OpenTelemetry · architecture-test frameworks · Azure resources · Bicep ·
+deployment or image-publishing workflows · Kubernetes · microservices.
+
+Also not delivered, on the product owner's instruction: **an initial EF Core
+migration**. The first migration is created in Prompt 3 with the first real
+tables.
 
 ---
 
@@ -33,46 +83,60 @@ dependency, no provisioned infrastructure. Those are Prompt 2.
 
 | # | Decision | ADR |
 |---|---|---|
-| 1 | ASP.NET Core 10 modular monolith plus a .NET worker; Option A over Next.js | [0001](../adr/0001-platform-and-runtime-shape.md) |
-| 2 | React 19, Vite 8, the TypeScript 7 + 6 compiler pair, PixiJS isolated | [0002](../adr/0002-frontend-stack.md) |
-| 3 | PostgreSQL 18, **one `WooDbContext`**, six grouped schemas, EF Core writes with raw SQL reads | [0003](../adr/0003-persistence.md) |
-| 4 | **Synchronous same-transaction cross-module calls; outbox for post-commit reactions only**; `SKIP LOCKED` jobs; generic idempotency sealing | [0004](../adr/0004-consistency-and-durable-work.md) |
-| 5 | `IClock`, project-owned PCG with named streams, banned-API analyzer, the battle contract | [0005](../adr/0005-determinism.md) |
-| 6 | Module tiers, the **Runes-removability test**, `ForgeCraft` separate from `RuneforgingAttempt` | [0006](../adr/0006-module-boundaries-and-progression-order.md) |
-| 7 | Versioned JSON content, stable string IDs, **reference-driven version retention**, terminating asset fallbacks | [0007](../adr/0007-content-and-assets.md) |
-| 8 | REST `/api/v1`, ETag concurrency, polling with a server-computed hint, the authorization boundary without authentication | [0008](../adr/0008-api-and-access-boundary.md) |
-| 9 | **Stable seasonal schema with `season_id`**, no FK permanent → seasonal, archival as an audited job | [0009](../adr/0009-permanent-versus-seasonal-data.md) |
-| 10 | Docker Compose locally, Azure Container Apps topology, testing pyramid, CI gates, cost controls | [0010](../adr/0010-environments-delivery-and-cost.md) |
+| 1 | One ASP.NET Core application with feature folders; no worker, no jobs, no outbox, no architecture tests; `/api/v1` retained | [0011](../adr/0011-minimal-platform-shape.md) |
+| 2 | React 19, Vite 8, **one** plain `typescript@6.0.3` | [0012](../adr/0012-frontend-stack.md) |
+| 3 | PostgreSQL 18, one `WooDbContext`, default schema, no entities yet, elapsed time as stored timestamps | [0013](../adr/0013-persistence.md) |
+| 4 | Compose for PostgreSQL only on host port 5433; CI for build, test, lint and type-check; no deployment | [0014](../adr/0014-local-development-and-ci.md) |
 
-### Corrections applied during review
+### 2.1 The dual TypeScript compiler was never necessary
 
-Five decisions in the first draft were wrong and were corrected before
-acceptance:
+ADR-0002 installed two compilers under aliases because `typescript-eslint`
+resolves the bare specifier `typescript` and TypeScript 7 ships without the
+programmatic API it needs. The premise was right; the conclusion was not.
+Registry queries run for this prompt:
 
-| Draft error | Correction |
-|---|---|
-| `typescript` aliased to TS 7, `@typescript/native` to TS 6 | **Reversed.** Tools resolve the bare `typescript` specifier, so that name must hold the package with an API — TypeScript 6 |
-| ~18 DbContexts and ~18 schemas | **One `WooDbContext`, six grouped schemas** |
-| Cross-module writes routed through the outbox | **Corrected.** Anything whose failure must undo the decision is synchronous and in the same transaction |
-| Ordinary forging modelled as a shared `RiskAttempt` | **Separated.** `ForgeCraft` has no probability model; they share idempotency infrastructure only |
-| Dynamic `season_<n>` schemas with `DROP SCHEMA CASCADE` | **Replaced** with a stable schema and `season_id` |
-| A fixed cap of two loaded content versions | **Replaced** with reference-driven retention |
-| `global.json` pinned to `10.0.2xx` | **Pinned exactly** to `10.0.200` |
+```
+$ npm view typescript versions        → … "6.0.2", "6.0.3", "7.0.1-rc", "7.0.2"
+$ npm view typescript@6.0.3 bin       → { tsc: 'bin/tsc', tsserver: 'bin/tsserver' }
+$ npm view typescript-eslint peerDependencies
+  { eslint: '^8.57.0 || ^9.0.0 || ^10.0.0', typescript: '>=4.8.4 <6.1.0' }
+```
+
+**`typescript@6.0.3` is published under the plain package name.** One install
+satisfies `typescript-eslint`, provides `tsc`, and needs no explanation. The
+alias pair, the `@typescript/typescript6` compat package, the `tsc6` binary and
+the documented `@typescript/native` 404 are all gone.
+
+### 2.2 Two corrections found by running things
+
+**PostgreSQL 18 changed the container data directory.** Mounting
+`/var/lib/postgresql/data` makes `postgres:18-alpine` refuse to start —
+18+ images expect a single mount at `/var/lib/postgresql` and place the cluster
+in a major-version subdirectory. The container reported `unhealthy` until the
+mount was corrected.
+
+**A native PostgreSQL service shadowed the container.** After the mount fix the
+container was healthy, `psql` worked inside it, the host port was reachable, and
+.NET still failed with `28P01: password authentication failed for user "woo"`.
+The cause: `postgresql-x64-18` is installed and running on this machine and owns
+port 5432, so the Docker mapping was shadowed and Npgsql was authenticating
+against the wrong server. **The project now publishes host port 5433**
+(`POSTGRES_PORT` overrides), which leaves the existing installation untouched.
+Both the diagnosis and the resolution are in
+[ADR-0014](../adr/0014-local-development-and-ci.md).
 
 ---
 
 ## 3. Validation actually run
 
-All commands below were executed on 1 August 2026. Output is recorded as
+All commands executed on 3 August 2026 on Windows 11. Output recorded as
 returned.
 
 ### 3.1 Toolchain
 
 ```
 $ dotnet --list-sdks
-9.0.301 [C:\Program Files\dotnet\sdk]
-10.0.100 [C:\Program Files\dotnet\sdk]
-10.0.200 [C:\Program Files\dotnet\sdk]
+9.0.301 / 10.0.100 / 10.0.200 [C:\Program Files\dotnet\sdk]
 
 $ dotnet --list-runtimes
 Microsoft.AspNetCore.App 8.0.17 / 9.0.6 / 10.0.0 / 10.0.4
@@ -85,142 +149,129 @@ v22.18.0
 $ docker --version && docker compose version
 Docker version 28.5.1, build e180ab8
 Docker Compose version v2.40.3-desktop.1
-
-$ git --version
-git version 2.50.1.windows.1
-
-$ az version
-azure-cli 2.78.0
 ```
 
-| Requirement | Installed | Status |
-|---|---|---|
-| .NET SDK 10.0.200 | 10.0.200 | **Satisfied** |
-| .NET runtime 10.0 | 10.0.4 | **Satisfied** |
-| **Node.js 24 LTS** | **22.18.0** | **ACTION REQUIRED before Prompt 2** |
-| Docker Compose v2.40+ | v2.40.3 | Satisfied |
-| Azure CLI | 2.78.0 | Satisfied (unused until Prompt 29) |
+Node 22.18.0 satisfies Vite 8's `>=22.12`, so `.nvmrc` pins **22** and no
+upgrade is required. The Prompt 1 "upgrade to Node 24 before Prompt 2" action
+item is withdrawn.
 
-> Node 22.18.0 satisfies Vite 8's minimum (≥ 22.12), so it is not blocking. The
-> architecture selects Node 24 because it is Active LTS. **Upgrade before
-> Prompt 2 creates `.nvmrc`.**
-
-### 3.2 Package versions — read-only registry queries, nothing installed
+### 3.2 Database
 
 ```
-$ npm view <spec> version
-typescript@7                 7.0.2
-@typescript/typescript6      6.0.2
-react                        19.2.8
-vite                         8.2.0
-@vitejs/plugin-react         6.0.5
-pixi.js                      8.19.0
+$ docker compose -f docker/docker-compose.yml up -d
+ Container woo-db  Started
 
-$ npm view @typescript/native version
-npm error code E404
-npm error 404 Not Found - GET https://registry.npmjs.org/@typescript%2fnative
-
-$ npm view typescript@7.0.2 bin
-{ tsc: 'bin/tsc' }
-
-$ npm view @typescript/typescript6@6.0.2 bin
-{ tsc6: 'bin/tsc6' }
-
-$ npm view typescript-eslint peerDependencies
-{
-  eslint: '^8.57.0 || ^9.0.0 || ^10.0.0',
-  typescript: '>=4.8.4 <6.1.0'
-}
-
-$ npm view typescript dist-tags
-{ latest: '7.0.2', rc: '7.0.1-rc', beta: '6.0.0-beta',
-  next: '7.1.0-dev.20260801.1', ... }
+$ docker compose -f docker/docker-compose.yml ps
+NAME     IMAGE                STATUS                   PORTS
+woo-db   postgres:18-alpine   Up 7 seconds (healthy)   0.0.0.0:5433->5432/tcp
 ```
 
-Every pinned version resolves. Three results are worth calling out:
-
-1. **The `@typescript/native` 404 is expected and correct.** It is not a
-   published package — it is an arbitrary *local alias name*. In `npm:` alias
-   syntax the left side names the folder and the right side is what is
-   installed, so `"@typescript/native": "npm:typescript@^7.0.2"` installs real
-   TypeScript 7. Documented in ARCHITECTURE.md §2.1 so nobody tries to "fix" it.
-2. **The bin entries confirm no collision.** TypeScript 7 declares `tsc`; the
-   TypeScript 6 compatibility package declares `tsc6`. Under the alias
-   arrangement `npx tsc` runs 7, `npx tsc6` runs 6, and the bare specifier
-   `typescript` resolves to 6 for `typescript-eslint`.
-3. **`typescript-eslint` peer range is `>=4.8.4 <6.1.0`** — TypeScript 7 is
-   excluded outright. The compiler pair is a hard installation constraint, not a
-   stylistic preference.
-
-`typescript@next` at `7.1.0-dev` confirms 7.1 is in active development, which is
-the ADR-0002 collapse trigger.
-
-### 3.3 Container images — read-only manifest inspection, nothing pulled
+### 3.3 Backend
 
 ```
-$ docker manifest inspect postgres:18-alpine                     → OK
-$ docker manifest inspect mcr.microsoft.com/dotnet/aspnet:10.0   → OK
-$ docker manifest inspect mcr.microsoft.com/azure-storage/azurite → OK
+$ dotnet restore
+  Restored src\Woo.Api\Woo.Api.csproj (in 3.71 sec).
+  Restored tests\Woo.Tests\Woo.Tests.csproj (in 5.63 sec).
+
+$ dotnet format --verify-no-changes
+(no output, exit code 0)
+
+$ dotnet build -c Release
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+$ dotnet test -c Release --no-build
+Passed!  - Failed: 0, Passed: 6, Skipped: 0, Total: 6, Duration: 710 ms
 ```
 
-### 3.4 Documentation checks
+The six tests: platform status shape · platform status omits the server version
+· unknown route returns 404 · `/health` reports Healthy · the context can open a
+connection to PostgreSQL · the context declares no entities.
+
+### 3.4 Endpoints
 
 ```
-$ bash scripts/check-adrs.sh
-0001-platform-and-runtime-shape.md: ok
-0002-frontend-stack.md: ok
-0003-persistence.md: ok
-0004-consistency-and-durable-work.md: ok
-0005-determinism.md: ok
-0006-module-boundaries-and-progression-order.md: ok
-0007-content-and-assets.md: ok
-0008-api-and-access-boundary.md: ok
-0009-permanent-versus-seasonal-data.md: ok
-0010-environments-delivery-and-cost.md: ok
+$ curl -i http://localhost:5080/health
+HTTP/1.1 200 OK
+{"status":"Healthy","totalDurationMs":21.3,
+ "checks":[{"name":"postgresql","status":"Healthy","description":null}]}
 
-checked 10 ADR(s)
-OK: every ADR is complete
+$ curl -i http://localhost:5080/api/v1/platform/status
+HTTP/1.1 200 OK
+{"application":"Weapons of Chaos and Order","environment":"Development",
+ "utcNow":"2026-08-03T08:42:03.2272459+00:00","database":{"connected":true}}
 ```
 
+Structured console logging, first line as emitted:
+
 ```
-$ bash scripts/check-doc-links.sh
-checked 21 Markdown files
-OK: all relative links resolve
+{"Timestamp":"2026-08-03T08:42:01.308Z","EventId":14,"LogLevel":"Information",
+ "Category":"Microsoft.Hosting.Lifetime","Message":"Now listening on: http://localhost:5080",
+ "State":{"address":"http://localhost:5080","{OriginalFormat}":"Now listening on: {address}"},
+ "Scopes":[]}
 ```
 
-The link check failed on its first run with two broken links, both pointing at
-this file before it existed. Recorded because a check that has never failed has
-not been shown to work.
+### 3.5 Frontend
 
-### 3.5 Secrets
+```
+$ npm install
+added 156 packages, and audited 157 packages in 16s
+found 0 vulnerabilities
 
-`.gitignore` covers `.env*` (except `.env.example`),
-`appsettings.*.local.json`, `secrets.json`, `*.pfx`, `*.pem`, `*.key`. No
-credential, connection string or key is committed. **gitleaks is a Prompt 2 CI
-gate** and has not been run — there is nothing yet for it to scan.
+$ ls node_modules | grep ^typescript
+typescript
+typescript-eslint
+$ ls node_modules/@typescript
+(no such directory)
+$ npx tsc --version
+Version 6.0.3
+
+$ npm run typecheck
+(no output, exit code 0)
+
+$ npm run lint
+(no output, exit code 0)
+
+$ npm run build
+vite v8.2.0 building client environment for production...
+✓ 17 modules transformed.
+dist/index.html                   0.41 kB │ gzip:  0.27 kB
+dist/assets/index-BwxD9mwE.css    1.12 kB │ gzip:  0.51 kB
+dist/assets/index-D_ATu7vx.js   192.35 kB │ gzip: 60.67 kB
+✓ built in 156ms
+```
+
+### 3.6 End-to-end round trip
+
+With the API and `npm run dev` both running, the request the browser makes was
+issued through the Vite proxy:
+
+```
+$ curl -i http://localhost:5173/api/v1/platform/status
+HTTP/1.1 200 OK
+server: Kestrel
+{"application":"Weapons of Chaos and Order","environment":"Development",
+ "utcNow":"2026-08-03T08:42:12.6711762+00:00","database":{"connected":true}}
+```
+
+`server: Kestrel` confirms the response came from the backend through the proxy
+rather than from Vite.
 
 ---
 
 ## 4. What was NOT run, and why
 
-The Global Agent Contract forbids claiming a check passed unless it was
-executed. These could not run, because the code they validate does not exist:
-
-| Not run | Blocked by | Arrives |
-|---|---|---|
-| `dotnet format --verify-no-changes` | No `.csproj` | Prompt 2 |
-| `dotnet build -c Release` | No solution | Prompt 2 |
-| `dotnet test` | No test project | Prompt 2 |
-| `npm ci`, `typecheck`, `lint`, `test`, `build` | No `package.json` | Prompt 2 |
-| Testcontainers integration tests | No persistence layer | Prompt 9 |
-| `content:validate` | No content or validator | Prompt 3 |
-| gitleaks | Nothing to scan | Prompt 2 |
-| **Mermaid diagram rendering** | No renderer in the toolchain | **Prompt 2 CI** |
-| Any deployment | Nothing built; **and not authorized** | Prompt 29 |
-
-> **The nine Mermaid diagrams have not been rendered.** They are written to the
-> documented syntax but have not been visually verified. Adding a Mermaid lint
-> step is a Prompt 2 CI task.
+| Not run | Reason |
+|---|---|
+| **The page loaded in a real browser** | Not executed. The proxied request was verified with `curl`, and the component renders that response, but **no human or automated browser check was performed.** This is the one acceptance criterion resting on inference |
+| CI workflow | Nothing is committed or pushed; `validate.yml` has never executed |
+| Frontend tests | No test runner exists — Prompt 5 |
+| EF Core migrations | None exist — Prompt 3 |
+| Content validation | No content or validator — Prompt 3 |
+| gitleaks | Out of Prompt 2's stated CI scope |
+| Mermaid diagram rendering | No renderer in the toolchain. The one diagram in `ARCHITECTURE.md` is written to documented syntax but has not been visually verified |
+| Any deployment | Nothing is deployed, and it is not authorised |
 
 ---
 
@@ -228,91 +279,81 @@ executed. These could not run, because the code they validate does not exist:
 
 ### 5.1 `project_sources/` — blocks Prompt 3
 
-**Status: OPEN.** The directory does not exist in this repository, and a search
-of `d:\Workspace` and the user profile found no copy anywhere on the machine.
+**Status: OPEN, unchanged.** The directory does not exist in this repository.
 
 Both planning documents name it as the canon source. Prompt 3 defines rune
 families, rarity classes, fusion compatibility, destructibility policy, Aura
-metadata, kingdom definitions and named-material catalogues — all canon-derived.
+metadata, kingdom definitions and named-material catalogues — all canon-derived
+and not safely authored from Workbase summaries.
 
-**Decision taken (product owner, 1 August 2026):** proceed with Prompt 1, which
-is architecture-only, and treat this as a hard gate before Prompt 3. The
-Workbase carries enough rune canon for architecture (§9 categories and
-destructibility, §10 L0–L3, §16 Chaos and Order, §23 conflicts).
-
-- **Prompt 2 is unaffected** — the platform bootstrap needs no lore.
+- **Prompt 2 was unaffected** — the platform bootstrap needs no lore.
 - **Prompt 3 must not start** until the directory is present and read.
-- `docs/domain/GLOSSARY.md` is therefore **incomplete on lore specifics** and
-  says so.
-- Sibling repositories (`d:\Workspace\WOO\docs` and others) contain kingdom lore
-  but are **separate earlier projects and are not treated as canon**.
+- `docs/domain/GLOSSARY.md` remains incomplete on lore specifics and says so.
 
-### 5.2 Node.js upgrade — before Prompt 2
+### 5.2 Node.js — resolved
 
-Installed 22.18.0; architecture selects Node 24 LTS. Not blocking (Vite 8 needs
-≥ 22.12) but `.nvmrc` will pin 24, so upgrade first.
+Prompt 1 recorded "upgrade to Node 24 before Prompt 2". Withdrawn: `.nvmrc`
+pins 22, which is installed and satisfies every dependency.
 
 ### 5.3 Open canon conflicts
 
 The nine Workbase §23 conflicts are recorded in
-[`../domain/GLOSSARY.md §10`](../domain/GLOSSARY.md#10-open-canon-register) with
-the handling for each. **None has been resolved by this change set.** Two block
-Prompt 31: the Order living-anchor rule (§23.4) and the Chaos/Order physical
-process (§23.7).
+[`../domain/GLOSSARY.md`](../domain/GLOSSARY.md). **None was resolved by this
+change set.** Two block Prompt 31.
 
 ---
 
-## 6. Assumptions
+## 6. Acceptance criteria
 
-| Assumption | Basis | If wrong |
+| # | Criterion | Result |
 |---|---|---|
-| Azure cost estimates are order-of-magnitude | Not verified against the pricing calculator for a chosen region | Re-verify at Prompt 29; COST.md flags this |
-| ~10 s average worker drain at 20 players | Estimated from expected job volume, not measured | The cron cadence is a documented knob; measure at Prompt 18 |
-| 2 requests/second polling load | 20 players at a 10 s cadence | Above the 2M free request grant; `304` responses and the poll hint reduce it. Measure at Prompt 29 |
-| PCG32 is the right PRNG | Published algorithm, small state, easy to reimplement | Any documented fixed algorithm works; golden vectors would need regenerating |
-| Six schemas are the right grouping | Judgement call | Moving a table between schemas is a migration, not a redesign |
-| Node 24 remains Active LTS through the closed test | Node 26 becomes LTS around October 2026 | Node 24 moves to Maintenance LTS, still supported |
+| 1 | A clean checkout starts PostgreSQL, the backend and the frontend from documented commands | **Met** — §3.2–3.5, commands as written in `README.md` |
+| 2 | The frontend renders a structural shell and successfully calls the API | **Partly evidenced** — the proxied call returns 200 from Kestrel (§3.6) and the build succeeds; the rendered page has not been opened in a browser |
+| 3 | The solution builds and the focused tests pass | **Met** — 6/6 passed |
+| 4 | The frontend type-checks and lints | **Met** |
+| 5 | CI runs the same core build and test commands | **Written, not executed** — nothing is pushed |
+| 6 | No secrets committed | **Met** — only `.env.example` and local Compose credentials; `.gitignore` covers `.env`, `appsettings.*.local.json`, `secrets.json`, key material |
+| 7 | No gameplay or future infrastructure implemented | **Met** — no entities (asserted by a test), no lore, none of the banned infrastructure |
+| 8 | Architecture docs no longer prescribe unused infrastructure | **Met** — §1.2 |
+| 9 | One TypeScript compiler | **Met** — §3.5 |
+| 10 | Local development needs no Azure or paid service | **Met** |
 
 ---
 
-## 7. Risks carried forward
+## 7. Assumptions and risks
 
-| Risk | Mitigation | Owner |
-|---|---|---|
-| `project_sources/` never materialises | Prompt 3 is gated; escalate rather than inventing canon | Product owner |
-| Modular monolith decays without enforcement | Architecture tests are a **Prompt 2 deliverable**, not a later nicety | Prompt 2 |
-| Mermaid diagrams contain syntax errors | Add a render step to Prompt 2 CI | Prompt 2 |
-| TypeScript compiler pair confuses a newcomer | Documented in ARCHITECTURE.md §2.1 and ADR-0002, including the 404 | — |
-| Cost estimates prove low | Budgets at $10/month and $80 total with alerts at 50/80/100 % | Prompt 29 |
-| Invariants documented but never tested | Every invariant in §15 names its proving test and prompt | Each prompt |
+| Item | Note |
+|---|---|
+| Host port 5433 | Chosen because a native PostgreSQL 18 service occupies 5432 on the development machine. `POSTGRES_PORT` overrides it. CI publishes 5433 too, so one connection string works in both places |
+| `Woo.slnx` | The modern solution format. `dotnet build`, `test` and `format` all resolved it correctly. Falls back to `.sln` if other tooling objects |
+| `tests/.editorconfig` | Disables the repository's async-suffix naming rule for test methods, whose names read as sentences. Scoped to `tests/` only |
+| Feature folders are not mechanically enforced | With two projects there is nothing an architecture test could prove. Review carries it; [ADR-0011](../adr/0011-minimal-platform-shape.md) names the trigger for reopening |
+| Rune leakage prevention | No longer a compile-time guarantee. It holds because runes do not exist — no folder, no table, no content |
+| CI is unverified | It will first run on the initial push. Expect to iterate once |
 
 ---
 
-## 8. Readiness for Prompt 2
+## 8. Readiness for Prompt 3
 
-**Ready**, with one action first.
+**Ready, but gated.**
 
 | Criterion | Status |
 |---|---|
-| Architecture documented and accepted | Yes |
-| ADRs accepted, complete, indexed | Yes — 10/10 verified |
-| Repository layout defined | Yes — [ARCHITECTURE.md §16](../architecture/ARCHITECTURE.md#16-repository-layout) |
-| Module boundaries and dependency direction defined as **testable statements** | Yes — the Runes-removability test is the key one |
-| Critical invariants registered with enforcing mechanism **and** proving test | Yes — 30 invariants |
-| Versions selected with sources and support horizons | Yes — verified against the registry |
-| Local development topology defined | Yes |
-| Azure topology and cost controls defined | Yes — nothing provisioned |
-| No secrets committed | Yes |
-| No application code, dependencies or deployment | Confirmed |
-| **Node 24 installed** | **No — upgrade from 22.18.0 first** |
+| Platform runs from a clean checkout | Yes |
+| Backend, tests, lint, typecheck and build all green | Yes |
+| PostgreSQL reachable from the application and from tests | Yes |
+| Architecture documentation matches what exists | Yes |
+| Decision record current and consistent | Yes — 0011–0014 accepted, 0001–0010 superseded |
+| No secrets, no gameplay, no deferred infrastructure | Yes |
+| `project_sources/` present | **No — this blocks Prompt 3** |
 
-**Prompt 2 will deliver:** the repository tree, `global.json` pinned to
-`10.0.200`, `Directory.Build.props`, `Directory.Packages.props`, the solution,
-the React/Vite web shell, API health endpoints, the worker heartbeat, Docker
-Compose, configuration validation, structured logging, **the architecture
-tests**, and CI.
+**Prompt 3 will deliver:** the first entities and the first EF Core migration,
+`Microsoft.EntityFrameworkCore.Design` and a `dotnet-ef` tool manifest, the
+Houses/Settlements/Resources/Forge/Armies/Battles feature folders, and the
+Foundations of Iron starter content.
 
-> **Do not begin Prompt 2 without the product owner's instruction.**
+> **Do not begin Prompt 3 without the product owner's instruction, and not
+> before `project_sources/` is present and read.**
 
 ---
 
@@ -320,4 +361,5 @@ tests**, and CI.
 
 | Date | Prompt | Summary |
 |---|---|---|
-| 2026-08-01 | 1 | Repository initialised. Architecture package, 10 ADRs, glossary, operations docs, slice traceability, validation scripts. Five draft decisions corrected during review. `project_sources/` gate recorded against Prompt 3. |
+| 2026-08-01 | 1 | Repository initialised. Architecture package, 10 ADRs, glossary, operations docs, slice traceability, validation scripts. |
+| 2026-08-03 | 2 | Architecture package simplified: ARCHITECTURE.md rewritten, SLICES.md trimmed, `docs/operations/` deleted, ADRs 0001–0010 superseded by 0011–0014. Platform bootstrapped: one ASP.NET Core application, one test project, React/Vite shell, Compose for PostgreSQL, CI. Dual TypeScript compiler removed. PostgreSQL 18 mount path and a port-5432 collision with a native service found and fixed. |

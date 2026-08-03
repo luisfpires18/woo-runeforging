@@ -1,7 +1,13 @@
 # ADR-0010 — Environments, delivery, testing and cost
 
-**Status:** Accepted
+**Status:** Superseded by [ADR-0014](0014-local-development-and-ci.md)
 **Date:** 1 August 2026
+
+> **Superseded by [ADR-0014](0014-local-development-and-ci.md) on 3 August 2026.**
+> Docker Compose survives, reduced to PostgreSQL. The Azure Container Apps topology, Bicep, budgets, backup/restore procedures and the deployment pipeline are deferred until a local playable slice exists.
+>
+> The text below is left unedited as the record of what was designed and
+> why it was cut back. Do not treat it as current.
 
 ---
 
@@ -129,7 +135,7 @@ development.
 ### Backup and recovery
 
 Automated backups, 7-day retention, geo-redundancy off. **Restore is a drill,
-not a claim** — [`RESTORE.md`](../operations/RESTORE.md) documents restoring to
+not a claim** — `docs/operations/RESTORE.md` documented restoring to
 a new server, running ledger reconciliation, comparing history counts, and
 cutting over. Prompt 28 requires it **executed**.
 
@@ -219,8 +225,8 @@ and manual gating enforces it in the pipeline rather than in a person's memory.
 
 ## References
 
-- [`ARCHITECTURE.md §12`](../architecture/ARCHITECTURE.md#12-local-development)
-- [`ARCHITECTURE.md §13`](../architecture/ARCHITECTURE.md#13-azure-deployment-topology)
-- [`ARCHITECTURE.md §14`](../architecture/ARCHITECTURE.md#14-configuration-and-observability)
-- [`COST.md`](../operations/COST.md), [`RUNBOOK.md`](../operations/RUNBOOK.md), [`RESTORE.md`](../operations/RESTORE.md)
+- `ARCHITECTURE.md §12`, `§13`, `§14` — sections of the Prompt 1 architecture
+  document, replaced by [ADR-0014](0014-local-development-and-ci.md)
+- `docs/operations/COST.md`, `RUNBOOK.md`, `RESTORE.md` — deleted with this
+  ADR's supersession; they described infrastructure that was never provisioned
 - Workbase §19; Prompt 28, Prompt 29

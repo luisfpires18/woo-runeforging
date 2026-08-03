@@ -1,8 +1,14 @@
 # ADR-0001 — Platform and runtime shape
 
-**Status:** Accepted
+**Status:** Superseded by [ADR-0011](0011-minimal-platform-shape.md)
 **Date:** 1 August 2026
 **Deciders:** Product owner, principal architect
+
+> **Superseded by [ADR-0011](0011-minimal-platform-shape.md) on 3 August 2026.**
+> The separate worker process, and with it the durable-job and outbox machinery this ADR justified, is not built. Prompt 2 ships one ASP.NET Core process.
+>
+> The text below is left unedited as the record of what was designed and
+> why it was cut back. Do not treat it as current.
 
 ---
 

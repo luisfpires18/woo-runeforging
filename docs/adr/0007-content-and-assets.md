@@ -1,7 +1,13 @@
 # ADR-0007 — Authored content and assets
 
-**Status:** Accepted
+**Status:** Superseded by [ADR-0014](0014-local-development-and-ci.md)
 **Date:** 1 August 2026
+
+> **Superseded by [ADR-0014](0014-local-development-and-ci.md) on 3 August 2026.**
+> Versioned JSON content, reference-driven version retention, the asset manifest and object storage are all deferred until there is content to author. Art ships with the application.
+>
+> The text below is left unedited as the record of what was designed and
+> why it was cut back. Do not treat it as current.
 
 ---
 

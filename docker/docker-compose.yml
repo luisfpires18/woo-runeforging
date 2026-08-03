@@ -1,0 +1,33 @@
+# PostgreSQL only.
+#
+# The API and the web client run on the host: that keeps the inner loop fast
+# (hot reload, breakpoints) and keeps Compose responsible for the one thing that
+# is awkward to run natively. Nothing here requires Azure or any paid service.
+
+services:
+  db:
+    image: postgres:18-alpine
+    container_name: woo-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: woo
+      POSTGRES_USER: woo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-woo}
+    ports:
+      # Host port 5433, not 5432: a machine with a native PostgreSQL service
+      # installed already owns 5432, and that listener silently wins over this
+      # mapping. 5433 keeps the project independent of what else is installed.
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      # PostgreSQL 18 images expect a single mount at /var/lib/postgresql and
+      # place the cluster in a major-version subdirectory beneath it. Mounting
+      # /var/lib/postgresql/data instead makes the container refuse to start.
+      - woo-pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U woo -d woo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  woo-pgdata:

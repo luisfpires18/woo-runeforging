@@ -1,9 +1,8 @@
 # Weapons of Chaos and Order
 
-## Game Design Workbase v0.2
+## Game Design Workbase
 
 **Date:** 1 August 2026  
-**Supersedes:** Game Design Workbase v0.1  
 **Canon sources:** all Markdown files in project_sources/  
 **Purpose:** Product source of truth for planning, prototyping, implementation, and playtest decisions.
 
@@ -45,11 +44,11 @@ The core progression is:
 
 War, trade, settlement growth, professions, and armies are not separate games. They create the conditions, materials, demand, deeds, and danger that make the weapon journey meaningful.
 
-## What changed from v0.1
+## Product hierarchy
 
 The earlier design made the War Council, profession economy, and seasonal Warfront the visible centre. Blacksmithing was one calling among many.
 
-Version 0.2 changes the hierarchy:
+The game follows this hierarchy:
 
 | Priority | System role |
 |---|---|
@@ -101,7 +100,7 @@ The normal interface, world, dialogue, economy, and art should feel grounded. An
 - PixiJS or equivalent for map layers, battle replays, weather, fire, smoke, projectiles, Aura, and corruption.
 - A responsive application interface for settlement management, forge projects, markets, armies, reports, and history.
 
-Runtime-generated AI art is not part of gameplay. Approved art is versioned through an asset manifest. Faction placeholders and heraldic tokens are fallbacks.
+Runtime-generated AI art is not part of gameplay. Approved art is stored with the application at first; an asset manifest can be added when the library becomes large enough to need one. Faction placeholders and heraldic tokens are fallbacks.
 
 ---
 
@@ -356,7 +355,7 @@ The grounded game uses:
 
 Workshop Supplies abstract common charcoal, nails, cloth, oils, rope, bindings, containers, ordinary hides, tools, and maintenance inputs.
 
-Stone is added to the v0.1 model because fortifications, ports, roads, mines, and kingdom construction require it.
+Stone is included because fortifications, ports, roads, mines, and kingdom construction require it.
 
 ## Workforce and capacity are not inventory resources
 
@@ -430,7 +429,7 @@ Basic play must remain possible during blockade. High-tier efficiency and legend
 
 ## The forge loop
 
-> **Acquire materials → choose a weapon and method → forge → sell, supply, retain, or equip → use the weapon → repair or reforge → build mastery and history.**
+> **Acquire materials â†’ choose a weapon and method â†’ forge â†’ sell, supply, retain, or equip â†’ use the weapon â†’ repair or reforge â†’ build mastery and history.**
 
 This loop exists from the first ordinary spear to the final Order project.
 
@@ -1087,47 +1086,42 @@ Do not move to a 20-player Warfront merely because Slice A works. The product id
 
 # 19. Technical foundation
 
-## Recommended baseline
+## Minimal recommended baseline
 
-The architecture decision must be documented before scaffolding. The preferred baseline, subject to repository evidence, is:
+Begin with the smallest stack that can prove the game:
 
-- ASP.NET Core modular-monolith API.
-- Separate .NET worker process.
-- React, TypeScript, and Vite.
-- PixiJS for settlement/map layers and battle replay.
-- PostgreSQL as authoritative persistence.
-- Database-backed durable jobs, leases, retries, idempotency, and transactional outbox.
-- Versioned authored content.
-- S3-compatible object storage abstraction and asset manifest.
-- Docker Compose for local development.
-- Azure Container Apps consumption-oriented deployment, managed PostgreSQL, and Azure Blob Storage for student-credit stages, while keeping the application portable.
+- One ASP.NET Core modular-monolith application.
+- Feature folders inside that application rather than many projects or services.
+- One EF Core `DbContext` and PostgreSQL database.
+- React, TypeScript, and Vite for the web client.
+- One automated test project, expanded only when a real need appears.
+- Docker Compose for PostgreSQL only.
+- GitHub Actions for build and tests.
+- Basic structured application logs.
+- Static art and content stored with the application at first.
 
-The project owner has strong C#/.NET experience and access to Azure for Students. Cost budgets, alerts, scale-to-zero where appropriate, and avoidance of premium infrastructure are requirements.
+The ASP.NET Core process owns the API and, when gameplay needs it, small in-process background tasks. Elapsed-time systems should prefer storing timestamps and calculating progress when state is read or changed. A separate worker is introduced only after measured work can no longer be handled safely in the application process.
+
+PixiJS is added when the first battle replay or map genuinely needs it. Azure deployment, Blob Storage, distributed job processing, and deeper observability are later operational steps, not requirements for the first platform.
+
+The project owner has strong C#/.NET experience and access to Azure for Students. When deployment is justified, use a small cost-capped Azure setup and keep the application portable. Local development must not require Azure or another paid service.
 
 ## Modular boundaries
 
-Initial modules should include:
+Start with feature folders for only the first playable slice:
 
-- Accounts and Houses.
-- Settlements and Construction.
-- Resources, Storage, and Ledgers.
-- Workforce and Specialists.
-- Forge and Techniques.
-- Runes and Runeforging.
-- Equipment and Provenance.
-- Companies and Armies.
-- Battles and Replays.
-- Contracts, Markets, and Trade.
-- Situations and World State.
-- Orders and Warfronts.
-- History and Reports.
-- Content and Assets.
+- Houses.
+- Settlements.
+- Resources.
+- Forge.
+- Armies.
+- Battles.
 
-The rune model must exist in architecture and schemas from the start, but rune gameplay is not implemented in the tutorial slice.
+Add Contracts, Markets, Situations, Runes, Orders, Warfronts, History, and other areas when their prompt makes them playable. Future systems should influence naming and obvious extension points, but they do not need projects, tables, services, or empty abstractions before use.
 
 ## Critical technical invariants
 
-- The server is authoritative for resources, time, jobs, forge outcomes, battle outcomes, and world state.
+- The server is authoritative for resources, time, forge outcomes, battle outcomes, and world state.
 - Gold and goods movements are transactional and ledgered.
 - A weapon or batch has one exclusive state and owner at a time.
 - A Runeforging attempt produces one immutable outcome under retries.
@@ -1140,6 +1134,12 @@ The rune model must exist in architecture and schemas from the start, but rune g
 
 ## Do not use initially
 
+- A separate worker process.
+- A transactional outbox or general-purpose job platform.
+- Object storage or an asset service.
+- An OpenTelemetry stack.
+- Multiple `DbContext` instances or database schemas by feature.
+- Detailed cloud infrastructure or deployment automation.
 - Microservices.
 - Kubernetes.
 - Redis or a message broker without measured need.
@@ -1150,9 +1150,9 @@ The rune model must exist in architecture and schemas from the start, but rune g
 
 ---
 
-# 20. Research principles retained from v0.1
+# 20. Research principles
 
-The v0.1 research remains useful, but its lessons now support the corrected hierarchy.
+The research lessons support the corrected hierarchy.
 
 | Reference | Principle retained |
 |---|---|
@@ -1176,7 +1176,7 @@ Retained warnings:
 - Do not make Runeforging failure a paid protection funnel.
 - Do not mistake more content for a proven loop.
 
-The curated links and videos in v0.1 remain a research appendix and do not need to be duplicated here.
+The curated links and videos from the earlier research remain useful as a separate appendix and do not need to be duplicated here.
 
 ---
 
@@ -1265,7 +1265,7 @@ These source conflicts remain open:
 - The first two validation slices are Foundations of Iron and First Flame.
 - The first border remains Arkazia versus Sylvara.
 - Warfronts support the forge loop rather than replace it.
-- ASP.NET Core, .NET Worker, React, Vite, PixiJS, PostgreSQL, Docker Compose, and portable Azure deployment are the preferred technical baseline.
+- One ASP.NET Core modular monolith, React, TypeScript, Vite, PostgreSQL, EF Core, a small test setup, and Docker Compose for PostgreSQL are the preferred starting baseline.
 
 ## Open
 
@@ -1298,21 +1298,22 @@ These source conflicts remain open:
 
 ---
 
-# 25. Immediate next planning task
+# 25. Immediate next implementation task
 
-The next technical planning session should use this workbase and the v0.2 implementation prompt pack.
+The next session should use this workbase and the implementation prompt pack.
 
-Prompt 1 remains architecture only. It must:
+Prompt 2 must create only the minimal empty platform:
 
-- Inspect the repository.
-- Resolve the approved tech baseline.
-- Define modules and invariants for the whole medieval-to-Artifact journey.
-- Keep rune gameplay represented but dormant.
-- Design for two vertical-slice gates.
-- Preserve cloud portability while targeting Azure for Students.
-- Stop before scaffolding or gameplay implementation.
+- One ASP.NET Core application.
+- One React, TypeScript, and Vite client.
+- PostgreSQL through Docker Compose.
+- EF Core connectivity and one simple API endpoint.
+- One small automated test setup.
+- GitHub Actions for build and tests.
 
-After architecture approval, implementation begins with the grounded medieval foundation. It does not begin by forging a Fire Artifact. It also does not postpone Runeforging until after a large MMO has been built.
+It must also simplify any earlier architecture documentation that prescribes a separate worker, outbox, object storage, extensive cloud operations, or other infrastructure that the first playable slice does not need.
+
+After the platform works, implementation begins with the grounded medieval foundation. It does not begin by forging a Fire Artifact. It also does not postpone Runeforging until after a large MMO has been built.
 
 ---
 

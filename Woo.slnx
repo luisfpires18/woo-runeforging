@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Woo.Api/Woo.Api.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Woo.Tests/Woo.Tests.csproj" />
+  </Folder>
+</Solution>

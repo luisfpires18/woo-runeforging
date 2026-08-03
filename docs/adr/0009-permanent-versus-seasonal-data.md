@@ -1,7 +1,13 @@
 # ADR-0009 — Permanent versus seasonal data
 
-**Status:** Accepted
+**Status:** Superseded by [ADR-0013](0013-persistence.md)
 **Date:** 1 August 2026
+
+> **Superseded by [ADR-0013](0013-persistence.md) on 3 August 2026.**
+> Deferred rather than replaced. There are no tables yet, seasonal or otherwise. The permanent/seasonal separation stays a recorded product invariant; revisit at Prompt 27.
+>
+> The text below is left unedited as the record of what was designed and
+> why it was cut back. Do not treat it as current.
 
 ---
 

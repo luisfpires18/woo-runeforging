@@ -1,7 +1,13 @@
 # ADR-0002 — Frontend stack and the TypeScript compiler pair
 
-**Status:** Accepted
+**Status:** Superseded by [ADR-0012](0012-frontend-stack.md)
 **Date:** 1 August 2026
+
+> **Superseded by [ADR-0012](0012-frontend-stack.md) on 3 August 2026.**
+> The TypeScript 7 + 6 alias pair is not used. `typescript@6.0.3` is published under the plain package name and satisfies `typescript-eslint` on its own.
+>
+> The text below is left unedited as the record of what was designed and
+> why it was cut back. Do not treat it as current.
 
 ---
 

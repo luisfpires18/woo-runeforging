@@ -1,7 +1,13 @@
 # ADR-0008 — API style, polling and the access boundary
 
-**Status:** Accepted
+**Status:** Superseded by [ADR-0011](0011-minimal-platform-shape.md)
 **Date:** 1 August 2026
+
+> **Superseded by [ADR-0011](0011-minimal-platform-shape.md) on 3 August 2026.**
+> The `/api/v1` prefix and problem-details error shape survive. ETag concurrency, the server-computed poll hint, `ActorContext` and the split private/public read models are deferred until there is state to guard.
+>
+> The text below is left unedited as the record of what was designed and
+> why it was cut back. Do not treat it as current.
 
 ---
 

@@ -41,7 +41,12 @@ while IFS= read -r file; do
     done
 
     checked=$((checked + 1))
-done < <(find . -name '*.md' -not -path './node_modules/*' -not -path './.git/*' | sort)
+done < <(find . -name '*.md' \
+    -not -path '*/node_modules/*' \
+    -not -path '*/dist/*' \
+    -not -path '*/bin/*' \
+    -not -path '*/obj/*' \
+    -not -path './.git/*' | sort)
 
 if [ -f "$repo_root/.linkcheck.tmp" ]; then
     broken="$(wc -l < "$repo_root/.linkcheck.tmp" | tr -d ' ')"
