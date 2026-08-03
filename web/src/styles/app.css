@@ -1,0 +1,570 @@
+/* Screen and component styling. Tokens only — no literal colours below. */
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.offline {
+  padding: var(--space-2) var(--space-4);
+  background: var(--surface-3);
+  border-bottom: 1px solid var(--warning);
+  color: var(--text-primary);
+  font-size: var(--text-small);
+}
+
+/* ---------- header ---------- */
+
+.shell__header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.shell__identity {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.shell__crest {
+  width: 2rem;
+  height: auto;
+}
+
+.shell__house {
+  display: block;
+  font-weight: 600;
+}
+
+.shell__settlement {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  color: var(--text-secondary);
+  font-size: var(--text-small);
+}
+
+.shell__stage {
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border-interactive);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.resource-bar__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+}
+
+.resource-bar__item {
+  display: flex;
+  gap: var(--space-2);
+  align-items: baseline;
+}
+
+.resource-bar__name {
+  color: var(--text-secondary);
+  font-size: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.resource-bar__amount {
+  font-size: var(--text-small);
+}
+
+/* ---------- layout ---------- */
+
+.shell__body {
+  display: flex;
+  flex: 1;
+  gap: var(--space-6);
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4);
+}
+
+.shell__nav ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 9rem;
+}
+
+.nav-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: var(--target-min);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.nav-link:hover {
+  background: var(--surface-2);
+  color: var(--text-primary);
+}
+
+.nav-link--current {
+  background: var(--surface-2);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.nav-link__marker {
+  position: absolute;
+  left: 0;
+  width: 3px;
+  height: 60%;
+  background: var(--accent-settlement);
+  border-radius: var(--radius-sm);
+}
+
+.shell__main {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---------- panels ---------- */
+
+.panel {
+  padding: var(--space-4);
+  margin-bottom: var(--space-6);
+  background: var(--surface-1);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+}
+
+.panel__heading {
+  margin-bottom: var(--space-3);
+  color: var(--text-secondary);
+  font-size: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.seat__title,
+.settlement__title {
+  font-size: var(--text-display);
+  line-height: var(--leading-tight);
+}
+
+.seat__geography,
+.settlement__geography {
+  max-width: 65ch;
+  margin-top: var(--space-2);
+  color: var(--text-secondary);
+}
+
+.seat__intro,
+.settlement__intro {
+  margin-bottom: var(--space-6);
+}
+
+.seat__returning {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.seat__returning .panel {
+  margin-bottom: var(--space-6);
+}
+
+.seat__lore {
+  max-width: 60ch;
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--border-strong);
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ---------- the primary task ---------- */
+
+.task__reason {
+  max-width: 60ch;
+  margin-bottom: var(--space-3);
+}
+
+.task__terms {
+  margin-bottom: var(--space-4);
+  color: var(--text-secondary);
+}
+
+.task__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: center;
+}
+
+.button {
+  min-height: var(--target-min);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  font: inherit;
+  cursor: pointer;
+  transition: background var(--duration-instant) var(--easing-standard);
+}
+
+.button--primary {
+  background: var(--accent-forge);
+  border: 1px solid var(--accent-forge);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+
+.button--primary:hover {
+  background: var(--warning);
+}
+
+.button--secondary {
+  background: transparent;
+  border: 1px solid var(--border-interactive);
+  color: var(--text-primary);
+}
+
+.button--secondary:hover {
+  background: var(--surface-3);
+}
+
+.link,
+.attention__link {
+  color: var(--accent-settlement);
+}
+
+/* ---------- lists ---------- */
+
+.change,
+.attention {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.change:last-child,
+.attention:last-child {
+  border-bottom: 0;
+}
+
+.change__glyph {
+  color: var(--success);
+}
+
+.attention__glyph {
+  color: var(--warning);
+}
+
+.attention__detail,
+.state__detail {
+  margin-top: var(--space-1);
+  color: var(--text-muted);
+  font-size: var(--text-small);
+}
+
+/* ---------- the site row ---------- */
+
+/* A grid that wraps, not a row that clips. Seven plots do not fit across a
+   1280px viewport, and a half-cut final plot reads as broken rather than as
+   scrollable — which undermines the whole point of showing the site. */
+.site-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+  gap: var(--space-3);
+}
+
+.site-plot {
+  padding: var(--space-2);
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.site-plot[data-status='Complete'] {
+  border-color: var(--success);
+}
+
+.site-plot[data-status='UnderConstruction'] {
+  border-color: var(--accent-settlement);
+}
+
+.site-plot[data-status='Previewed'] {
+  opacity: 0.72;
+}
+
+.site-plot__art {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+}
+
+.site-plot__name {
+  display: block;
+  margin-top: var(--space-2);
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+.site-plot__status {
+  display: block;
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+}
+
+/* ---------- building list ---------- */
+
+.building {
+  display: flex;
+  gap: var(--space-4);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.building:last-child {
+  border-bottom: 0;
+}
+
+.building--highlighted {
+  background: var(--surface-2);
+  box-shadow: inset 3px 0 0 var(--accent-forge);
+}
+
+.building:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+.building__art {
+  flex: 0 0 8rem;
+  width: 8rem;
+  height: auto;
+  border-radius: var(--radius-sm);
+}
+
+.building__body {
+  min-width: 0;
+}
+
+.building__name {
+  display: flex;
+  gap: var(--space-2);
+  align-items: baseline;
+  font-size: var(--text-heading);
+}
+
+.building__glyph {
+  color: var(--accent-settlement);
+}
+
+.building[data-status='Complete'] .building__glyph {
+  color: var(--success);
+}
+
+.building__status {
+  color: var(--text-secondary);
+  font-size: var(--text-small);
+}
+
+.building__description {
+  max-width: 60ch;
+  margin-top: var(--space-2);
+  color: var(--text-secondary);
+}
+
+.building__yield {
+  margin-top: var(--space-2);
+  color: var(--success);
+  font-size: var(--text-small);
+}
+
+.building__unavailable {
+  margin-top: var(--space-2);
+  color: var(--warning);
+  font-size: var(--text-small);
+}
+
+.building__progress {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  margin-top: var(--space-2);
+  color: var(--text-secondary);
+  font-size: var(--text-small);
+}
+
+.building__cost {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  margin-top: var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--text-small);
+}
+
+/* ---------- household ---------- */
+
+.person {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.person__portrait {
+  flex: 0 0 4rem;
+  width: 4rem;
+  height: auto;
+}
+
+.person__name {
+  font-size: var(--text-subheading);
+}
+
+.person__role {
+  color: var(--accent-forge);
+  font-size: var(--text-small);
+}
+
+.person__introduction {
+  max-width: 60ch;
+  margin-top: var(--space-2);
+  color: var(--text-secondary);
+}
+
+/* ---------- states ---------- */
+
+.state {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+}
+
+.state--loading {
+  background: var(--surface-1);
+  color: var(--text-muted);
+}
+
+/* Empty is not an error and never uses the danger colour. */
+.state--empty {
+  padding: var(--space-2) 0;
+  color: var(--text-muted);
+}
+
+.state--error {
+  background: var(--surface-2);
+  border: 1px solid var(--danger);
+}
+
+/* ---------- dev tools ---------- */
+
+.dev-tools {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  background: var(--surface-2);
+  border-top: 1px dashed var(--border-interactive);
+}
+
+.dev-tools__label {
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ---------- mobile ---------- */
+
+@media (width < 48rem) {
+  .shell__body {
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-3);
+  }
+
+  .seat__returning {
+    grid-template-columns: 1fr;
+  }
+
+  /* Navigation becomes a bottom tab bar, thumb-reachable, labels always shown. */
+  .shell__nav {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 5;
+    background: var(--surface-1);
+    border-top: 1px solid var(--border-strong);
+    order: 2;
+  }
+
+  .shell__nav ul {
+    flex-direction: row;
+  }
+
+  .shell__nav li {
+    flex: 1;
+  }
+
+  .nav-link {
+    justify-content: center;
+    min-height: var(--target-min);
+    border-radius: 0;
+  }
+
+  .nav-link__marker {
+    top: 0;
+    left: 20%;
+    width: 60%;
+    height: 3px;
+  }
+
+  .shell__main {
+    padding-bottom: calc(var(--target-min) + var(--space-6));
+  }
+
+  .building {
+    flex-direction: column;
+  }
+
+  .building__art {
+    width: 100%;
+  }
+
+  .task__actions .button--primary {
+    flex: 1;
+    width: 100%;
+  }
+
+  /* The bar wraps rather than dropping the labels. `display: none` would take
+     the resource names out of the accessibility tree too, leaving a screen
+     reader with a row of bare numbers — and a sighted player with the same. */
+  .resource-bar__list {
+    gap: var(--space-1) var(--space-3);
+  }
+
+  .resource-bar__name {
+    font-size: 0.6875rem;
+  }
+
+  .site-row {
+    grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+  }
+}

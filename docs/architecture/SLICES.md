@@ -111,10 +111,26 @@ correctly have none.
 The package assigns Sylvara no role or relationship — no source it works from
 establishes one.
 
+### Prompt 5 — Mock House Seat and outpost onboarding · **complete**
+
+The first player-facing screen, from typed fake data. House Seat with
+first-session and returning shapes, settlement view with all seven buildings, the
+six resources, a named smith, and the seven states.
+
+**The adapter seam** (`web/src/api/`) is the deliverable that matters most:
+components consume `HouseState` through a provider and cannot reach a fixture —
+ESLint forbids it — so Prompts 10–17 replace fake state by writing a second
+`HouseStateSource`, not by rewriting components.
+
+Two design-package amendments came out of it: the site holds **seven** buildings
+(Barracks and Forge previewed), and the mobile resource bar keeps its labels
+rather than collapsing to bare numbers.
+
+**Not built:** the construction commit flow — reserving resources, resolving
+shortages and confirming — which is Prompt 6.
+
 | Prompt | Deliverable | Lands in |
 |---|---|---|
-| 5 | House Seat, settlement view, six resources, first smith — typed fake data | `web/src/` |
-| 5 | Typed adapters so fake state is replaceable without rewriting components | `web/src/api/` |
 | 6 | Reserve resources, resolve shortages, assign a specialist, complete construction | `web/src/` |
 | 6 | Iron sword pattern, grade, technique, smith; cost, duration and guaranteed quality floor before confirming | `web/src/` |
 | 6 | **Exactly one destination** — equip, contract, sell, retain | Destination state machine |

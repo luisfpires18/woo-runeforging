@@ -118,6 +118,28 @@ what exists** — an area that has not arrived is absent, never a disabled tab.
 
 ---
 
+## Amended by Prompt 5
+
+Building the mock surfaced three places where the prompt sequence asked for more
+than this package had designed. All three were resolved with the product owner
+and are recorded here rather than left as drift:
+
+| Gap | Resolution |
+|---|---|
+| Prompt 5 names **barracks and forge**; this package drew five buildings | **Seven.** Barracks and Forge appear as previews with their requirement stated. `WIREFRAMES.md` carries the amendment |
+| Prompt 5 asks the player to **meet a named smith** | A household card on the House Seat. Fake data; he is idle until a forge exists |
+| Prompt 5 asks to **assign or confirm basic production** | **Confirm** — a completed production site states what it yields, read-only. No workforce model was invented |
+
+Two further changes came out of looking at the built screens:
+
+- **The site row wraps rather than scrolls.** Seven plots do not fit across a
+  1280px viewport, and a clipped final plot reads as broken rather than
+  scrollable.
+- **The resource bar keeps its labels on mobile.** The package said it
+  "collapses to values"; implemented literally with `display: none`, that
+  removed the names from the accessibility tree as well as the screen, leaving
+  everyone with a row of bare numbers. It now wraps to two lines instead.
+
 ## Approval
 
 The acceptance criteria for Prompt 4:

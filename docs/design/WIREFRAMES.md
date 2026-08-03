@@ -5,6 +5,13 @@
 Low fidelity on purpose. These fix **layout, hierarchy and copy** — not pixels.
 Prompt 5 owns the visual execution using `VISUAL-LANGUAGE.md`.
 
+> **Amended by Prompt 5 (3 August 2026): the site holds seven buildings, not
+> five.** Prompt 5 asks the player to "build or preview the House Hall,
+> storehouse, barracks, and forge", and Prompt 11 lists Barracks and Forge as
+> Foundations of Iron buildings. They are shown as **previews** — visible on the
+> site with the reason they cannot be raised — beside the five raisable ones.
+> The drawings below show five plots; read them as seven.
+
 **Reading key**
 
 ```

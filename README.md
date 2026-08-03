@@ -5,13 +5,19 @@ House from a frontier outpost into a regional power, masters weapon forging from
 crude arms to steel masterworks, and eventually discovers runes and risks them in
 Runeforging.
 
-**Current stage: Prompt 3 — the first domain model exists.** One Arkazian House
-establishes an outpost, constructs buildings, and manages the six universal
-resources. The rules are enforced and tested, and the House aggregate persists
-to PostgreSQL.
+**Current stage: Prompt 5 — the first player-facing screen exists.** A House
+Seat for a new minor Arkazian House, built from typed fake data: the six
+resources, seven buildings on the site, a named smith, and what changed and what
+needs attention on return.
 
-Nothing is playable yet: there is no API over the domain and no screen for it.
-Forging, armies and battles are later prompts.
+It is a **mock**. The screens do not talk to the domain — there is no API over
+it — and nothing is saved. Committing resources, forging, armies and battles are
+later prompts.
+
+```bash
+cd web && npm run dev        # http://localhost:5173
+                             # ?scenario=returning for the construction demo
+```
 
 - Product source of truth: [`docs/Weapons_of_Chaos_and_Order_Game_Workbase.md`](docs/Weapons_of_Chaos_and_Order_Game_Workbase.md)
 - Execution contract: [`docs/Weapons_of_Chaos_and_Order_Agent_AI_Implementation_Prompts.md`](docs/Weapons_of_Chaos_and_Order_Agent_AI_Implementation_Prompts.md)
@@ -27,7 +33,7 @@ Forging, armies and battles are later prompts.
 | Tool | Version | Check |
 |---|---|---|
 | .NET SDK | 10.0.200 (pinned in `global.json`) | `dotnet --list-sdks` |
-| Node.js | 22 (pinned in `.nvmrc`) | `node --version` |
+| Node.js | **22.23.2** (`.nvmrc`); minimum **22.22.2** | `node --version` |
 | Docker Desktop | with Compose v2 | `docker compose version` |
 
 Nothing else. **No Azure account and no paid service is required.**
@@ -74,10 +80,20 @@ npm ci
 npm run dev
 ```
 
-Open <http://localhost:5173>. The page shows the application name, environment,
-server time and database state — all fetched from the backend. The Vite dev
-server proxies `/api` to `http://localhost:5080`, which is why the backend needs
-no CORS configuration.
+Open <http://localhost:5173>. You arrive at the House Seat: the six resources,
+the site and its seven buildings, the household, and one clear first task.
+
+| URL | Shows |
+|---|---|
+| `/` | First session — nothing built, one primary action |
+| `/?scenario=returning` | The Lumber Yard already under construction. The **Advance 20 minutes** control at the foot of the page carries it to completion |
+| `/settlement` | All seven buildings with their costs |
+
+The screens are **fake data**. Nothing is saved, and nothing reaches the domain
+model. The one real call to the backend is `/api/v1/platform/status`, which
+drives the offline banner — so if you skip step 2, the banner appears and that
+is correct behaviour rather than a fault. The Vite dev server proxies `/api` to
+`http://localhost:5080`, which is why the backend needs no CORS configuration.
 
 ---
 
@@ -109,6 +125,7 @@ dotnet test
 npm ci
 npm run lint
 npm run typecheck
+npm run test
 npm run build
 
 # Documentation
@@ -180,8 +197,12 @@ src/Woo.Api/         one ASP.NET Core application
   Features/          one folder per feature — Houses, Settlements, Resources
   Content/           starter catalogues, static C#
   Persistence/       WooDbContext, Configurations/, Migrations/
-tests/Woo.Tests/     the one test project
+tests/Woo.Tests/     the backend test project
 web/                 React, TypeScript and Vite client
+  src/api/           the typed adapter seam — swap fake for real here
+  src/features/      House Seat, settlement, household
+  src/components/    shared components
+  src/assets/        placeholder art and the fallback chain
 docker/              PostgreSQL only
 docs/                planning documents, architecture, ADRs, status
 project_sources/     the lore canon — 12 files, read before touching lore

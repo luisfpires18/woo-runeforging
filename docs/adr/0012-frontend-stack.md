@@ -1,8 +1,14 @@
 # ADR-0012 — Frontend stack and a single TypeScript compiler
 
-**Status:** Accepted
+**Status:** Superseded in part by [ADR-0015](0015-frontend-routing-and-tests.md)
 **Date:** 3 August 2026
 **Supersedes:** [ADR-0002](0002-frontend-stack.md)
+
+> **Partly superseded by [ADR-0015](0015-frontend-routing-and-tests.md) on 3 August 2026.**
+> The single-TypeScript decision below still stands. What changed: a test
+> runner now exists (Vitest, as this ADR's own trigger anticipated), routing
+> is a project-owned History-API router rather than React Router, and the
+> Node floor rose to 22.22.2.
 
 ---
 

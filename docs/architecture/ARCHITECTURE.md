@@ -52,7 +52,7 @@ Verified against the package registries on 3 August 2026.
 | Npgsql.EntityFrameworkCore.PostgreSQL | 10.0.3 | Matches EF Core 10 |
 | PostgreSQL | 18 (`postgres:18-alpine`) | Docker Compose only |
 | xunit.v3 | 3.2.2 | With `xunit.runner.visualstudio` 3.1.5 for `dotnet test` discovery |
-| Node.js | **22** (`.nvmrc`) | Satisfies Vite 8's `>=22.12`; matches the installed 22.18.0 |
+| Node.js | **22.23.2** (`.nvmrc`) | Floor is `>=22.22.2` in `package.json` engines — jsdom 30's requirement. `.nvmrc` pins the version actually run |
 | React | 19.2.8 | |
 | Vite | 8.2.0 | With `@vitejs/plugin-react` 6.0.5 |
 | **TypeScript** | **6.0.3 — one install, no alias** | See below |

@@ -194,6 +194,7 @@ dotnet test
 npm ci
 npm run lint             # typescript-eslint, type-aware
 npm run typecheck        # tsc --noEmit, one TypeScript 6.0.3 install
+npm run test             # vitest
 npm run build
 
 # Documentation
@@ -206,19 +207,21 @@ Every command above is runnable today and is what
 command is added to this list in the same change that makes it runnable — never
 before.
 
-There is no frontend test runner and no content validator yet. They arrive with
-the code they would validate (Prompts 5 and 3).
+There is no content validator yet; it arrives with authored content.
 
 ---
 
 ## 8. Current stage
 
-**Prompt 4 (UX and visual design) is complete, uncommitted, awaiting design
-approval.** It is a package of documents in
-[`docs/design/`](docs/design/) — no code, no change to `web/`.
+**Prompt 5 (the mocked House Seat) is complete, uncommitted, awaiting review.**
+The web client now shows a House Seat and settlement for a new minor Arkazian
+House, built from **typed fake data**. No API over the domain, nothing saved.
 
-**Prompt 3 (the first domain model) is complete and committed** — `97248cb` and
-`9483047`, pushed, CI green.
+**Prompt 4 (UX and visual design) is committed** — `f084304`. The design package
+lives in [`docs/design/`](docs/design/) and Prompt 5 amended it in two places
+(seven buildings, and the mobile resource bar).
+
+**Prompt 3 (the first domain model) is committed** — `97248cb`, `9483047`.
 
 The repository holds one ASP.NET Core application with `Houses`, `Settlements`
 and `Resources` feature folders; a static C# starter-content catalogue; the
@@ -235,8 +238,16 @@ the prompts that mock and then build them, along with four of the prompt's six
 rules. See
 [`docs/implementation/STATUS.md §2.1`](docs/implementation/STATUS.md).
 
-Next: **Prompt 5 — the mocked House Seat and outpost onboarding**, over typed
-fake data, built from the approved design package. Do not begin it without the
-product owner's instruction, and read
-[`docs/design/README.md`](docs/design/README.md) first — if a needed decision is
-missing there, fix the package rather than inventing an answer in a component.
+Next: **Prompt 6 — the mocked construction and forging loop**: reserving
+resources, resolving shortages, completing a construction, and the first craft.
+Do not begin it without the product owner's instruction.
+
+Two standing rules the frontend now depends on:
+
+- **The adapter seam.** Components consume `HouseState` through
+  `web/src/api/HouseStateProvider.tsx`. Nothing under `features/` or
+  `components/` may import from `api/fake/` — ESLint enforces it, so that
+  replacing fake state with real endpoints stays a change in one file.
+- **Read [`docs/design/README.md`](docs/design/README.md) before building a
+  screen.** If a decision it should carry is missing, fix the package rather
+  than inventing an answer inside a component.

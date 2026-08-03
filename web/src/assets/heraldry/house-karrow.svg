@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 72" role="img" aria-hidden="true">
+  <!-- House Karrow. The terminal fallback: every asset chain ends here, so this
+       file must always exist. Placeholder art. -->
+  <path d="M4 4h56v40c0 14-12 21-28 24C16 65 4 58 4 44Z" fill="#241f1b" stroke="#8c7d6c" stroke-width="2"/>
+  <path d="M32 16 42 34H22Z" fill="#e97a6f"/>
+  <rect x="20" y="38" width="24" height="5" fill="#8c7d6c"/>
+  <path d="M32 46v12" stroke="#8fa4b8" stroke-width="3" stroke-linecap="square"/>
+</svg>

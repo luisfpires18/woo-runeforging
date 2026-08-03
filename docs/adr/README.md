@@ -23,7 +23,8 @@ one without reading the others.
 | # | Decision | Status |
 |---|---|---|
 | [0011](0011-minimal-platform-shape.md) | **Minimal platform shape** — one ASP.NET Core 10 application with feature folders; no worker, no durable-job engine, no outbox, no architecture-test framework; `/api/v1` retained | Accepted |
-| [0012](0012-frontend-stack.md) | **Frontend stack** — React 19, Vite 8 and **one** plain `typescript@6.0.3`; no compiler alias pair, no PixiJS, no test runner yet | Accepted |
+| [0012](0012-frontend-stack.md) | **Frontend stack** — React 19, Vite 8 and **one** plain `typescript@6.0.3`; no compiler alias pair, no PixiJS | Accepted, **partly superseded by [0015](0015-frontend-routing-and-tests.md)** |
+| [0015](0015-frontend-routing-and-tests.md) | **Frontend routing, test runner and the Node floor** — a project-owned History-API router instead of React Router (every 7.x release carries a high-severity advisory); Vitest with Testing Library; Node ≥ 22.22.2; the adapter boundary as a lint rule | Accepted |
 | [0013](0013-persistence.md) | **Persistence** — PostgreSQL 18, one `WooDbContext`, default schema, EF Core migrations from Prompt 3, explicit transactions, elapsed time as stored timestamps | Accepted |
 | [0014](0014-local-development-and-ci.md) | **Local development and CI** — Compose for PostgreSQL only on host port 5433, GitHub Actions for build/test/lint/typecheck, no deployment or infrastructure code | Accepted |
 
@@ -58,7 +59,8 @@ worth being able to re-read.
 | Architecture tests and assembly boundaries | The module count makes review-based enforcement unreliable | [0011](0011-minimal-platform-shape.md) |
 | TypeScript 7 | 7.1 ships with a programmatic API **and** `typescript-eslint` supports it | [0012](0012-frontend-stack.md) |
 | PixiJS | Prompt 7, the first battle replay | [0012](0012-frontend-stack.md) |
-| Frontend test runner | Prompt 5, when there are components worth testing | [0012](0012-frontend-stack.md) |
+| ~~Frontend test runner~~ | **Done at Prompt 5** — Vitest | [0015](0015-frontend-routing-and-tests.md) |
+| React Router | Routing needs loaders, route params, nested layouts or code-splitting — **or** a 7.x release lands with a clean audit | [0015](0015-frontend-routing-and-tests.md) |
 | More schemas or more `DbContext`s | Measured contention or a real ownership dispute | [0013](0013-persistence.md) |
 | Clock abstraction and project-owned PRNG | Prompt 14, the first simulation code | [0013](0013-persistence.md) |
 | Permanent/seasonal schema boundary | Prompt 27, when seasons exist | [0013](0013-persistence.md) |
