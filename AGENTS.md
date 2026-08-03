@@ -212,10 +212,17 @@ the code they would validate (Prompts 5 and 3).
 
 ## 8. Current stage
 
-**Prompt 2 (platform bootstrap) is complete, pending review.** The repository
-holds one ASP.NET Core application, one test project, a React/Vite shell, Docker
-Compose for PostgreSQL, and CI. There is **no gameplay, no lore data, no
-authentication and no deployed infrastructure**.
+**Prompt 2 (platform bootstrap) is complete, reviewed and committed.** The
+repository holds one ASP.NET Core application, one test project, a React/Vite
+shell, Docker Compose for PostgreSQL, CI, and the 12 canon files in
+[`project_sources/`](project_sources/). There is **no gameplay, no
+authentication and no deployed infrastructure** — the canon is source material,
+not gameplay data.
+
+| Commit | Contents |
+|---|---|
+| `c1b3c98` | Platform bootstrap and the simplified architecture package |
+| `a1067a7` | Review corrections and the 12 canon files |
 
 Prompt 2 also corrected the Prompt 1 architecture package, which had designed a
 separate worker, durable jobs, a transactional outbox, object storage, six

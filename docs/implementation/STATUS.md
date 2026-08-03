@@ -2,12 +2,19 @@
 
 **Last updated:** 3 August 2026
 **Current stage:** Prompt 2 — simplified architecture and platform bootstrap ·
-**implemented and reviewed**
+**implemented, reviewed and committed**
 **Next:** Prompt 3 — Foundations of Iron domain model · **unblocked**, awaiting
 the product owner's instruction
 
-Prompt 2 was implemented, reviewed by the product owner, and corrected on the
-review's findings (§2.3). The change set is **uncommitted**, by instruction.
+Prompt 2 was implemented, reviewed by the product owner, corrected on the
+review's findings (§2.3), and committed.
+
+| Commit | Contents |
+|---|---|
+| `c1b3c98` — *feat(platform): bootstrap minimal application stack* | The platform and the simplified architecture package |
+| `a1067a7` — *fix(platform): complete Prompt 2 review corrections* | The four review corrections, the `.env` relocation, and the 12 canon files |
+
+`master` is level with `origin/master`, so both commits are pushed.
 
 ---
 
@@ -70,11 +77,16 @@ documentation and the decision record.
 
 ### 1.3 Deliberately not delivered
 
-Gameplay · lore data · authentication · a separate worker · background-job
-infrastructure · a transactional outbox · object storage or Azurite · PixiJS ·
-Redis or a message broker · a second `DbContext` or per-feature schemas ·
-OpenTelemetry · architecture-test frameworks · Azure resources · Bicep ·
-deployment or image-publishing workflows · Kubernetes · microservices.
+Gameplay · authentication · a separate worker · background-job infrastructure ·
+a transactional outbox · object storage or Azurite · PixiJS · Redis or a message
+broker · a second `DbContext` or per-feature schemas · OpenTelemetry ·
+architecture-test frameworks · Azure resources · Bicep · deployment or
+image-publishing workflows · Kubernetes · microservices.
+
+`project_sources/` is in the repository as of `a1067a7`, but **no lore reached
+the application.** The canon is unread reference material for Prompt 3: there is
+no rune, kingdom, resource or content record in the code, the schema or the
+web client.
 
 Also not delivered, on the product owner's instruction: **an initial EF Core
 migration**. The first migration is created in Prompt 3 with the first real
@@ -298,7 +310,7 @@ rather than from Vite.
 | Not run | Reason |
 |---|---|
 | **The page loaded in a real browser** | Not executed. The proxied request was verified with `curl`, and the component renders that response, but **no human or automated browser check was performed.** This is the one acceptance criterion resting on inference |
-| CI workflow | Nothing is committed or pushed; `validate.yml` has never executed |
+| **CI workflow result** | `c1b3c98` and `a1067a7` are pushed to `master`, so `validate.yml` has been triggered. **Its outcome has not been checked from this machine** — `gh` is not installed here. Confirm it on GitHub before relying on it |
 | Frontend tests | No test runner exists — Prompt 5 |
 | EF Core migrations | None exist — Prompt 3 |
 | Content validation | No content or validator — Prompt 3 |
@@ -332,8 +344,8 @@ files**, supplied by the product owner and unchanged.
 | `zandres.md` | 64 | 2,099 | Kingdom |
 
 Verified: 12 `.md` files, **no non-Markdown files**, none empty, none excluded
-by `.gitignore`. The directory is untracked and will enter git with the review
-commit.
+by `.gitignore`. All 12 are tracked, committed in `a1067a7` and pushed
+(`git ls-files project_sources` → 12).
 
 The seven kingdoms, the Aura ladder, the rune catalogue and the Chaos/Order
 material together cover what
@@ -370,9 +382,9 @@ change set.** Two block Prompt 31.
 | 2 | The frontend renders a structural shell and successfully calls the API | **Partly evidenced** — the proxied call returns 200 from Kestrel (§3.6) and the build succeeds; the rendered page has not been opened in a browser |
 | 3 | The solution builds and the focused tests pass | **Met** — 6/6 passed |
 | 4 | The frontend type-checks and lints | **Met** |
-| 5 | CI runs the same core build and test commands | **Written for `master`, not executed** — nothing is pushed |
+| 5 | CI runs the same core build and test commands | **Written for `master` and triggered by the push; result unverified from this machine** (§4). The same commands were run locally and all passed |
 | 6 | No secrets committed | **Met** — only `docker/.env.example` and local Compose credentials; `.gitignore` covers `.env`, `appsettings.*.local.json`, `secrets.json`, key material |
-| 7 | No gameplay or future infrastructure implemented | **Met** — no entities (asserted by a test), no lore, none of the banned infrastructure |
+| 7 | No gameplay or future infrastructure implemented | **Met** — no entities (asserted by a test), no lore in the application, none of the banned infrastructure. The canon files are source material only (§1.3) |
 | 8 | Architecture docs no longer prescribe unused infrastructure | **Met** — §1.2 |
 | 9 | One TypeScript compiler | **Met** — §3.5 |
 | 10 | Local development needs no Azure or paid service | **Met** |
@@ -425,4 +437,5 @@ present but unread; Prompt 2 had no reason to open them.
 |---|---|---|
 | 2026-08-01 | 1 | Repository initialised. Architecture package, 10 ADRs, glossary, operations docs, slice traceability, validation scripts. |
 | 2026-08-03 | 2 | Architecture package simplified: ARCHITECTURE.md rewritten, SLICES.md trimmed, `docs/operations/` deleted, ADRs 0001–0010 superseded by 0011–0014. Platform bootstrapped: one ASP.NET Core application, one test project, React/Vite shell, Compose for PostgreSQL, CI. Dual TypeScript compiler removed. PostgreSQL 18 mount path and a port-5432 collision with a native service found and fixed. |
-| 2026-08-03 | 2 (review) | Corrections applied: CI retargeted to `master`; `.env` documented as Compose-only and its template moved to `docker/.env.example` where Compose actually reads it; status recorded as reviewed. `project_sources/` supplied — 12 canon files verified, **Prompt 3 gate closed**. |
+| 2026-08-03 | 2 (review) | Corrections applied: CI retargeted to `master`; `.env` documented as Compose-only and its template moved to `docker/.env.example` where Compose actually reads it; status recorded as reviewed. `project_sources/` supplied — 12 canon files verified, **Prompt 3 gate closed**. Committed as `a1067a7`. |
+| 2026-08-03 | 2 (cleanup) | Corrected stale statements that the commit made false: "pending review", "uncommitted", "the directory is untracked", and the two claims that CI had never run because nothing was pushed. |
