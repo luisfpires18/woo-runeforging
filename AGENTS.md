@@ -213,8 +213,12 @@ the code they would validate (Prompts 5 and 3).
 
 ## 8. Current stage
 
-**Prompt 3 (the first domain model) is complete and committed** — `97248cb`,
-pushed, CI green.
+**Prompt 4 (UX and visual design) is complete, uncommitted, awaiting design
+approval.** It is a package of documents in
+[`docs/design/`](docs/design/) — no code, no change to `web/`.
+
+**Prompt 3 (the first domain model) is complete and committed** — `97248cb` and
+`9483047`, pushed, CI green.
 
 The repository holds one ASP.NET Core application with `Houses`, `Settlements`
 and `Resources` feature folders; a static C# starter-content catalogue; the
@@ -231,5 +235,8 @@ the prompts that mock and then build them, along with four of the prompt's six
 rules. See
 [`docs/implementation/STATUS.md §2.1`](docs/implementation/STATUS.md).
 
-Next: **Prompt 4 — Foundations of Iron UX and visual design.** A design package,
-not code. Do not begin it without the product owner's instruction.
+Next: **Prompt 5 — the mocked House Seat and outpost onboarding**, over typed
+fake data, built from the approved design package. Do not begin it without the
+product owner's instruction, and read
+[`docs/design/README.md`](docs/design/README.md) first — if a needed decision is
+missing there, fix the package rather than inventing an answer in a component.

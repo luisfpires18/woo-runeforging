@@ -94,9 +94,25 @@ rather than listing what canon describes but no prompt has built.
 
 ## Phase B — Model and mock Foundations of Iron
 
+### Prompt 4 — UX and visual design · **complete**
+
+A design package, no code. Seven documents in
+[`../design/`](../design/): journeys, navigation, wireframes for six screens on
+both viewports, the visual language with computed contrast ratios, the component
+and state inventory, and the accessibility requirements.
+
+**Decisions it makes so Prompt 5 does not have to:** the first useful action
+(raise the Lumber Yard — a starter-balance hypothesis, not canon); four domain
+accents each paired with a non-colour cue; a single dark theme; the mobile
+two-tap rule; and where a primary action belongs, including the states that
+correctly have none.
+
+`accent-sylvara` is **reserved for future Sylvaran content** and used nowhere.
+The package assigns Sylvara no role or relationship — no source it works from
+establishes one.
+
 | Prompt | Deliverable | Lands in |
 |---|---|---|
-| 4 | UX and visual design package for the first playable experience | `docs/design/` |
 | 5 | House Seat, settlement view, six resources, first smith — typed fake data | `web/src/` |
 | 5 | Typed adapters so fake state is replaceable without rewriting components | `web/src/api/` |
 | 6 | Reserve resources, resolve shortages, assign a specialist, complete construction | `web/src/` |

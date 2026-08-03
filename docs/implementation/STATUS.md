@@ -1,9 +1,9 @@
 # Implementation status
 
 **Last updated:** 3 August 2026
-**Current stage:** Prompt 3 — House, outpost, buildings and resources ·
-**complete and committed** (`97248cb`)
-**Next:** Prompt 4 — Foundations of Iron UX and visual design
+**Current stage:** Prompt 4 — UX and visual design ·
+**complete, uncommitted, awaiting design approval**
+**Next:** Prompt 5 — the mocked House Seat and outpost onboarding
 
 This document describes **what is true now**. The history of how it got here is
 in the [change log](#9-change-log).
@@ -14,8 +14,10 @@ in the [change log](#9-change-log).
 | 2 | `c1b3c98` | Platform bootstrap and the simplified architecture package |
 | 2 | `a1067a7` | Review corrections and the 12 canon files |
 | 3 | `bb1a1fa`, `97248cb` | The first domain model, starter content and migration |
+| 3 | `9483047` | Review corrections — the construction ordering defect |
+| 4 | *uncommitted* | The design package — documents only |
 
-`master` is level with `origin/master`. **CI is green on every commit**,
+`master` is level with `origin/master`. **CI is green on every pushed commit**,
 verified against the GitHub Actions API on 3 August 2026:
 
 ```
@@ -40,12 +42,78 @@ a1067a7  validate  completed  success
 | Tests | 32, in one project |
 | CI | `validate.yml` on `master` — backend against a real PostgreSQL service container, frontend, docs |
 | Canon | 12 files in [`project_sources/`](../../project_sources/), **present and read in full** |
+| Design | Seven documents in [`../design/`](../design/) — the first playable experience, designed but not built |
 
 **Not built:** forge, smith, crafts, equipment batches · companies, armies,
 battles · runes in any form · markets, contracts, Orders, Warfronts, seasons ·
 settlement stages beyond Outpost · the other six kingdoms · resource accrual,
 storage capacity, procurement · authentication · background jobs, outbox,
 idempotency keys · object storage · PixiJS · Azure, deployment, Kubernetes.
+
+---
+
+## 1a. Prompt 4 — the design package
+
+**A package of documents. No code, no change to `web/`, no CSS.** Seven files in
+[`../design/`](../design/): journeys, navigation, wireframes, visual language,
+components and states, accessibility, and an index.
+
+### 1a.1 Decisions it makes so Prompt 5 does not have to
+
+**The first useful action — raise the Lumber Yard.** Presented on the
+first-session House Seat as the single filled button. **A starter-balance and
+playtest hypothesis, not canon:** it is the cheapest building and timber appears
+in every other cost. Nothing in `project_sources/` makes Arkazia timber-poor —
+`arkazia.md` lists alpine forests beside its iron-rich slopes. Prompt 8's
+playtest confirms or overturns it.
+
+**Four domain accents, each with a non-colour cue** — settlement ash-blue,
+forge ember, army crimson tint, consequence wound-red — so the acceptance
+criterion about distinct identities does not rest on hue. The greyscale test is
+written into `ACCESSIBILITY.md` §3.
+
+**A single dark theme.** Forge-dark surfaces, warm firelight accents. Half the
+tokens and half the contrast work of dual themes, and it matches the canon's own
+description of Arkazia.
+
+**`accent-sylvara` is reserved and unused.** The package allocates the colour for
+future Sylvaran content and stops there. It assigns Sylvara **no role,
+relationship or disposition**, because none of the sources this prompt works
+from establishes one.
+
+**One primary action is an onboarding device, not a law.** It holds for the
+first-session House Seat. Returning sessions may lead with a different action,
+and several states correctly have none — an error offers a retry, not a next
+move. `COMPONENTS-AND-STATES.md` §4 records which is which.
+
+**The mobile rule:** any control that commits resources, confirms a craft or
+chooses a destination is reachable in at most two taps, with no nested modal.
+
+### 1a.2 Contrast was computed, and four colours failed
+
+Every foreground/background pair was calculated against the WCAG relative
+luminance formula rather than eyeballed. The first palette failed in four
+places:
+
+| Token | First value | Worst ratio | Corrected to | Worst ratio |
+|---|---|---:|---|---:|
+| `accent-army` | `#C0392F` | 2.68 | `#E97A6F` | **5.18** |
+| `text-muted` | `#8A8074` | 3.75 | `#9A9083` | **4.63** |
+| `danger` | `#D45C50` | 3.77 | `#E4756A` | **4.88** |
+| `border-interactive` | `#7A6C5D` | 2.86 | `#8C7D6C` | **3.65** |
+
+Canon says Arkazian *crimson cloth*, and true crimson cannot carry text on dark
+ground. The token is the lightened tint; deep crimson stays available for
+illustration and heraldry, where it carries no text. That trade-off is recorded
+in `VISUAL-LANGUAGE.md` §2.3 rather than left as an unexplained deviation.
+
+### 1a.3 Screens for systems that do not exist
+
+Forge, Army and Battle report are designed here and were not built by Prompt 3.
+That is intended — Prompt 4 designs the whole first experience, and Prompts 6–7
+mock those parts in turn. **Navigation shows only what exists:** an area that has
+not arrived is absent, never a disabled tab, because a disabled control is an
+advertisement.
 
 ---
 
@@ -217,7 +285,9 @@ $ curl http://localhost:5080/api/v1/platform/status
 
 | Not run | Why |
 |---|---|
-| Any browser check of the web shell | Prompt 3 changed no frontend code. The shell's behaviour was last verified by `curl` through the Vite proxy at Prompt 2; the rendered page has never been opened by a human or a browser test |
+| **Mermaid diagram rendering** | No renderer in this toolchain. The five diagrams in the design package are written to documented syntax but have **not been visually confirmed** |
+| **Any human read of the design package** | It is an argument, not a result. Nothing in it is proven until a person reads the screens and a tester plays them — that is the Prompt 8 gate |
+| Any browser check of the web shell | Prompt 3 and Prompt 4 changed no frontend code. The shell's behaviour was last verified by `curl` through the Vite proxy at Prompt 2; the rendered page has never been opened by a human or a browser test |
 | Frontend tests | No test runner exists — Prompt 5 |
 | Anything gameplay-facing | No endpoint exposes the domain, by design |
 | Mermaid diagram rendering | No renderer in the toolchain |
@@ -261,6 +331,17 @@ process.
 
 ## 6. Acceptance criteria
 
+### Prompt 4
+
+| # | Criterion | Result |
+|---|---|---|
+| 1 | The first useful action is obvious | **Met** — one filled button on the first-session House Seat, named, with its reasoning and its status as a hypothesis |
+| 2 | Settlement growth, forging, army readiness and consequence have distinct visual identities | **Met** — four accents, each paired with a shape cue and a label; greyscale test defined |
+| 3 | Mobile preserves all essential decisions | **Met** — the two-tap rule, a mobile wireframe per screen, no desktop-only decision |
+| 4 | Specific enough for Prompt 5 without inventing the product design | **Met as far as a document can be** — literal token values, a wireframe per screen, copy per state, and a handoff contract. **Only Prompt 5 can prove this**, by finding out whether it had to invent anything |
+
+### Prompt 3
+
 | # | Criterion | Result |
 |---|---|---|
 | 1 | First-slice rules understandable and covered by focused tests | **Met** — 5 tests for the resource rule, 11 for construction |
@@ -286,38 +367,37 @@ process.
 
 ---
 
-## 8. Readiness for Prompt 4
+## 8. Readiness for Prompt 5
 
-**Ready.** Prompt 3 stopped at the platform gate: are the repository, feature
-folders and first contracts ready for gameplay?
+**Ready, pending design approval.** Prompt 4 stops at a design gate, not a
+technical one — the package is an argument about the product, and only a person
+can accept it.
 
 | Criterion | Status |
 |---|---|
+| Design package complete against every listed deliverable | Yes — seven documents |
+| Every Prompt 4 acceptance criterion answered | Yes — §6 |
+| Tokens carry literal values, contrast computed | Yes — four colours corrected to reach AA |
+| Code untouched and still green | Yes — 32 tests, format, lint, typecheck, build |
 | Platform runs from a clean checkout | Yes |
-| Backend, tests, format, lint, typecheck and build all green | Yes — 32 tests |
-| CI green on the committed state | Yes — verified via the Actions API |
-| Schema applies to an empty database with no manual step | Yes |
-| The suite is repeatable and leaves no data behind | Yes — verified twice in a row |
-| Architecture documentation matches what exists | Yes |
-| Decision record current and consistent | Yes — 0011–0014 accepted, no new ADR needed |
-| Glossary reconciled with canon for the built slice | Yes, with the conflict register |
 | Canon present and read | Yes — all 12 files |
-| No secrets, no deferred infrastructure | Yes |
+| Documentation links resolve | Yes |
+| **Design approved by the product owner** | **No — this is the gate** |
 
-**Prompt 4 delivers a design package, not code:** first-session and returning
-journeys, information architecture, low-fidelity wireframes, a grounded Arkazian
-visual direction, tokens, a component inventory, desktop and mobile layouts, and
-the loading, empty, error and offline states.
+**Prompt 5 builds the mocked House Seat and outpost onboarding** over typed fake
+data, from the approved package.
 
-Two things Prompt 4 should know:
+Three things Prompt 5 should know:
 
-- **The domain has no API surface.** Nothing is reachable from the browser yet,
-  by design — Prompt 5 builds the mocked screens over typed fake data.
-- **The design covers systems this prompt did not build** — forge, army, battle
-  report. That is correct: Prompt 4 designs the whole first experience, and
-  Prompts 6–7 mock the parts the domain has not reached.
+- **Read [`../design/README.md`](../design/README.md) first.** It carries the
+  handoff contract: which document answers which question.
+- **Prompt 5 creates `tokens.css`** from `VISUAL-LANGUAGE.md`. Prompt 4 left no
+  code behind because it ended at "stop for design approval".
+- **A gap in the package is a defect in the package.** Fix it there rather than
+  inventing an answer inside a component — a decision made in passing inside a
+  component is a decision nobody reviewed.
 
-> **Do not begin Prompt 4 without the product owner's instruction.**
+> **Do not begin Prompt 5 without the product owner's instruction.**
 
 ---
 
@@ -330,4 +410,5 @@ Two things Prompt 4 should know:
 | 2026-08-03 | 2 (review) | CI retargeted to `master`. `.env` documented as Compose-only, and its template moved to `docker/.env.example` — the repository root is not where Compose reads it. `project_sources/` supplied: 12 canon files verified, closing the Prompt 3 gate. |
 | 2026-08-03 | 2 (cleanup) | Corrected statements the commit had made false — "pending review", "uncommitted", "the directory is untracked", and the claims that CI had never run. |
 | 2026-08-03 | 3 | All 12 canon files read. First domain model: House, Outpost settlement, five buildings with construction state, the six resources with the spend rule. Static C# starter content. House-aggregate persistence with enums stored as strings, and the `InitialHouseAggregate` migration. Verified against an empty database and twice in a row. **Narrowed by the product owner**: smith, forge, batch, company and battle contracts deferred, with four of the prompt's six rules (§2.1). |
-| 2026-08-03 | 3 (review) | `.claude/settings.json` untracked and `.claude/` ignored — per-machine tool permissions, not a project decision. **Ordering defect fixed:** `House.BeginConstruction` validated the duration only after spending the cost, so a zero or negative duration left the House poorer with nothing started. The guard moved ahead of the spend, proven by a test that fails against the old ordering. Status and `AGENTS.md` cleaned of claims the commits had made stale. |
+| 2026-08-03 | 3 (review) | `.claude/settings.json` untracked and `.claude/` ignored — per-machine tool permissions, not a project decision. **Ordering defect fixed:** `House.BeginConstruction` validated the duration only after spending the cost, so a zero or negative duration left the House poorer with nothing started. The guard moved ahead of the spend, proven by a test that fails against the old ordering. Status and `AGENTS.md` cleaned of claims the commits had made stale. Committed as `9483047`. |
+| 2026-08-03 | 4 | The design package — seven documents in `docs/design/`, no code. Journeys, navigation, wireframes for six screens on both viewports, visual language with computed contrast, components and states, accessibility. Four colours corrected after the first palette failed AA. The first useful action proposed as a **starter-balance hypothesis, not canon**; `accent-sylvara` reserved with no role assigned. |
