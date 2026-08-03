@@ -51,6 +51,8 @@ public sealed class Building
                 Kind, $"cannot begin construction from {Status}.");
         }
 
+        // Also checked by House.BeginConstruction before it spends anything.
+        // Kept here so the invariant holds for any future caller.
         ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(duration, TimeSpan.Zero);
 
         Status = ConstructionStatus.UnderConstruction;

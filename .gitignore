@@ -64,6 +64,13 @@ __azurite*
 pgdata/
 
 # ---------------------------------------------------------------------------
+# Agent tooling
+#   Per-machine assistant settings — tool permissions and the like. They record
+#   one developer's local approvals, not a project decision.
+# ---------------------------------------------------------------------------
+.claude/
+
+# ---------------------------------------------------------------------------
 # OS and editor noise
 # ---------------------------------------------------------------------------
 Thumbs.db

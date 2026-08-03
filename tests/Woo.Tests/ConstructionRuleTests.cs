@@ -148,6 +148,34 @@ public sealed class ConstructionRuleTests
             house.Settlement.BuildingOf(BuildingKind.HouseHall).Status);
     }
 
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(-3600)]
+    public void An_invalid_duration_leaves_resources_and_building_state_unchanged(int seconds)
+    {
+        // The duration is validated before anything is spent. Checking it only
+        // inside Building would be too late: the cost would already be gone,
+        // leaving the House poorer with nothing under construction.
+        var house = WealthyHouse();
+        var cost = BuildingCatalogue.DefinitionOf(BuildingKind.Mine).Cost;
+
+        var before = Enum.GetValues<ResourceKind>()
+            .ToDictionary(kind => kind, house.Resources.AmountOf);
+
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => house.BeginConstruction(
+                BuildingKind.Mine, cost, TimeSpan.FromSeconds(seconds), Noon));
+
+        Assert.All(before, entry =>
+            Assert.Equal(entry.Value, house.Resources.AmountOf(entry.Key)));
+
+        var mine = house.Settlement.BuildingOf(BuildingKind.Mine);
+        Assert.Equal(ConstructionStatus.NotBuilt, mine.Status);
+        Assert.Null(mine.StartedAtUtc);
+        Assert.Null(mine.CompletesAtUtc);
+    }
+
     [Fact]
     public void A_completed_construction_is_not_re_charged_when_a_second_start_is_rejected()
     {

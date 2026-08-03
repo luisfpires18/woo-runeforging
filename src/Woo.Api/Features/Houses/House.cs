@@ -63,6 +63,9 @@ public sealed class House
     /// <exception cref="InsufficientResourcesException">
     /// The House cannot afford the cost. Nothing is spent and nothing starts.
     /// </exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// The duration is zero or negative. Nothing is spent and nothing starts.
+    /// </exception>
     public void BeginConstruction(
         BuildingKind kind,
         ResourceCost cost,
@@ -71,8 +74,12 @@ public sealed class House
     {
         ArgumentNullException.ThrowIfNull(cost);
 
-        // Ask the building first: a second start on a completed building must
-        // not spend resources before it is rejected.
+        // Everything that can reject this call is checked before anything is
+        // spent, so a rejected start always leaves the House exactly as it was.
+        // Validating the duration inside Building would be too late: the cost
+        // would already be gone.
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(duration, TimeSpan.Zero);
+
         var building = Settlement.BuildingOf(kind);
 
         if (building.Status != ConstructionStatus.NotBuilt)

@@ -150,13 +150,13 @@ the next numbered prompt.
 
 | Gate | Status | Blocks |
 |---|---|---|
-| **`project_sources/` present** | **READY** — 12 canon Markdown files are in the repository (3 August 2026) | Nothing. Prompt 3 may proceed once the product owner instructs it. |
-| **`project_sources/` read** | **Open per task** — read them before touching lore | Any change involving lore, kingdoms, Aura, runes, Runeforged Weapons, Chaos Weapons or Order Weapons |
+| **`project_sources/` present** | **Closed** — 12 canon Markdown files, in the repository since 3 August 2026 and read in full | Nothing |
+| **`project_sources/` read for the task at hand** | **Standing** — read them before touching lore | Any change involving lore, kingdoms, Aura, runes, Runeforged Weapons, Chaos Weapons or Order Weapons |
 
-Prompt 3 defines rune families, fusion compatibility, destructibility policy,
-Aura metadata, kingdom definitions and named-material catalogues. All of that
-is canon-derived. **Do not author it from the Workbase summaries alone** — the
-canon is now present, so there is no longer any excuse to.
+Rune families, fusion compatibility, destructibility policy, Aura metadata,
+kingdom definitions and named-material catalogues are **canon-derived**. Do not
+author any of them from the Workbase summaries — the canon is present, so there
+is no excuse to.
 
 The 12 files, unchanged as supplied:
 
@@ -213,19 +213,14 @@ the code they would validate (Prompts 5 and 3).
 
 ## 8. Current stage
 
-**Prompt 3 (first domain model) is complete, uncommitted, awaiting review.**
-
-| Prompt | Commit | Contents |
-|---|---|---|
-| 2 | `c1b3c98` | Platform bootstrap and the simplified architecture package |
-| 2 | `a1067a7` | Review corrections and the 12 canon files |
-| 3 | *uncommitted* | First domain model, starter content, first migration |
+**Prompt 3 (the first domain model) is complete and committed** — `97248cb`,
+pushed, CI green.
 
 The repository holds one ASP.NET Core application with `Houses`, `Settlements`
 and `Resources` feature folders; a static C# starter-content catalogue; the
 House aggregate persisted through the `InitialHouseAggregate` migration; one
-test project (29 tests); a React/Vite shell; Docker Compose for PostgreSQL; CI;
-and the 12 canon files in [`project_sources/`](project_sources/).
+test project; a React/Vite shell; Docker Compose for PostgreSQL; CI on `master`;
+and the 12 canon files in [`project_sources/`](project_sources/), read in full.
 
 There is **no forge, no army, no battle, no rune, no authentication, no API
 surface over the domain, and no deployed infrastructure.**
@@ -233,7 +228,8 @@ surface over the domain, and no deployed infrastructure.**
 **Prompt 3 was deliberately narrowed by the product owner** — smith, forge
 capability, equipment batches, companies and battle contracts were deferred to
 the prompts that mock and then build them, along with four of the prompt's six
-rules. See [`docs/implementation/STATUS.md §0.1`](docs/implementation/STATUS.md).
+rules. See
+[`docs/implementation/STATUS.md §2.1`](docs/implementation/STATUS.md).
 
 Next: **Prompt 4 — Foundations of Iron UX and visual design.** A design package,
 not code. Do not begin it without the product owner's instruction.
