@@ -35,6 +35,14 @@ builder.Services
 
 var app = builder.Build();
 
+// Development only, so a clean checkout is one command to run. Applying
+// migrations elsewhere stays an explicit, reviewed step — see ADR-0013.
+if (app.Environment.IsDevelopment())
+{
+    await using var scope = app.Services.CreateAsyncScope();
+    await scope.ServiceProvider.GetRequiredService<WooDbContext>().Database.MigrateAsync();
+}
+
 app.MapHealthEndpoints();
 app.MapPlatformEndpoints();
 

@@ -5,9 +5,13 @@ House from a frontier outpost into a regional power, masters weapon forging from
 crude arms to steel masterworks, and eventually discovers runes and risks them in
 Runeforging.
 
-**Current stage: Prompt 2 — the platform exists and nothing else does.** There is
-no gameplay. The application starts, reaches PostgreSQL, and the web client
-successfully calls one API endpoint. That is the whole feature set.
+**Current stage: Prompt 3 — the first domain model exists.** One Arkazian House
+establishes an outpost, constructs buildings, and manages the six universal
+resources. The rules are enforced and tested, and the House aggregate persists
+to PostgreSQL.
+
+Nothing is playable yet: there is no API over the domain and no screen for it.
+Forging, armies and battles are later prompts.
 
 - Product source of truth: [`docs/Weapons_of_Chaos_and_Order_Game_Workbase.md`](docs/Weapons_of_Chaos_and_Order_Game_Workbase.md)
 - Execution contract: [`docs/Weapons_of_Chaos_and_Order_Agent_AI_Implementation_Prompts.md`](docs/Weapons_of_Chaos_and_Order_Agent_AI_Implementation_Prompts.md)
@@ -96,6 +100,7 @@ These are exactly the commands CI runs.
 
 ```bash
 # Backend — needs PostgreSQL running
+dotnet tool restore                 # dotnet-ef, for migrations
 dotnet format --verify-no-changes
 dotnet build -c Release
 dotnet test
@@ -171,10 +176,25 @@ string is missing. `docker/.env` is gitignored; no secret is committed.
 ## Layout
 
 ```
-src/Woo.Api/      one ASP.NET Core application, organised by feature folder
-tests/Woo.Tests/  the one test project
-web/              React, TypeScript and Vite client
-docker/           PostgreSQL only
-docs/             planning documents, architecture, ADRs, status
-scripts/          documentation checks
+src/Woo.Api/         one ASP.NET Core application
+  Features/          one folder per feature — Houses, Settlements, Resources
+  Content/           starter catalogues, static C#
+  Persistence/       WooDbContext, Configurations/, Migrations/
+tests/Woo.Tests/     the one test project
+web/                 React, TypeScript and Vite client
+docker/              PostgreSQL only
+docs/                planning documents, architecture, ADRs, status
+project_sources/     the lore canon — 12 files, read before touching lore
+scripts/             documentation checks
 ```
+
+### Migrations
+
+```bash
+dotnet tool restore
+dotnet ef migrations list --project src/Woo.Api
+dotnet ef migrations add <Name> --project src/Woo.Api --output-dir Persistence/Migrations
+```
+
+The API applies migrations automatically **in Development only**, so the first
+run needs no separate step. Anywhere else it is an explicit, reviewed action.

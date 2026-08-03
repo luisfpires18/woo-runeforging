@@ -1,20 +1,190 @@
 # Implementation status
 
 **Last updated:** 3 August 2026
-**Current stage:** Prompt 2 — simplified architecture and platform bootstrap ·
-**implemented, reviewed and committed**
-**Next:** Prompt 3 — Foundations of Iron domain model · **unblocked**, awaiting
-the product owner's instruction
+**Current stage:** Prompt 3 — House, outpost, buildings and resources ·
+**complete, uncommitted, awaiting review**
+**Next:** Prompt 4 — Foundations of Iron UX and visual design
 
-Prompt 2 was implemented, reviewed by the product owner, corrected on the
-review's findings (§2.3), and committed.
+| Prompt | Commit | Contents |
+|---|---|---|
+| 2 | `c1b3c98` | The platform and the simplified architecture package |
+| 2 | `a1067a7` | Review corrections, the `.env` relocation, and the 12 canon files |
+| 3 | *uncommitted* | The first domain model, starter content and migration |
 
-| Commit | Contents |
+---
+
+## 0. Prompt 3 — what was built
+
+**One Arkazian House establishes an outpost, constructs buildings, and manages
+resources.** All 12 canon files were read in full before any code was written.
+
+### 0.1 The prompt was deliberately narrowed
+
+Prompt 3 as written also asks for a named smith and forge capability, an iron
+sword equipment batch, a company with its equipment assignment, and a battle
+input/result contract. **The product owner deferred all of them.**
+
+The reasoning: those are precisely the models the mocked playtests (Prompts 5–8)
+exist to interrogate. Committing to their shape before a tester has seen the
+loop is the expensive kind of early decision, and the one the Workbase's own
+gate structure is designed to prevent.
+
+| Deferred | Returns at |
 |---|---|
-| `c1b3c98` — *feat(platform): bootstrap minimal application stack* | The platform and the simplified architecture package |
-| `a1067a7` — *fix(platform): complete Prompt 2 review corrections* | The four review corrections, the `.env` relocation, and the 12 canon files |
+| Smith, forge capability, `ForgeCraft`, equipment batches, weapon patterns | Prompt 12 · mocked at Prompt 6 |
+| Company, equipment slots, army archetypes | Prompt 13 · mocked at Prompt 7 |
+| `BattleInput`, `BattleResult`, result application | Prompts 14–15 · mocked at Prompt 7 |
+| Sylvaran opponent content | With the first battle |
 
-`master` is level with `origin/master`, so both commits are pushed.
+**The prompt lists six required rules.** Two are implemented and tested; four
+are deferred with the models they govern, because there is nothing for them to
+apply to.
+
+| # | Rule | This prompt |
+|---|---|---|
+| 1 | Resources cannot be spent below zero | **Implemented, 5 tests** |
+| 2 | A construction cannot complete twice | **Implemented, 8 tests** |
+| 3 | A craft cannot complete twice | Deferred — no craft exists |
+| 4 | One equipment batch has one current destination | Deferred — no batch exists |
+| 5 | A batch cannot be equipped and sold simultaneously | Deferred — no batch exists |
+| 6 | Battle results cannot be applied twice | Deferred — no battle exists |
+
+**This prompt is therefore not complete as written.** It is complete as scoped.
+
+### 0.2 Delivered
+
+**Domain** — plain C#, no EF attributes, no clock reads, no ambient randomness.
+Anything needing the time takes it as an argument.
+
+- `Features/Houses/` — `House` (the aggregate root), `Kingdom`
+- `Features/Settlements/` — `Settlement`, `Building`, `BuildingKind`,
+  `ConstructionStatus`, `SettlementStage`, `InvalidConstructionStateException`
+- `Features/Resources/` — `ResourceKind`, `ResourcePool`, `ResourceBalance`,
+  `ResourceCost`, `InsufficientResourcesException`
+
+**Content** — `Content/`, static C# keyed by the enums themselves. No parallel
+string-identifier scheme: nothing resolves content by name yet, so a second
+naming system would be one more thing to keep in step for no benefit.
+
+**Persistence** — the House aggregate only. `Persistence/Configurations/`,
+`Microsoft.EntityFrameworkCore.Design`, `.config/dotnet-tools.json` pinning
+`dotnet-ef` 10.0.10, and the `InitialHouseAggregate` migration. The API applies
+migrations in Development only.
+
+**Tests** — 29, up from 6.
+
+### 0.3 Decisions worth recording
+
+**No new ADR.** The contract asks for one when an accepted contract changes.
+ADRs 0011–0014 already decide the platform shape, the persistence approach and
+the content approach that this work sits inside; nothing was overturned.
+`ARCHITECTURE.md` §4 and §5 were updated instead — the smaller and truer change.
+
+**Enums persist as strings, never ordinals.** Applied as a convention in
+`ConfigureConventions`, so a new enum cannot be mapped as an `int` by omission.
+An ordinal silently re-points every existing row the moment a member is inserted
+or reordered, and tells a support query nothing. Verified by reading raw columns
+back with SQL, not just the mapped properties.
+
+**One-member enums.** `Kingdom` holds Arkazia; `SettlementStage` holds Outpost.
+Canon describes seven kingdoms and five stages, but a member with nothing behind
+it is exactly the unused future framework the acceptance criteria forbid.
+
+**Buildings are cost, duration and completion — not capability.** Storehouse
+capacity and production rates are Prompts 10 and 11. Barracks, Forge, Armoury
+and walls are omitted entirely, because each exists to unlock a capability and
+none of those capabilities is modelled.
+
+**Generated migrations are exempt from the style rules.** A scoped
+`.editorconfig` marks `Persistence/Migrations/` as generated code. Without it
+`dotnet ef migrations add` produces a build error (IDE0161, block-scoped
+namespace) and every future migration would need hand-editing.
+
+**The House and outpost names are invented, not canon.** Canon names Arkazia's
+capital (Obsidia) and its legendary smiths (Akron and Lewis Wright) but no minor
+House, so "House Karrow" of "Ashen Reach" are placeholders. Labelled as such in
+the file.
+
+### 0.4 Validation actually run
+
+All executed 3 August 2026. Output as returned.
+
+```
+$ dotnet ef migrations add InitialHouseAggregate --project src/Woo.Api --output-dir Persistence/Migrations
+Build succeeded.
+Done. To undo this action, use 'ef migrations remove'
+
+$ dotnet format --verify-no-changes
+(no output, exit code 0)
+
+$ dotnet build -c Release
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+$ dotnet test -c Release --no-build
+Passed!  - Failed: 0, Passed: 29, Skipped: 0, Total: 29, Duration: 2 s
+```
+
+**Against an empty database, then twice in a row** — the two properties the
+persistence test was written to guarantee:
+
+```
+$ docker compose -f docker/docker-compose.yml down -v
+ Volume docker_woo-pgdata  Removed
+$ docker compose -f docker/docker-compose.yml up -d      # healthy
+
+$ dotnet test -c Release --no-build          # run 1, empty database
+Passed!  - Failed: 0, Passed: 29, Skipped: 0, Total: 29
+
+$ dotnet test -c Release --no-build          # run 2, immediately after
+Passed!  - Failed: 0, Passed: 29, Skipped: 0, Total: 29
+```
+
+No manual migration step was needed: the fixture applies it.
+
+**Schema, and proof the tests clean up after themselves:**
+
+```
+$ docker exec woo-db psql -U woo -d woo -c '\dt'
+ public | Buildings             | table | woo
+ public | Houses                | table | woo
+ public | ResourceBalances      | table | woo
+ public | Settlements           | table | woo
+ public | __EFMigrationsHistory | table | woo
+(5 rows)
+
+$ docker exec woo-db psql -U woo -d woo -c 'SELECT ...counts...'
+ houses | settlements | buildings | balances
+      0 |           0 |         0 |        0
+```
+
+Four tables and nothing else, and zero rows after a full run.
+
+**The application still runs:**
+
+```
+$ dotnet run --project src/Woo.Api          # migrates on start, Development only
+$ curl http://localhost:5080/health
+{"status":"Healthy","totalDurationMs":60.3,
+ "checks":[{"name":"postgresql","status":"Healthy","description":null}]}
+
+$ curl http://localhost:5080/api/v1/platform/status
+{"application":"Weapons of Chaos and Order","environment":"Development",
+ "utcNow":"2026-08-03T11:19:34.8254944+00:00","database":{"connected":true}}
+```
+
+Generated column types, from the migration: enums are
+`character varying(50)`, amounts are `bigint`, timestamps are
+`timestamp with time zone`.
+
+### 0.5 Not run
+
+| Not run | Why |
+|---|---|
+| CI | Nothing is committed or pushed for this prompt |
+| Frontend behaviour change | None was made; `web/` is untouched by Prompt 3 |
+| Anything gameplay-facing in a browser | No endpoint exposes the domain — that is Prompts 5–8 |
 
 ---
 
@@ -405,29 +575,37 @@ change set.** Two block Prompt 31.
 
 ---
 
-## 8. Readiness for Prompt 3
+## 8. Readiness for Prompt 4
 
-**Ready. The gate is closed and nothing blocks it.**
+**Ready.** Prompt 3 stopped at the platform gate: are the repository, feature
+folders and first contracts ready for gameplay?
 
 | Criterion | Status |
 |---|---|
 | Platform runs from a clean checkout | Yes |
-| Backend, tests, lint, typecheck and build all green | Yes |
-| PostgreSQL reachable from the application and from tests | Yes |
+| Backend, tests, format, lint, typecheck and build all green | Yes — 29 tests |
+| Schema applies to an empty database with no manual step | Yes |
+| The suite is repeatable and leaves no data behind | Yes — verified twice in a row |
 | Architecture documentation matches what exists | Yes |
-| Decision record current and consistent | Yes — 0011–0014 accepted, 0001–0010 superseded |
-| No secrets, no gameplay, no deferred infrastructure | Yes |
-| `project_sources/` present | **Yes — 12 canon files, gate closed** |
+| Decision record current and consistent | Yes — 0011–0014 accepted, no new ADR needed |
+| Glossary reconciled with canon for the built slice | Yes, with the conflict register |
+| Canon present and read | Yes — all 12 files read for this prompt |
+| No secrets, no deferred infrastructure | Yes |
 
-**Prompt 3 will deliver:** the first entities and the first EF Core migration,
-`Microsoft.EntityFrameworkCore.Design` and a `dotnet-ef` tool manifest, the
-Houses/Settlements/Resources/Forge/Armies/Battles feature folders, and the
-Foundations of Iron starter content.
+**Prompt 4 delivers a design package, not code:** first-session and returning
+journeys, information architecture, low-fidelity wireframes, a grounded Arkazian
+visual direction, tokens, a component inventory, desktop and mobile layouts, and
+the loading/empty/error states.
 
-**Prompt 3 must begin by reading all 12 canon files completely.** They are
-present but unread; Prompt 2 had no reason to open them.
+Two things Prompt 4 should know:
 
-> **Do not begin Prompt 3 without the product owner's instruction.**
+- **The domain has no API surface.** Nothing is reachable from the browser yet,
+  by design — Prompt 5 builds the mocked screens over typed fake data.
+- **The design covers systems this prompt did not build** — forge, army, battle
+  report. That is correct: Prompt 4 designs the whole first experience, and
+  Prompts 6–7 mock the parts the domain has not reached.
+
+> **Do not begin Prompt 4 without the product owner's instruction.**
 
 ---
 
@@ -439,3 +617,4 @@ present but unread; Prompt 2 had no reason to open them.
 | 2026-08-03 | 2 | Architecture package simplified: ARCHITECTURE.md rewritten, SLICES.md trimmed, `docs/operations/` deleted, ADRs 0001–0010 superseded by 0011–0014. Platform bootstrapped: one ASP.NET Core application, one test project, React/Vite shell, Compose for PostgreSQL, CI. Dual TypeScript compiler removed. PostgreSQL 18 mount path and a port-5432 collision with a native service found and fixed. |
 | 2026-08-03 | 2 (review) | Corrections applied: CI retargeted to `master`; `.env` documented as Compose-only and its template moved to `docker/.env.example` where Compose actually reads it; status recorded as reviewed. `project_sources/` supplied — 12 canon files verified, **Prompt 3 gate closed**. Committed as `a1067a7`. |
 | 2026-08-03 | 2 (cleanup) | Corrected stale statements that the commit made false: "pending review", "uncommitted", "the directory is untracked", and the two claims that CI had never run because nothing was pushed. |
+| 2026-08-03 | 3 | All 12 canon files read. First domain model: House, Outpost settlement, five buildings with construction state, the six resources with the spend rule. Static C# starter content. House-aggregate persistence with enums stored as strings, and the `InitialHouseAggregate` migration. 29 tests, verified against an empty database and twice in a row. **Narrowed by the product owner**: smith, forge, batch, company and battle contracts deferred, with four of the prompt's six rules (§0.1). |

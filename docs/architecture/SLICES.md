@@ -8,8 +8,8 @@ Where each prompt's deliverables land. Read alongside
 > [`../Weapons_of_Chaos_and_Order_Agent_AI_Implementation_Prompts.md`](../Weapons_of_Chaos_and_Order_Agent_AI_Implementation_Prompts.md)
 > and get rows here as they approach. The Prompt 1 version of this file mapped
 > all thirty-two prompts onto modules, schemas and invariant identifiers that
-> did not exist; predicting a Prompt 27 deliverable's home before Prompt 3 has
-> written a single table is a guess written in the register of a decision.
+> did not exist; predicting a Prompt 27 deliverable's home before the first
+> table exists is a guess written in the register of a decision.
 
 ---
 
@@ -49,36 +49,46 @@ Where each prompt's deliverables land. Read alongside
 background jobs, an outbox, object storage, PixiJS, Redis, a broker, a second
 `DbContext`, OpenTelemetry, architecture tests, Azure, deployment.
 
-### Prompt 3 — Foundations of Iron domain model and starter content
+### Prompt 3 — House, outpost, buildings and resources · **complete**
 
-> **Canon is present.** The 12 files in [`../../project_sources/`](../../project_sources/)
-> arrived on 3 August 2026, closing the gate that blocked this prompt. Rune
-> families, destructibility policy, kingdom definitions and named-material
-> catalogues are canon-derived: **read all 12 before authoring any of them**,
-> and do not fall back on Workbase summaries. See
-> [`../implementation/STATUS.md §5.1`](../implementation/STATUS.md).
+The 12 canon files in [`../../project_sources/`](../../project_sources/) arrived
+on 3 August 2026 and were read in full for this prompt.
+
+**Delivered — one Arkazian House establishes an outpost, constructs buildings,
+and manages resources:**
 
 | Deliverable | Lands in |
 |---|---|
-| One House, one Outpost settlement | `Features/Houses/`, `Features/Settlements/` |
-| The six universal resources | `Features/Resources/` |
-| First buildings and construction state | `Features/Settlements/` |
-| One named smith, basic forge capability | `Features/Forge/` |
-| One iron sword equipment batch | `Features/Forge/` |
-| One company and its equipment assignment | `Features/Armies/` |
-| One local battle input and result contract | `Features/Battles/` |
-| **The first EF Core entities and the first migration** | `Persistence/` |
+| One House and one Outpost settlement | `Features/Houses/`, `Features/Settlements/` |
+| The six universal resources, with the spend rule | `Features/Resources/` |
+| The first buildings and construction state | `Features/Settlements/` |
+| Arkazian starter content | `Content/` |
+| **The first EF Core entities and the `InitialHouseAggregate` migration** | `Persistence/` |
 
-Plain C# types and focused tests. EF Core persistence only where the next
-playable action needs it. Minimum Arkazian and Sylvaran starter content.
+Plain C# types with EF configuration kept separate; a static C# content
+catalogue; focused tests.
 
-**Rules this slice must enforce:** resources cannot be spent below zero; a
-construction or craft cannot complete twice; one batch has one current
-destination; a batch cannot be equipped and sold at once; battle results cannot
-be applied twice.
+**Deliberately narrowed by the product owner.** The prompt also lists a smith
+and forge capability, an iron sword batch, a company with its equipment, and a
+battle input/result contract. Those models are the ones the mocked playtests are
+most likely to reshape, so they were deferred rather than guessed at:
 
-**No runes, markets, Orders, Warfronts, seasons, settlement tiers or further
-kingdoms** — only a short note on where they extend the model.
+| Deferred | Returns at |
+|---|---|
+| Smith, forge capability, crafts, equipment batches, weapon patterns | Prompt 12 · mocked at Prompt 6 |
+| Companies, equipment slots, army archetypes | Prompt 13 · mocked at Prompt 7 |
+| Battle input, result and application | Prompts 14–15 · mocked at Prompt 7 |
+| Sylvaran opponent content | With the first battle |
+
+**Rules.** The prompt lists six. Two are implemented and tested — *resources
+cannot be spent below zero*, *a construction cannot complete twice*. Four are
+deferred with the models they govern: *a craft cannot complete twice*, *one
+batch has one current destination*, *a batch cannot be equipped and sold at
+once*, *battle results cannot be applied twice*.
+
+**No runes, markets, Orders, Warfronts, seasons, settlement tiers beyond Outpost,
+or further kingdoms.** `Kingdom` and `SettlementStage` each have one member
+rather than listing what canon describes but no prompt has built.
 
 ---
 

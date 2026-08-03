@@ -185,6 +185,7 @@ These are the commands CI runs. Run the same ones locally.
 docker compose -f docker/docker-compose.yml up -d
 
 # .NET
+dotnet tool restore          # dotnet-ef, for migrations
 dotnet format --verify-no-changes
 dotnet build -c Release
 dotnet test
@@ -212,25 +213,27 @@ the code they would validate (Prompts 5 and 3).
 
 ## 8. Current stage
 
-**Prompt 2 (platform bootstrap) is complete, reviewed and committed.** The
-repository holds one ASP.NET Core application, one test project, a React/Vite
-shell, Docker Compose for PostgreSQL, CI, and the 12 canon files in
-[`project_sources/`](project_sources/). There is **no gameplay, no
-authentication and no deployed infrastructure** — the canon is source material,
-not gameplay data.
+**Prompt 3 (first domain model) is complete, uncommitted, awaiting review.**
 
-| Commit | Contents |
-|---|---|
-| `c1b3c98` | Platform bootstrap and the simplified architecture package |
-| `a1067a7` | Review corrections and the 12 canon files |
+| Prompt | Commit | Contents |
+|---|---|---|
+| 2 | `c1b3c98` | Platform bootstrap and the simplified architecture package |
+| 2 | `a1067a7` | Review corrections and the 12 canon files |
+| 3 | *uncommitted* | First domain model, starter content, first migration |
 
-Prompt 2 also corrected the Prompt 1 architecture package, which had designed a
-separate worker, durable jobs, a transactional outbox, object storage, six
-database schemas, an Azure topology and a two-compiler TypeScript setup. ADRs
-0001–0010 are superseded by
-[0011–0014](docs/adr/README.md); none of that machinery was ever built.
+The repository holds one ASP.NET Core application with `Houses`, `Settlements`
+and `Resources` feature folders; a static C# starter-content catalogue; the
+House aggregate persisted through the `InitialHouseAggregate` migration; one
+test project (29 tests); a React/Vite shell; Docker Compose for PostgreSQL; CI;
+and the 12 canon files in [`project_sources/`](project_sources/).
 
-Next: **Prompt 3 — the Foundations of Iron domain model and starter content.**
-The `project_sources/` gate in §6 is now **closed** — the 12 canon files are
-present — so nothing blocks it. Do not begin it without the product owner's
-instruction, and read all 12 canon files first.
+There is **no forge, no army, no battle, no rune, no authentication, no API
+surface over the domain, and no deployed infrastructure.**
+
+**Prompt 3 was deliberately narrowed by the product owner** — smith, forge
+capability, equipment batches, companies and battle contracts were deferred to
+the prompts that mock and then build them, along with four of the prompt's six
+rules. See [`docs/implementation/STATUS.md §0.1`](docs/implementation/STATUS.md).
+
+Next: **Prompt 4 — Foundations of Iron UX and visual design.** A design package,
+not code. Do not begin it without the product owner's instruction.

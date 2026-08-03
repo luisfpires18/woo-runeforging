@@ -1,12 +1,14 @@
 using Microsoft.EntityFrameworkCore;
+using Woo.Api.Features.Houses;
+using Woo.Api.Features.Resources;
+using Woo.Api.Features.Settlements;
 using Woo.Api.Persistence;
 
 namespace Woo.Tests;
 
 /// <summary>
 /// Connectivity against a real PostgreSQL instance — the Compose container
-/// locally, the workflow service container in CI. There is nothing to migrate
-/// yet: the first migration arrives with the first entities in Prompt 3.
+/// locally, the workflow service container in CI.
 /// </summary>
 public sealed class DatabaseConnectivityTests
 {
@@ -25,16 +27,38 @@ public sealed class DatabaseConnectivityTests
         await db.Database.CloseConnectionAsync();
     }
 
+    /// <summary>
+    /// Replaces Prompt 2's "the model declares no entities" guard. That test
+    /// existed to catch gameplay leaking into the platform, and this prompt is
+    /// the change it was watching for — so the guard moves rather than
+    /// disappears. It now pins the exact mapped set, and fails if anything
+    /// unplanned is added.
+    /// </summary>
     [Fact]
-    public async Task The_context_declares_no_entities_yet()
+    public void The_model_maps_the_house_aggregate_and_nothing_else()
     {
         var options = new DbContextOptionsBuilder<WooDbContext>()
             .UseNpgsql(WooApiFactory.ConnectionString)
             .Options;
 
-        await using var db = new WooDbContext(options);
+        using var db = new WooDbContext(options);
 
-        // Guards the Prompt 2 boundary: no gameplay model has been smuggled in.
-        Assert.Empty(db.Model.GetEntityTypes());
+        // Compared by name: xUnit's structural comparison would try to reflect
+        // over the members of Type itself.
+        var mapped = db.Model.GetEntityTypes()
+            .Select(entity => entity.ClrType.Name)
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+
+        string[] expected =
+        [
+            nameof(Building),
+            nameof(House),
+            nameof(ResourceBalance),
+            nameof(ResourcePool),
+            nameof(Settlement),
+        ];
+
+        Assert.Equal(expected, mapped);
     }
 }

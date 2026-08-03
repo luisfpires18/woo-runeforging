@@ -15,6 +15,14 @@ disappears.
 
 Terms without a label are architectural rather than product decisions.
 
+**Canon is the higher authority.** Where an entry here and a file in
+[`project_sources/`](../../project_sources/) disagree, the canon file wins and
+this document is wrong. §11 lists the canon's own internal contradictions,
+which are open questions rather than errors to fix here.
+
+**Bold entries are implemented in code.** Everything else is vocabulary for
+systems that do not exist yet.
+
 ---
 
 ## 1. The player and their holdings
@@ -23,8 +31,11 @@ Terms without a label are architectural rather than product decisions.
 |---|---|---|
 | **House** | The player's organisation. The unit of ownership, identity, reputation and history. The player leads a *minor* House, not a kingdom | Foundation |
 | **House Seat** | The home screen. Answers: what completed while I was away, what needs attention, what advances my House today | Foundation |
-| **Settlement** | The single evolving site a House develops. **One settlement per House** — no village spam | Locked |
-| **Settlement stage** | Outpost → Village → Fortified town → Regional capital → Runic seat. The last is a late capability layer on the regional capital, not a separate tier | Open (exact stages, names and pace) |
+| **Settlement** | The single evolving site a House develops. **One settlement per House** — no village spam. *Implemented: `Settlement`* | Locked |
+| **Settlement stage** | Outpost → Village → Fortified town → Regional capital → Runic seat. The last is a late capability layer on the regional capital, not a separate tier. *Implemented: `SettlementStage`, **Outpost only** — later stages join when they are reachable* | Open (exact stages, names and pace) |
+| **Outpost** | The founding stage: survival and claim. A House Hall, a storehouse, basic production, and later a militia and basic forge | Foundation |
+| **Building** | A structure in the settlement. Buildings unlock **capabilities**, not thirty levels of percentage increases. *Implemented: `Building`, `BuildingKind` — House Hall, Storehouse, Lumber Yard, Quarry, Mine* | Locked |
+| **Construction state** | `NotBuilt → UnderConstruction → Complete`. Driven by stored timestamps read on demand, never by a timer. **A construction cannot complete twice.** *Implemented: `ConstructionStatus`* | — |
 | **Specialist** | A named person who performs work — smith, commander, scholar. The player makes House-level decisions; specialists do the work | Foundation |
 | **Workforce** | Labour capacity. **A capacity, not an inventory resource** — it is never a spendable pile of tokens | Foundation |
 | **Crest / motto** | House heraldry. Also the terminal fallback for missing art | Foundation |
@@ -33,8 +44,10 @@ Terms without a label are architectural rather than product decisions.
 
 | Term | Meaning | Label |
 |---|---|---|
-| **Universal resources** | **Gold, Provisions, Timber, Stone, Ore, Workshop Supplies.** The six that support all ordinary play | Foundation |
+| **Universal resources** | **Gold, Provisions, Timber, Stone, Ore, Workshop Supplies.** The six that support all ordinary play. *Implemented: `ResourceKind`* | Foundation |
 | **Workshop Supplies** | Abstraction over charcoal, nails, cloth, oils, rope, bindings, containers, ordinary hides, tools and maintenance inputs | Foundation |
+| **Resource pool** | A House's holdings across the six. **A spend can never take a balance below zero**, and a multi-resource cost is all-or-nothing: a cost that cannot be paid in full changes nothing at all. *Implemented: `ResourcePool`* | — |
+| **Cost** | What an action requires, across one or more resources. Always spent whole; never partially paid. *Implemented: `ResourceCost`* | — |
 | **Strategic material** | A named material appearing only when it creates a meaningful decision. Lives in a small separate inventory, never in the six | Foundation |
 | **Material family** | A broad recipe slot — Metal, Wood, Stone, Hide or textile, Fuel or supplies, Reagent, Runic component | Foundation |
 | **Ledger entry** | An append-only record of one resource movement: delta, reason, actor, correlation ID. **Every** gold and goods movement has one | — |
@@ -127,18 +140,26 @@ what the wielder does with it** — is adopted throughout.
 
 ## 9. Architectural terms
 
+In use today:
+
 | Term | Meaning |
 |---|---|
-| **Module** | A vertical slice in `Woo.Domain` and `Woo.Application` with a published `Contracts/` surface. Never touches another module's internals |
-| **Tier** | Position in the dependency graph. Arrows point down only. **Runes is tier 4; nothing in tiers 0–3 may reference it** |
-| **Due job** | A row in `app.due_job` claimed under a bounded lease with `FOR UPDATE SKIP LOCKED` |
-| **Lease** | Time-bounded ownership of a job. An expired lease is reclaimed automatically |
-| **Outbox** | Domain events written in the same transaction as their cause, dispatched after commit. **Post-commit reactions only — never maintains an invariant** |
-| **Idempotency key** | A client-supplied key inserted in the effect transaction. A duplicate returns the stored response |
-| **Content version** | The identifier of an authored content bundle. Persisted on every craft, battle, attempt and situation |
-| **Rules version** | The identifier of the calculation rules used. Persisted alongside content version so an old object stays explainable |
-| **`ActorContext`** | Who is acting: account, House, roles. **`HouseId` always comes from here, never from a request body** |
-| **Correlation ID** | Flows request → command → outbox → job → battle → history, so one identifier reconstructs a chain |
+| **Feature folder** | A slice of the one application owning its endpoints, domain types and persistence configuration in one directory. Not a project, not an assembly |
+| **Aggregate** | A cluster of objects saved and loaded as a unit. **House** is the only one so far: it owns its settlement, that settlement's buildings, and its resource balances |
+| **Elapsed-time progression** | Progress stored as `StartedAtUtc` / `CompletesAtUtc` and computed when state is read. **No timer, no scheduler, no job row** |
+
+Vocabulary for infrastructure that is **deferred, not present** — see
+[ARCHITECTURE.md §8](../architecture/ARCHITECTURE.md#8-deferred) for the trigger
+that reintroduces each:
+
+| Term | Meaning | Arrives |
+|---|---|---|
+| **Due job**, **lease** | A durable unit of work claimed under bounded ownership | Only if elapsed-time resolution proves insufficient |
+| **Outbox** | Domain events written in the same transaction as their cause, dispatched after commit. **Post-commit reactions only — never maintains an invariant** | When a reaction must survive a crash and cannot be recomputed |
+| **Idempotency key** | A client-supplied key inserted in the effect transaction; a duplicate returns the stored response | Prompt 9 |
+| **Content version**, **rules version** | Identifiers persisted on a craft, battle or attempt so an old object stays explainable after balance changes | With authored content |
+| **`ActorContext`** | Who is acting: account, House, roles. **`HouseId` always comes from here, never from a request body** | Prompt 25 |
+| **Correlation ID** | One identifier reconstructing a whole causal chain | With telemetry, Prompt 28 |
 
 ---
 
@@ -186,19 +207,48 @@ never as hard-coded rules:
 
 ## 11. Canon source gate
 
-**[`project_sources/`](../../project_sources/) is present** — 12 canon Markdown
-files, supplied 3 August 2026. It is the canon source for kingdoms, Aura, runes,
-Runeforged weapons, Chaos Weapons and Order Weapons. The gate that blocked
-Prompt 3 is closed.
+**[`project_sources/`](../../project_sources/) is present and has been read in
+full** — 12 canon Markdown files, supplied 3 August 2026 and read completely
+during Prompt 3.
 
-**This glossary has not yet been reconciled with it.** Every entry below is
-built from the Workbase alone and is therefore **incomplete on lore specifics** —
-rune family taxonomy, kingdom detail, named characters and material catalogues.
-Where this document and a canon file disagree, **the canon file wins**.
+### What the slice uses
 
-> **Prompt 3 must read all 12 canon files completely, then correct this
-> glossary.** Prompt 3 defines rune families, fusion compatibility,
-> destructibility policy, Aura metadata, kingdom definitions and named-material
-> catalogues; none of it may be authored from the summaries below.
+Only Arkazia matters to the built model so far:
 
-See [`../implementation/STATUS.md §5.1`](../implementation/STATUS.md).
+| Term | Canon | Label |
+|---|---|---|
+| **Arkazia** | Capital **Obsidia**. Mountain strongholds, fortified passes, stone-built towns, harsh ridgelands, alpine forests, **iron-rich slopes**. Discipline, fortresses, steel and elite cavalry | Locked |
+| **Sylvara** | Capital **Unitas**. Deep forests, herb meadows, river cutbanks. Exceptional timber, hides, food and herbs; imports heavy metal and fortress stone. **The first border is Arkazia versus Sylvara** | Locked |
+| **Bastion** | Arkazia's core line infantry — Sword + Shield — recruited at the **Red Bastion** barracks. The company of the first slice | Locked |
+| **Warden** | Sylvara's core line infantry — Spear + Shield — from **Greenwatch Hall**. The first opposing force | Locked |
+| **Two-slot rule** | Every wield is **two slots, one hand each**. Two-handed takes both; Sword + Shield takes one each | Locked |
+
+Arkazia's geography is why the starter content makes Stone and Ore plentiful and
+**Timber the pressure** — which is what gives a Sylvaran timber trade something
+to be worth, later.
+
+**The other five kingdoms** — Veridor (Azure), Nordalh (Haven), Draxys
+(Scorcheye), Lumus (Sol), Zandres (Deephearth) — are canon and are **not
+modelled**. `Kingdom` has one member.
+
+### Conflicts found by reading the canon directly
+
+§10 lists the conflicts the Workbase predicted. Reading the sources confirmed
+them and added two. **None blocks current work** — the slice has no runes, no
+weapons and no combat. All remain **unresolved**.
+
+| Conflict | Sources |
+|---|---|
+| Victura's rune is *Necrosis* vs *Necro* | `weapons_of_chaos_and_order.md` vs `rune_list.md` — confirms §10.1 |
+| Vantashields' rune is *Metorite* vs *Meteorite* | same pair — confirms §10.2 |
+| Ruincoils uses *Entropy*, which the corrupted-rune list omits | same pair — confirms §10.3 |
+| L1 and L2 headings name the **state** where the Workbase names the **weapon** — "LEVEL 1 – CONDUIT", "LEVEL 2 — ASPECT FORM" | `aura_levels.md` vs `runeforged_weapons.md` ("a L1 weapon is called Enhanced") — confirms §10.5 |
+| Order and souls: "contain no soul, only harmony" vs Ascendant's "sacrificed soul" vs Soul Entrapment being "a requirement for the creation of weapons of chaos / order" | `weapons_of_chaos_and_order.md`, `aura_levels.md`, `runeforged_weapons.md` — confirms §10.4, still blocks Prompt 31 |
+| **New:** *Protect* (Fortitude + Order), the Bulwarkers' rune, is absent from the Purified Runes list | `weapons_of_chaos_and_order.md` vs `rune_list.md` |
+| **New:** *Ascendant* is "Beast + Order" on Skyrend Talons but "Any Animal" in the rune list | same pair |
+
+Two entries in `rune_list.md` are **blank rather than contradictory** — Quartz
+(Crystal) and Steel (Iron) have no description. That is missing canon, not a
+conflict, and Prompt 20 will need it.
+
+See [`../implementation/STATUS.md`](../implementation/STATUS.md).

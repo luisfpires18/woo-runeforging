@@ -86,12 +86,15 @@ woo-runeforging/
 │
 ├─ docs/                       # planning documents, architecture, ADRs, status
 │
+├─ .config/dotnet-tools.json   # dotnet-ef, pinned
+│
 ├─ src/Woo.Api/
 │  ├─ Program.cs               # composition root
-│  ├─ Persistence/             # WooDbContext
+│  ├─ Content/                 # starter catalogues, static C#
+│  ├─ Persistence/             # WooDbContext, Configurations/, Migrations/
 │  └─ Features/                # one folder per feature
-│     ├─ Health/
-│     └─ Platform/
+│     ├─ Health/  Platform/
+│     └─ Houses/  Settlements/  Resources/
 │
 ├─ tests/Woo.Tests/            # the one test project
 │
@@ -117,20 +120,25 @@ technical layer. A feature owns its endpoints, its handlers and its persistence
 configuration in one directory, so a change to construction touches
 `Features/Construction/` and little else.
 
-**Exists today:** `Health`, `Platform`. Both are platform plumbing with no
-gameplay meaning.
+**Exists today:**
 
-**Reserved for the first playable slice** (Foundations of Iron):
+| Folder | Holds |
+|---|---|
+| `Health`, `Platform` | Platform plumbing, no gameplay meaning |
+| `Houses` | `House` — the aggregate root — and `Kingdom` |
+| `Settlements` | `Settlement`, `Building`, `BuildingKind`, `ConstructionStatus`, `SettlementStage` |
+| `Resources` | The six `ResourceKind` values, `ResourcePool`, `ResourceBalance`, `ResourceCost` |
 
-> Houses · Settlements · Resources · Forge · Armies · Battles
+`Content/` sits alongside them and holds the starter catalogues.
 
-These names are **documented, not created**. Workbase §19 is explicit that
-future systems "do not need projects, tables, services, or empty abstractions
-before use", so each folder appears in the change set that first makes it do
-something — Prompt 3 onward.
+**Still reserved, not created:** Forge · Armies · Battles, then Contracts ·
+Markets · Situations · Runes · Orders · Warfronts · History.
 
-Later areas — Contracts, Markets, Situations, Runes, Orders, Warfronts, History
-— follow the same rule.
+Each folder appears in the change set that first makes it do something.
+Workbase §19 is explicit that future systems "do not need projects, tables,
+services, or empty abstractions before use" — which is also why `Kingdom` has
+one member and `SettlementStage` has one member, rather than listing the seven
+kingdoms and five stages the canon describes.
 
 ### 4.1 Where deterministic simulation will live
 
@@ -154,13 +162,34 @@ or a schema per feature would buy nothing at this size and would make an
 ordinary cross-feature command — spend resources *and* start construction *and*
 write the ledger entry — awkward to keep in a single transaction.
 
-Today the context declares **no entity types**. Prompt 2 proves connectivity;
-the first entities and the first migration arrive with the Foundations of Iron
-domain model in Prompt 3.
+The context maps the **House aggregate**: `House`, its `Settlement`, that
+settlement's `Building`s, and its `ResourceBalance`s — four tables plus
+`__EFMigrationsHistory`. Forging, armies and battles are not modelled yet and
+so have nothing to persist.
+
+**The domain types carry no EF attributes.** Mapping lives in
+`Persistence/Configurations/`, applied by `ApplyConfigurationsFromAssembly`,
+which is what keeps the domain testable with no database.
+
+**Enums are persisted as strings, never ordinals.** Applied as a convention in
+`ConfigureConventions`, so a new enum cannot be mapped as an `int` by omission.
+An ordinal would silently re-point every existing row the moment a member was
+inserted or reordered, and tells a support query nothing.
+
+**Quantities are whole numbers.** `long` → `bigint`. No floating point anywhere
+in the economy.
 
 **Migrations.** EF Core migrations against the single context, created with
-`dotnet ef migrations add` and reviewed like code. Applying them is an explicit
-step, not something the API does on startup in a real environment.
+`dotnet ef migrations add` (tooling pinned in `.config/dotnet-tools.json`) and
+reviewed like code. The first is `InitialHouseAggregate`.
+
+The API applies migrations **only when running in Development**, so a clean
+checkout is one command. Applying them anywhere else stays an explicit,
+reviewed step.
+
+Generated migration files are marked `generated_code` in a scoped
+`.editorconfig`: holding scaffolder output to the repository's style rules would
+mean hand-editing every new migration.
 
 **Transactions.** `SaveChangesAsync` is already one transaction. A command that
 must change several things together opens one explicitly with
@@ -183,6 +212,11 @@ in one query, and the server's workload tracks player decisions rather than
 player count multiplied by wall-clock time. This is what makes the deferral of
 background-job infrastructure ([§8](#8-deferred)) sustainable rather than
 merely postponed.
+
+`Building` is the first type built this way: it stores `StartedAtUtc` and
+`CompletesAtUtc`, and every method that needs the time — `IsDueAt`, `Complete` —
+**takes it as an argument**. Nothing in the domain reads a clock, which is also
+why the construction tests cover three days of absence without sleeping.
 
 ---
 
