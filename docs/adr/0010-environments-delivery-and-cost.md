@@ -117,12 +117,12 @@ in-memory provider has.
 
 ### CI and deployment stages
 
-**`validate.yml`** on PR and `main`: `dotnet format --verify-no-changes` →
+**`validate.yml`** on PR and `master`: `dotnet format --verify-no-changes` →
 `dotnet build -c Release` (warnings as errors) → unit/architecture/simulation
 tests → persistence and API integration tests → `npm ci`, `typecheck`, `lint`,
 `test`, `build` → `content:validate` → gitleaks → docker build (no push).
 
-**`publish.yml`** on `main`: build and push images to ghcr.io tagged with the
+**`publish.yml`** on `master`: build and push images to ghcr.io tagged with the
 git SHA.
 
 **`deploy.yml`**: `workflow_dispatch` **only**, gated by a GitHub Environment
@@ -192,7 +192,7 @@ Rejected. It cannot test `FOR UPDATE SKIP LOCKED`, `xmin` concurrency or real
 transaction semantics — which is most of what the integration tests exist to
 prove.
 
-### Auto-deploy on merge to `main`
+### Auto-deploy on merge to `master`
 
 Rejected. The agent contract forbids deploying without explicit authorization,
 and manual gating enforces it in the pipeline rather than in a person's memory.

@@ -2,9 +2,12 @@
 
 **Last updated:** 3 August 2026
 **Current stage:** Prompt 2 — simplified architecture and platform bootstrap ·
-**complete, uncommitted, awaiting review**
-**Next:** Prompt 3 — Foundations of Iron domain model · **blocked** by the
-`project_sources/` gate (§5.1)
+**implemented and reviewed**
+**Next:** Prompt 3 — Foundations of Iron domain model · **unblocked**, awaiting
+the product owner's instruction
+
+Prompt 2 was implemented, reviewed by the product owner, and corrected on the
+review's findings (§2.3). The change set is **uncommitted**, by instruction.
 
 ---
 
@@ -57,13 +60,13 @@ documentation and the decision record.
 **Platform**
 
 - `global.json` (SDK 10.0.200), `Directory.Build.props`,
-  `Directory.Packages.props`, `Woo.slnx`, `.nvmrc`, `.env.example`
+  `Directory.Packages.props`, `Woo.slnx`, `.nvmrc`
 - `src/Woo.Api` — one ASP.NET Core 10 application; `Features/Health/`,
   `Features/Platform/`, `Persistence/WooDbContext.cs`
 - `tests/Woo.Tests` — one test project, xunit.v3, 6 tests
 - `web/` — React 19, Vite 8, **one** `typescript@6.0.3`
-- `docker/docker-compose.yml` — PostgreSQL only
-- `.github/workflows/validate.yml` — backend, frontend and docs jobs
+- `docker/docker-compose.yml` — PostgreSQL only, plus `docker/.env.example`
+- `.github/workflows/validate.yml` — backend, frontend and docs jobs, on `master`
 
 ### 1.3 Deliberately not delivered
 
@@ -86,7 +89,7 @@ tables.
 | 1 | One ASP.NET Core application with feature folders; no worker, no jobs, no outbox, no architecture tests; `/api/v1` retained | [0011](../adr/0011-minimal-platform-shape.md) |
 | 2 | React 19, Vite 8, **one** plain `typescript@6.0.3` | [0012](../adr/0012-frontend-stack.md) |
 | 3 | PostgreSQL 18, one `WooDbContext`, default schema, no entities yet, elapsed time as stored timestamps | [0013](../adr/0013-persistence.md) |
-| 4 | Compose for PostgreSQL only on host port 5433; CI for build, test, lint and type-check; no deployment | [0014](../adr/0014-local-development-and-ci.md) |
+| 4 | Compose for PostgreSQL only on host port 5433; CI on `master` for build, test, lint and type-check; no deployment | [0014](../adr/0014-local-development-and-ci.md) |
 
 ### 2.1 The dual TypeScript compiler was never necessary
 
@@ -124,6 +127,36 @@ against the wrong server. **The project now publishes host port 5433**
 (`POSTGRES_PORT` overrides), which leaves the existing installation untouched.
 Both the diagnosis and the resolution are in
 [ADR-0014](../adr/0014-local-development-and-ci.md).
+
+### 2.3 Corrections applied after review
+
+The product owner reviewed the first implementation and required four
+corrections before acceptance. All are applied.
+
+| # | Finding | Correction |
+|---|---|---|
+| 1 | CI triggered on `main`; the repository's default branch is `master` | `validate.yml` now runs on push and pull request against **`master`**. Every branch-name reference to `main` in the documentation was corrected, including the superseded ADR-0010 |
+| 2 | The `.env` documentation implied it configured the application | Rewritten. `.env` configures **Docker Compose only**; the backend never reads it and no dotenv package is installed. Changing the container's port or password requires setting `ConnectionStrings__Woo` explicitly for the API, which is now documented as a two-step change |
+| 3 | Status did not record that the prompt had been reviewed | This document now states implemented **and reviewed** |
+| 4 | `project_sources/` absent | **Supplied by the product owner.** 12 canon Markdown files verified present and unchanged; the Prompt 3 gate is now **READY** (§5.1) |
+
+Correction 2 uncovered a further defect. **`.env.example` was at the repository
+root, where Compose never reads it.** Compose resolves `.env` from the directory
+containing the compose file, so the template was inert. Verified:
+
+```
+$ printf 'POSTGRES_PORT=15999\n' > .env
+$ docker compose -f docker/docker-compose.yml config | grep published
+        published: "5433"          # root .env ignored
+
+$ printf 'POSTGRES_PORT=15999\n' > docker/.env
+$ docker compose -f docker/docker-compose.yml config | grep published
+        published: "15999"         # docker/.env honoured
+```
+
+The template moved to **`docker/.env.example`**. `.gitignore` was confirmed to
+still ignore `docker/.env` while allowing `docker/.env.example`
+(`git check-ignore -v docker/.env` → `.gitignore:46:.env docker/.env`).
 
 ---
 
@@ -275,20 +308,46 @@ rather than from Vite.
 
 ---
 
-## 5. Open gates and blockers
+## 5. Gates and blockers
 
-### 5.1 `project_sources/` — blocks Prompt 3
+### 5.1 `project_sources/` — **CLOSED**
 
-**Status: OPEN, unchanged.** The directory does not exist in this repository.
+**Status: READY** as of 3 August 2026. The gate that blocked Prompt 3 through
+Prompts 1 and 2 is satisfied: `project_sources/` holds **exactly 12 Markdown
+files**, supplied by the product owner and unchanged.
 
-Both planning documents name it as the canon source. Prompt 3 defines rune
-families, rarity classes, fusion compatibility, destructibility policy, Aura
-metadata, kingdom definitions and named-material catalogues — all canon-derived
-and not safely authored from Workbase summaries.
+| File | Lines | Bytes | Subject |
+|---|---:|---:|---|
+| `arkazia.md` | 65 | 2,045 | Kingdom |
+| `aura_levels.md` | 452 | 34,167 | L0 Dormant → L3; Conduit, Aspect, Dreadform, Ascendant |
+| `draxys.md` | 64 | 1,931 | Kingdom |
+| `lumus.md` | 62 | 2,061 | Kingdom |
+| `my_lore_inspirations.md` | 23 | 298 | Creator's inspiration notes |
+| `nordalh.md` | 60 | 1,788 | Kingdom |
+| `rune_list.md` | 242 | 11,017 | Rune families and identities |
+| `runeforged_weapons.md` | 41 | 3,350 | Rune vessels and weapon progression |
+| `sylvara.md` | 64 | 2,092 | Kingdom |
+| `veridor.md` | 68 | 2,241 | Kingdom |
+| `weapons_of_chaos_and_order.md` | 158 | 9,349 | Singular Chaos Weapons; Order counters |
+| `zandres.md` | 64 | 2,099 | Kingdom |
 
-- **Prompt 2 was unaffected** — the platform bootstrap needs no lore.
-- **Prompt 3 must not start** until the directory is present and read.
-- `docs/domain/GLOSSARY.md` remains incomplete on lore specifics and says so.
+Verified: 12 `.md` files, **no non-Markdown files**, none empty, none excluded
+by `.gitignore`. The directory is untracked and will enter git with the review
+commit.
+
+The seven kingdoms, the Aura ladder, the rune catalogue and the Chaos/Order
+material together cover what
+[`AGENTS.md §6`](../../AGENTS.md#6-active-gates) names as Prompt 3's
+canon-derived inputs: rune families, fusion compatibility, destructibility
+policy, Aura metadata, kingdom definitions and named-material catalogues.
+
+**Not yet done:** the files are **present, not read**. Prompt 2 does not touch
+lore, so reading them was out of scope. **Prompt 3 must read all 12 completely
+before authoring any domain contract or content schema.**
+
+`docs/domain/GLOSSARY.md` is still written against the Workbase summaries and
+remains incomplete on lore specifics. Reconciling it with the canon is Prompt 3
+work.
 
 ### 5.2 Node.js — resolved
 
@@ -311,8 +370,8 @@ change set.** Two block Prompt 31.
 | 2 | The frontend renders a structural shell and successfully calls the API | **Partly evidenced** — the proxied call returns 200 from Kestrel (§3.6) and the build succeeds; the rendered page has not been opened in a browser |
 | 3 | The solution builds and the focused tests pass | **Met** — 6/6 passed |
 | 4 | The frontend type-checks and lints | **Met** |
-| 5 | CI runs the same core build and test commands | **Written, not executed** — nothing is pushed |
-| 6 | No secrets committed | **Met** — only `.env.example` and local Compose credentials; `.gitignore` covers `.env`, `appsettings.*.local.json`, `secrets.json`, key material |
+| 5 | CI runs the same core build and test commands | **Written for `master`, not executed** — nothing is pushed |
+| 6 | No secrets committed | **Met** — only `docker/.env.example` and local Compose credentials; `.gitignore` covers `.env`, `appsettings.*.local.json`, `secrets.json`, key material |
 | 7 | No gameplay or future infrastructure implemented | **Met** — no entities (asserted by a test), no lore, none of the banned infrastructure |
 | 8 | Architecture docs no longer prescribe unused infrastructure | **Met** — §1.2 |
 | 9 | One TypeScript compiler | **Met** — §3.5 |
@@ -324,7 +383,8 @@ change set.** Two block Prompt 31.
 
 | Item | Note |
 |---|---|
-| Host port 5433 | Chosen because a native PostgreSQL 18 service occupies 5432 on the development machine. `POSTGRES_PORT` overrides it. CI publishes 5433 too, so one connection string works in both places |
+| Host port 5433 | Chosen because a native PostgreSQL 18 service occupies 5432 on the development machine. `POSTGRES_PORT` in `docker/.env` moves the container, but the API needs `ConnectionStrings__Woo` set separately. CI publishes 5433 too, so one connection string works in both places |
+| Compose and application configuration are separate on purpose | No dotenv package. The .NET configuration system already layers environment variables, and a second mechanism reading the same file would make it ambiguous which one wins |
 | `Woo.slnx` | The modern solution format. `dotnet build`, `test` and `format` all resolved it correctly. Falls back to `.sln` if other tooling objects |
 | `tests/.editorconfig` | Disables the repository's async-suffix naming rule for test methods, whose names read as sentences. Scoped to `tests/` only |
 | Feature folders are not mechanically enforced | With two projects there is nothing an architecture test could prove. Review carries it; [ADR-0011](../adr/0011-minimal-platform-shape.md) names the trigger for reopening |
@@ -335,7 +395,7 @@ change set.** Two block Prompt 31.
 
 ## 8. Readiness for Prompt 3
 
-**Ready, but gated.**
+**Ready. The gate is closed and nothing blocks it.**
 
 | Criterion | Status |
 |---|---|
@@ -345,15 +405,17 @@ change set.** Two block Prompt 31.
 | Architecture documentation matches what exists | Yes |
 | Decision record current and consistent | Yes — 0011–0014 accepted, 0001–0010 superseded |
 | No secrets, no gameplay, no deferred infrastructure | Yes |
-| `project_sources/` present | **No — this blocks Prompt 3** |
+| `project_sources/` present | **Yes — 12 canon files, gate closed** |
 
 **Prompt 3 will deliver:** the first entities and the first EF Core migration,
 `Microsoft.EntityFrameworkCore.Design` and a `dotnet-ef` tool manifest, the
 Houses/Settlements/Resources/Forge/Armies/Battles feature folders, and the
 Foundations of Iron starter content.
 
-> **Do not begin Prompt 3 without the product owner's instruction, and not
-> before `project_sources/` is present and read.**
+**Prompt 3 must begin by reading all 12 canon files completely.** They are
+present but unread; Prompt 2 had no reason to open them.
+
+> **Do not begin Prompt 3 without the product owner's instruction.**
 
 ---
 
@@ -363,3 +425,4 @@ Foundations of Iron starter content.
 |---|---|---|
 | 2026-08-01 | 1 | Repository initialised. Architecture package, 10 ADRs, glossary, operations docs, slice traceability, validation scripts. |
 | 2026-08-03 | 2 | Architecture package simplified: ARCHITECTURE.md rewritten, SLICES.md trimmed, `docs/operations/` deleted, ADRs 0001–0010 superseded by 0011–0014. Platform bootstrapped: one ASP.NET Core application, one test project, React/Vite shell, Compose for PostgreSQL, CI. Dual TypeScript compiler removed. PostgreSQL 18 mount path and a port-5432 collision with a native service found and fixed. |
+| 2026-08-03 | 2 (review) | Corrections applied: CI retargeted to `master`; `.env` documented as Compose-only and its template moved to `docker/.env.example` where Compose actually reads it; status recorded as reviewed. `project_sources/` supplied — 12 canon files verified, **Prompt 3 gate closed**. |

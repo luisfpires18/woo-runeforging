@@ -186,15 +186,19 @@ never as hard-coded rules:
 
 ## 11. Canon source gate
 
-**`project_sources/` is not present in this repository.** It is the canon source
-for kingdoms, Aura, runes, Runeforged weapons, Chaos Weapons and Order Weapons.
+**[`project_sources/`](../../project_sources/) is present** — 12 canon Markdown
+files, supplied 3 August 2026. It is the canon source for kingdoms, Aura, runes,
+Runeforged weapons, Chaos Weapons and Order Weapons. The gate that blocked
+Prompt 3 is closed.
 
-This glossary is built from the Workbase alone and is therefore **incomplete on
-lore specifics** — rune family taxonomy, kingdom detail, named characters and
-material catalogues.
+**This glossary has not yet been reconciled with it.** Every entry below is
+built from the Workbase alone and is therefore **incomplete on lore specifics** —
+rune family taxonomy, kingdom detail, named characters and material catalogues.
+Where this document and a canon file disagree, **the canon file wins**.
 
-> **Gate: `project_sources/` must be present and read before Prompt 3**, which
-> defines rune families, fusion compatibility, destructibility policy, Aura
-> metadata, kingdom definitions and named-material catalogues.
+> **Prompt 3 must read all 12 canon files completely, then correct this
+> glossary.** Prompt 3 defines rune families, fusion compatibility,
+> destructibility policy, Aura metadata, kingdom definitions and named-material
+> catalogues; none of it may be authored from the summaries below.
 
-See [`../implementation/STATUS.md`](../implementation/STATUS.md).
+See [`../implementation/STATUS.md §5.1`](../implementation/STATUS.md).

@@ -82,7 +82,7 @@ woo-runeforging/
 ├─ Directory.Build.props       # net10.0, nullable, warnings as errors
 ├─ Directory.Packages.props    # central package management
 ├─ Woo.slnx
-├─ .nvmrc  .env.example  .editorconfig  .gitignore  .gitattributes
+├─ .nvmrc  .editorconfig  .gitignore  .gitattributes
 │
 ├─ docs/                       # planning documents, architecture, ADRs, status
 │
@@ -98,7 +98,9 @@ woo-runeforging/
 ├─ web/
 │  └─ src/{main.tsx, App.tsx, api/, styles.css}
 │
-├─ docker/docker-compose.yml   # PostgreSQL only
+├─ docker/
+│  ├─ docker-compose.yml      # PostgreSQL only
+│  └─ .env.example            # Compose variables — the backend does not read these
 ├─ scripts/                    # documentation checks
 └─ .github/workflows/validate.yml
 ```
@@ -205,6 +207,12 @@ start** with a clear message if the connection string is missing, rather than
 failing on the first request. `appsettings.Development.json` carries local
 Compose credentials only; nothing secret is committed, and `.gitignore` excludes
 `.env`, `appsettings.*.local.json`, `secrets.json` and key material.
+
+`docker/.env` is a **Compose** file, not an application one. The .NET
+configuration system already layers environment variables, so no dotenv package
+exists and none is wanted. Changing the container's port or password therefore
+requires setting `ConnectionStrings__Woo` for the API as a separate step —
+documented in [`../../README.md`](../../README.md#configuration).
 
 ---
 

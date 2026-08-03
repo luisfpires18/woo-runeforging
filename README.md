@@ -44,7 +44,10 @@ docker compose -f docker/docker-compose.yml ps      # wait for "healthy"
 The container publishes **host port 5433**, not 5432. If a PostgreSQL service is
 already installed on your machine it owns 5432, and that listener silently wins
 over the Docker mapping — you get an authentication failure against the wrong
-server. Override the port with `POSTGRES_PORT` if 5433 is also taken.
+server.
+
+If 5433 is also taken, see [Configuration](#configuration) — changing the port
+takes two steps, not one.
 
 **2 — Backend**
 
@@ -115,12 +118,53 @@ before.
 
 ## Configuration
 
-`appsettings.Development.json` carries the local Compose connection string.
-Every other environment supplies `ConnectionStrings__Woo`. The application
-**refuses to start** with a clear message if it is missing.
+There are **two separate configuration systems**, and they do not talk to each
+other.
 
-Copy `.env.example` to `.env` to change the database password or published port.
-`.env` is gitignored; no secret is committed.
+| | Reads | Configures |
+|---|---|---|
+| `docker/.env` | Docker Compose | The PostgreSQL **container** only |
+| `ConnectionStrings__Woo`, or `appsettings.Development.json` | The .NET application | The **API and the tests** |
+
+**`.env` configures Docker Compose only. The backend never reads it**, and no
+dotenv package is installed — the .NET configuration system already layers
+`appsettings.json` → `appsettings.{Environment}.json` → environment variables.
+
+Two consequences worth stating plainly:
+
+1. **Compose reads `.env` from `docker/`, not from the repository root**, because
+   that is the directory holding the compose file. A `.env` at the root is
+   ignored. Start from the template:
+
+   ```bash
+   cp docker/.env.example docker/.env
+   ```
+
+2. **Changing `POSTGRES_PORT` or `POSTGRES_PASSWORD` takes two steps.** Editing
+   `docker/.env` moves the container; the API and the tests carry on using the
+   connection string in `src/Woo.Api/appsettings.Development.json`, which is
+   fixed at port 5433 with the password `woo`. They will then point at the wrong
+   server or fail to authenticate.
+
+   Set `ConnectionStrings__Woo` explicitly in the shell that runs them:
+
+   ```powershell
+   # PowerShell
+   $env:ConnectionStrings__Woo = "Host=localhost;Port=5555;Database=woo;Username=woo;Password=secret"
+   dotnet run --project src/Woo.Api
+   ```
+
+   ```bash
+   # bash
+   ConnectionStrings__Woo="Host=localhost;Port=5555;Database=woo;Username=woo;Password=secret" \
+     dotnet run --project src/Woo.Api
+   ```
+
+   The test project reads the same variable, with the same fallback. CI sets it
+   directly rather than using a `.env` file at all.
+
+The application **refuses to start**, with a clear message, if the connection
+string is missing. `docker/.env` is gitignored; no secret is committed.
 
 ---
 

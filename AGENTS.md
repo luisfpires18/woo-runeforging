@@ -15,8 +15,9 @@ When two sources disagree, the higher entry wins.
 2. **[`docs/Weapons_of_Chaos_and_Order_Agent_AI_Implementation_Prompts.md`](docs/Weapons_of_Chaos_and_Order_Agent_AI_Implementation_Prompts.md)**
    — the execution contract. Defines the prompt sequence, the gates and what
    each stage deliberately defers.
-3. **`project_sources/`** — the underlying lore canon (world, kingdoms, runes,
-   weapons, characters). *Not yet present in the repository. See §6.*
+3. **[`project_sources/`](project_sources/)** — the underlying lore canon
+   (kingdoms, Aura levels, runes, Runeforged Weapons, Chaos and Order Weapons).
+   12 Markdown files, present since 3 August 2026. See §6.
 4. **`docs/architecture/` and `docs/adr/`** — accepted technical decisions.
 5. Existing code and configuration.
 
@@ -149,11 +150,29 @@ the next numbered prompt.
 
 | Gate | Status | Blocks |
 |---|---|---|
-| **`project_sources/` present and read** | **OPEN** — the directory does not exist in this repository | **Prompt 3** (domain contracts and versioned content schemas). Prompts 1 and 2 are unaffected. |
+| **`project_sources/` present** | **READY** — 12 canon Markdown files are in the repository (3 August 2026) | Nothing. Prompt 3 may proceed once the product owner instructs it. |
+| **`project_sources/` read** | **Open per task** — read them before touching lore | Any change involving lore, kingdoms, Aura, runes, Runeforged Weapons, Chaos Weapons or Order Weapons |
 
 Prompt 3 defines rune families, fusion compatibility, destructibility policy,
 Aura metadata, kingdom definitions and named-material catalogues. All of that
-is canon-derived. Do not author it from the Workbase summaries alone.
+is canon-derived. **Do not author it from the Workbase summaries alone** — the
+canon is now present, so there is no longer any excuse to.
+
+The 12 files, unchanged as supplied:
+
+| File | Subject |
+|---|---|
+| `arkazia.md`, `draxys.md`, `lumus.md`, `nordalh.md`, `sylvara.md`, `veridor.md`, `zandres.md` | The seven kingdoms |
+| `aura_levels.md` | L0 Dormant through L3, Conduit, Aspect, Dreadform, Ascendant |
+| `rune_list.md` | Rune families and identities |
+| `runeforged_weapons.md` | Rune vessels and weapon progression |
+| `weapons_of_chaos_and_order.md` | The singular Chaos Weapons and the Order counters |
+| `my_lore_inspirations.md` | The creator's inspiration notes |
+
+**These files are canon and are never edited to fit the code.** If canon and an
+implementation disagree, raise it; do not quietly pick one. Contradictions
+between canon files are tracked in Workbase §23 and
+[`docs/domain/GLOSSARY.md`](docs/domain/GLOSSARY.md), not resolved unilaterally.
 
 ---
 
@@ -205,5 +224,6 @@ database schemas, an Azure topology and a two-compiler TypeScript setup. ADRs
 [0011–0014](docs/adr/README.md); none of that machinery was ever built.
 
 Next: **Prompt 3 — the Foundations of Iron domain model and starter content.**
-It is blocked by the `project_sources/` gate in §6. Do not begin it without the
-product owner's instruction.
+The `project_sources/` gate in §6 is now **closed** — the 12 canon files are
+present — so nothing blocks it. Do not begin it without the product owner's
+instruction, and read all 12 canon files first.

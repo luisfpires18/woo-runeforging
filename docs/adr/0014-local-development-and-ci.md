@@ -64,7 +64,7 @@ Compose.
 
 **No database in CI at all.** Rejected: "PostgreSQL connectivity works" would
 then be a claim rather than a fact, and a broken connection string would reach
-`main` silently.
+`master` silently.
 
 **Add gitleaks as a secret-scanning gate.** Deferred: Prompt 2's stated CI scope
 is build, tests, lint and type-check. Worth adding, but not by widening scope

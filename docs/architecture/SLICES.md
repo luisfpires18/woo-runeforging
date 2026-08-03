@@ -51,10 +51,12 @@ background jobs, an outbox, object storage, PixiJS, Redis, a broker, a second
 
 ### Prompt 3 — Foundations of Iron domain model and starter content
 
-> **Blocked on `project_sources/`.** Rune families, destructibility policy,
-> kingdom definitions and named-material catalogues are canon-derived and must
-> not be authored from Workbase summaries. See
-> [`../implementation/STATUS.md`](../implementation/STATUS.md).
+> **Canon is present.** The 12 files in [`../../project_sources/`](../../project_sources/)
+> arrived on 3 August 2026, closing the gate that blocked this prompt. Rune
+> families, destructibility policy, kingdom definitions and named-material
+> catalogues are canon-derived: **read all 12 before authoring any of them**,
+> and do not fall back on Workbase summaries. See
+> [`../implementation/STATUS.md §5.1`](../implementation/STATUS.md).
 
 | Deliverable | Lands in |
 |---|---|
