@@ -221,7 +221,7 @@ There is no content validator yet; it arrives with authored content.
 | `3934729` | Two visual passes over that presentation — styling, artwork and layout only |
 | `21d6310` | **The settlement terminology migration** — "House" retired, `House` and `Settlement` merged into one aggregate, the outpost left without a proper name. [ADR-0016](docs/adr/0016-settlement-terminology.md) |
 | `f35f797` | **Prompt 6, the construction half** — the confirm route, spending at confirm, shortages with mocked procurement, completion on read, and the Command Hall unlocking Barracks and Forge. [ADR-0017](docs/adr/0017-commands-over-the-settlement-state-seam.md) |
-| *this change* | **Prompt 6B, the forging half** — the ordinary forging loop and the exclusive destination. [ADR-0018](docs/adr/0018-forging-state-machine-and-exclusive-destination.md) |
+| `f8ad7d7` | **Prompt 6B, the forging half** — the ordinary forging loop and the exclusive destination. [ADR-0018](docs/adr/0018-forging-state-machine-and-exclusive-destination.md) |
 
 The Workbase, the prompt sheet and `project_sources/` keep their own wording, so
 **later prompt text saying "House" means the Settlement**.

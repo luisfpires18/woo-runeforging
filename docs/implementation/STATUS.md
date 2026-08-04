@@ -19,16 +19,16 @@ in the [change log](#9-change-log).
 | 5 | `3934729` | The two visual passes over that presentation |
 | — | `21d6310` | The settlement terminology migration — House merged into Settlement |
 | 6 | `f35f797` | The construction half — the commit flow |
-| 6B | *this change* | The forging half — the ordinary forging loop and the exclusive destination |
+| 6B | `f8ad7d7` | The forging half — the ordinary forging loop and the exclusive destination |
 
-**Correcting three documents that had gone stale.** Until this change,
+**Correcting three documents that had gone stale.** Until `f8ad7d7`,
 `AGENTS.md` §8, this file's header and `SLICES.md` all described `21d6310` and
 `f35f797` as uncommitted work sitting on top of Prompt 5. Both were committed and
 pushed on 4 August. All three are corrected here.
 
 **CI is green on every pushed commit**, verified against the GitHub Actions API
-on 3 August 2026. `3934729`, `21d6310` and `f35f797` were committed on 4 August
-and their CI results are not recorded here:
+on 3 August 2026. `3934729`, `21d6310`, `f35f797` and `f8ad7d7` were committed on
+4 August and their CI results are not recorded here:
 
 ```
 f6214a6  validate  completed  success   run 30835450898
