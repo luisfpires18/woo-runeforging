@@ -34,7 +34,7 @@ export function ErrorRegion({
 }) {
   return (
     <div className="state state--error" role="alert">
-      <p className="state__text">Could not reach the House. Your work is not lost.</p>
+      <p className="state__text">Could not reach the outpost. Your work is not lost.</p>
       <p className="state__detail">{message}</p>
       <button type="button" className="button button--secondary" onClick={onRetry}>
         Try again

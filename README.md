@@ -1,12 +1,12 @@
 # Weapons of Chaos and Order
 
-A persistent multiplayer medieval strategy RPG in which a player raises a minor
-House from a frontier outpost into a regional power, masters weapon forging from
+A persistent multiplayer medieval strategy RPG in which a player raises a
+settlement from a frontier outpost into a regional power, masters weapon forging from
 crude arms to steel masterworks, and eventually discovers runes and risks them in
 Runeforging.
 
-**Current stage: Prompt 5 — the first player-facing screen exists.** A House
-Seat for a new minor Arkazian House, built from typed fake data: the six
+**Current stage: Prompt 5 — the first player-facing screen exists.** An
+outpost screen for a new Arkazian settlement, built from typed fake data: the six
 resources, seven buildings on the site, a named smith, and what changed and what
 needs attention on return.
 
@@ -80,8 +80,8 @@ npm ci
 npm run dev
 ```
 
-Open <http://localhost:5173>. You arrive at the House Seat: the six resources,
-the site and its seven buildings, the household, and one clear first task.
+Open <http://localhost:5173>. You arrive at the outpost: the six resources,
+the site and its seven buildings, the residents, and one clear first task.
 
 | URL | Shows |
 |---|---|
@@ -194,13 +194,13 @@ string is missing. `docker/.env` is gitignored; no secret is committed.
 
 ```
 src/Woo.Api/         one ASP.NET Core application
-  Features/          one folder per feature — Houses, Settlements, Resources
+  Features/          one folder per feature — Settlements, Resources
   Content/           starter catalogues, static C#
   Persistence/       WooDbContext, Configurations/, Migrations/
 tests/Woo.Tests/     the backend test project
 web/                 React, TypeScript and Vite client
   src/api/           the typed adapter seam — swap fake for real here
-  src/features/      House Seat, settlement, household
+  src/features/      Outpost, settlement, residents
   src/components/    shared components
   src/assets/        placeholder art and the fallback chain
 docker/              PostgreSQL only

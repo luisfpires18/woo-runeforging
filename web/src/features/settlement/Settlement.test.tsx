@@ -22,7 +22,7 @@ describe('Settlement', () => {
     for (const kind of ['Barracks', 'Forge']) {
       const row = document.querySelector(`[data-kind="${kind}"]`);
       expect(row).toHaveAttribute('data-status', 'Previewed');
-      expect(within(row as HTMLElement).getByText(/needs the house hall/i)).toBeInTheDocument();
+      expect(within(row as HTMLElement).getByText(/needs the command hall/i)).toBeInTheDocument();
     }
   });
 

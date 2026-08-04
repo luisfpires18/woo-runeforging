@@ -9,21 +9,21 @@
  */
 
 import arkazia from './factions/arkazia.svg';
-import houseKarrow from './heraldry/house-karrow.svg';
+import arkazianToken from './heraldry/arkazian-token.svg';
 import barracks from './buildings/barracks.svg';
-import houseHall from './buildings/house-hall.svg';
+import commandHall from './buildings/command-hall.svg';
 import lumberYard from './buildings/lumber-yard.svg';
 import mine from './buildings/mine.svg';
 import quarry from './buildings/quarry.svg';
 import storehouse from './buildings/storehouse.svg';
 
 /** The terminal fallback. Always present. */
-export const heraldicToken = houseKarrow;
+export const heraldicToken = arkazianToken;
 
 const known: Readonly<Record<string, string>> = {
-  'heraldry/house-karrow': houseKarrow,
+  'heraldry/arkazian-token': arkazianToken,
   'factions/arkazia': arkazia,
-  'buildings/house-hall': houseHall,
+  'buildings/command-hall': commandHall,
   'buildings/storehouse': storehouse,
   'buildings/lumber-yard': lumberYard,
   'buildings/quarry': quarry,

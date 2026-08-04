@@ -1,7 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 76" role="img" aria-hidden="true">
-  <!-- House Karrow. The terminal fallback: every chain ends here, so this file
-       must always exist. Arkazian kite shield — blackened steel over crimson
-       cloth, riveted, with the pass and its fortified line as the charge. -->
+  <!-- The settlement token. The terminal fallback: every chain ends here, so
+       this file must always exist. Arkazian kite shield — blackened steel over
+       crimson cloth, riveted, with the pass and its fortified line as the
+       charge. It carries no House device: the outpost has no name yet. -->
   <defs>
     <linearGradient id="hkCloth" x1="0" y1="0" x2="0.3" y2="1">
       <stop offset="0" stop-color="#A03028"/>

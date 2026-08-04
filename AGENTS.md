@@ -213,14 +213,19 @@ There is no content validator yet; it arrives with authored content.
 
 ## 8. Current stage
 
-**Prompt 5 (the mocked House Seat) is complete, committed and reviewed** —
-`f6214a6`, pushed, CI green (validate run `30835450898`). The web client shows a
-House Seat and settlement for a new minor Arkazian House, built from **typed
-fake data**. No API over the domain, nothing saved.
+**Prompt 5 (the mocked Outpost) is complete, committed and reviewed** —
+`f6214a6`, pushed, CI green (validate run `30835450898`). The web client shows the
+outpost and its site for a new Arkazian settlement, built from **typed fake
+data**. No API over the domain, nothing saved.
 
-A **visual-polish pass** over that presentation is in progress and uncommitted.
-It changes styling and artwork only — routes, scenarios, the provider boundary,
-accessibility rules and mocked behaviour are unchanged.
+**Two visual passes** over that presentation are committed as `3934729` —
+styling, artwork and layout only.
+
+**The settlement terminology migration** sits on top, **uncommitted** — "House"
+retired, `House` and `Settlement` merged into one aggregate, the outpost left
+without a proper name. [ADR-0016](docs/adr/0016-settlement-terminology.md). The
+Workbase, the prompt sheet and `project_sources/` keep their own wording, so
+**later prompt text saying "House" means the Settlement**.
 
 **Prompt 4 (UX and visual design) is committed** — `f084304`. The design package
 lives in [`docs/design/`](docs/design/) and Prompt 5 amended it in two places
@@ -228,9 +233,9 @@ lives in [`docs/design/`](docs/design/) and Prompt 5 amended it in two places
 
 **Prompt 3 (the first domain model) is committed** — `97248cb`, `9483047`.
 
-The repository holds one ASP.NET Core application with `Houses`, `Settlements`
-and `Resources` feature folders; a static C# starter-content catalogue; the
-House aggregate persisted through the `InitialHouseAggregate` migration; one
+The repository holds one ASP.NET Core application with `Settlements` and
+`Resources` feature folders; a static C# starter-content catalogue; the
+Settlement aggregate persisted through the `InitialHouseAggregate` migration; one
 test project; a React/Vite shell; Docker Compose for PostgreSQL; CI on `master`;
 and the 12 canon files in [`project_sources/`](project_sources/), read in full.
 
@@ -249,8 +254,8 @@ Do not begin it without the product owner's instruction.
 
 Two standing rules the frontend now depends on:
 
-- **The adapter seam.** Components consume `HouseState` through
-  `web/src/api/HouseStateProvider.tsx`. Nothing under `features/` or
+- **The adapter seam.** Components consume `SettlementState` through
+  `web/src/api/SettlementStateProvider.tsx`. Nothing under `features/` or
   `components/` may import from `api/fake/` — ESLint enforces it, so that
   replacing fake state with real endpoints stays a change in one file.
 - **Read [`docs/design/README.md`](docs/design/README.md) before building a

@@ -23,10 +23,10 @@ public static class BuildingCatalogue
     public static IReadOnlyDictionary<BuildingKind, BuildingDefinition> Definitions { get; } =
         new Dictionary<BuildingKind, BuildingDefinition>
         {
-            [BuildingKind.HouseHall] = new(
-                BuildingKind.HouseHall,
-                "House Hall",
-                "The seat of the House. Governance, reputation and the settlement's standing.",
+            [BuildingKind.CommandHall] = new(
+                BuildingKind.CommandHall,
+                "Command Hall",
+                "Where the settlement is run. Governance, reputation and standing.",
                 ResourceCost.Of(
                     (ResourceKind.Timber, 120),
                     (ResourceKind.Stone, 80),
@@ -36,7 +36,7 @@ public static class BuildingCatalogue
             [BuildingKind.Storehouse] = new(
                 BuildingKind.Storehouse,
                 "Storehouse",
-                "Covered, guarded storage for the House's goods.",
+                "Covered, guarded storage for the settlement's goods.",
                 ResourceCost.Of(
                     (ResourceKind.Timber, 90),
                     (ResourceKind.Stone, 30),

@@ -202,7 +202,7 @@ while a timer ticks are the single most restless thing an idle screen can do.
 
 ### 3.1 The display treatment — added by the second visual pass
 
-The system stack stands. A game screen still needs a voice for the House and
+The system stack stands. A game screen still needs a voice for the settlement and
 the settlement that a data table does not have, and it is built from weight,
 scale and tracking rather than from a second typeface.
 
@@ -217,7 +217,7 @@ scale and tracking rather than from a second typeface.
 A *label* is small, uppercase and widely tracked. Nothing sits between them, so
 a heading never has to be read twice to know which kind of thing it is.
 
-The House name is a label, not a title: it is stamped above the settlement name
+The settlement name is a label, not a title: it is stamped above the title
 the way a name is stamped into steel. A screen label is followed by a hairline
 of `steel` capped in `action-rim` — a lit edge, drawn in CSS, not an image.
 

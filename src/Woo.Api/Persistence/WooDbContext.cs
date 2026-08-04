@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Woo.Api.Features.Houses;
+using Woo.Api.Features.Settlements;
 
 namespace Woo.Api.Persistence;
 
@@ -8,13 +8,13 @@ namespace Woo.Api.Persistence;
 /// connection, one transaction scope, one migration history.
 /// </summary>
 /// <remarks>
-/// It maps the House aggregate only — House, its settlement, that settlement's
-/// buildings, and its resource balances. Forging, armies and battles are not
-/// modelled yet and so have nothing to persist.
+/// It maps the Settlement aggregate only — the settlement, its buildings and
+/// its resource balances. Forging, armies and battles are not modelled yet and
+/// so have nothing to persist.
 /// </remarks>
 public sealed class WooDbContext(DbContextOptions<WooDbContext> options) : DbContext(options)
 {
-    public DbSet<House> Houses => Set<House>();
+    public DbSet<Settlement> Settlements => Set<Settlement>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

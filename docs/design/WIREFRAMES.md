@@ -6,7 +6,7 @@ Low fidelity on purpose. These fix **layout, hierarchy and copy** — not pixels
 Prompt 5 owns the visual execution using `VISUAL-LANGUAGE.md`.
 
 > **Amended by Prompt 5 (3 August 2026): the site holds seven buildings, not
-> five.** Prompt 5 asks the player to "build or preview the House Hall,
+> five.** Prompt 5 asks the player to "build or preview the Command Hall,
 > storehouse, barracks, and forge", and Prompt 11 lists Barracks and Forge as
 > Foundations of Iron buildings. They are shown as **previews** — visible on the
 > site with the reason they cannot be raised — beside the five raisable ones.
@@ -26,17 +26,17 @@ Numbers shown are the starter content in `Content/BuildingCatalogue.cs` and
 
 ---
 
-## 1. House Seat — first session, desktop
+## 1. Outpost — first session, desktop
 
 The screen that has one job: make the first move unmissable.
 
 ```
 ┌───────────────────────────────────────────────────────────────────────────┐
-│  ⌂  House Karrow · Ashen Reach                              [ Outpost ]   │
+│  ⌂  Arkazian Outpost                                        [ Outpost ]   │
 │  Gold 250   Provisions 200   Timber 220   Stone 180   Ore 120   Supp 100  │
 ├──────────────┬────────────────────────────────────────────────────────────┤
 │              │                                                            │
-│ ▸ Seat       │   Ashen Reach                                              │
+│ ▸ Outpost    │   Arkazian Outpost                                         │
 │   Settlement │   A claimed site on the ridge road. Nothing built yet.     │
 │              │                                                            │
 │              │   ┌──────────────────────────────────────────────────┐     │
@@ -53,7 +53,7 @@ The screen that has one job: make the first move unmissable.
 │              │   THE SITE                                                 │
 │              │   ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐   │
 │              │   │   □    │ │   □    │ │   □    │ │   □    │ │   □    │   │
-│              │   │ House  │ │ Store- │ │ Lumber │ │ Quarry │ │  Mine  │   │
+│              │   │Command │ │ Store- │ │ Lumber │ │ Quarry │ │  Mine  │   │
 │              │   │  Hall  │ │ house  │ │  Yard  │ │        │ │        │   │
 │              │   └────────┘ └────────┘ └────────┘ └────────┘ └────────┘   │
 │              │                                                            │
@@ -76,23 +76,23 @@ The screen that has one job: make the first move unmissable.
 
 ---
 
-## 2. House Seat — returning session, desktop
+## 2. Outpost — returning session, desktop
 
 Same screen, different job: answer the three questions before they are asked.
 
 ```
 ┌───────────────────────────────────────────────────────────────────────────┐
-│  ⌂  House Karrow · Ashen Reach                              [ Outpost ]   │
+│  ⌂  Arkazian Outpost                                        [ Outpost ]   │
 │  Gold 250   Provisions 200   Timber 180   Stone 180   Ore 120   Supp 70   │
 ├──────────────┬────────────────────────────────────────────────────────────┤
 │              │                                                            │
-│ ▸ Seat       │   WHAT CHANGED            │  NEEDS ATTENTION               │
+│ ▸ Outpost    │   WHAT CHANGED            │  NEEDS ATTENTION               │
 │   Settlement │   ─────────────           │  ────────────────              │
 │              │   ✓ Lumber Yard complete  │  ⚠ Storehouse due in 4 min     │
 │              │     2 hours ago           │    < go to construction >      │
 │              │                           │                                │
 │              │   ✓ Storehouse begun      │  ⚠ Not enough Timber for the   │
-│              │     2 hours ago           │    House Hall — short by 20    │
+│              │     2 hours ago           │    Command Hall — short by 20  │
 │              │                           │    < see the site >            │
 │              │   < full history >        │                                │
 │              │                                                            │
@@ -105,7 +105,7 @@ Same screen, different job: answer the three questions before they are asked.
 │              │   THE SITE                                                 │
 │              │   ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐   │
 │              │   │   □    │ │   ▨    │ │   ■    │ │   □    │ │   □    │   │
-│              │   │ House  │ │ Store- │ │ Lumber │ │ Quarry │ │  Mine  │   │
+│              │   │Command │ │ Store- │ │ Lumber │ │ Quarry │ │  Mine  │   │
 │              │   │  Hall  │ │ house  │ │  Yard  │ │        │ │        │   │
 │              │   │        │ │  4 min │ │        │ │        │ │        │   │
 │              │   └────────┘ └────────┘ └────────┘ └────────┘ └────────┘   │
@@ -125,21 +125,21 @@ Same screen, different job: answer the three questions before they are asked.
 
 ---
 
-## 3. House Seat — mobile
+## 3. Outpost — mobile
 
 First session, `< 48rem`. Returning session stacks in the order of §2.
 
 ```
 ┌──────────────────────────┐
-│ ⌂ HOUSE KARROW           │
-│   Ashen Reach  [Outpost] │
+│ ⌂ ARKAZIAN OUTPOST       │
+│   Arkazia      [Outpost] │
 │ GOLD PROV TIMBER         │
 │  250  200    220         │
 │ STONE ORE WORKSHOP       │
 │  180  120 SUPPLIES 100   │
 ├──────────────────────────┤
-│ THE HOUSE SEAT           │
-│ Ashen Reach              │
+│ OVERVIEW                 │
+│ Arkazian Outpost         │
 │ A claimed site on the    │
 │ ridge road.              │
 │ ┌──────────────────────┐ │
@@ -156,12 +156,12 @@ First session, `< 48rem`. Returning session stacks in the order of §2.
 │ │ THE SITE             │ │
 │ │ ┌───────┐ ┌───────┐  │ │  the sites, two across
 │ │ │ ▒art▒ │ │ ▒art▒ │  │ │
-│ │ │ House │ │ Store │  │ │
-│ │ │  □ … │ │  □ …  │  │ │
+│ │ │Command│ │ Store │  │ │
+│ │ │  □ … │ │  □ …  │  │  │
 │ │ └───────┘ └───────┘  │ │
 │ └──────────────────────┘ │
 ├──────────────────────────┤
-│   SEAT   │  SETTLEMENT   │
+│ OUTPOST  │  SETTLEMENT   │
 └──────────────────────────┘
 ```
 
@@ -184,10 +184,10 @@ First session, `< 48rem`. Returning session stacks in the order of §2.
 
 ```
 ┌───────────────────────────────────────────────────────────────────────────┐
-│  ⌂  House Karrow · Ashen Reach                              [ Outpost ]   │
+│  ⌂  Arkazian Outpost                                        [ Outpost ]   │
 │  Gold 250   Provisions 200   Timber 180   Stone 180   Ore 120   Supp 70   │
 ├──────────────┬────────────────────────────────────────────────────────────┤
-│   Seat       │  Ashen Reach — Outpost                                     │
+│   Outpost    │  Arkazian Outpost                                          │
 │ ▸ Settlement │  Mountain road, alpine forest below the ridgeline.         │
 │              │                                                            │
 │              │  ┌─────────────────────────────────────────────────────┐   │
@@ -205,8 +205,8 @@ First session, `< 48rem`. Returning session stacks in the order of §2.
 │              │  │ ▨ Storehouse           ▓▓▓▓▓▓▓▓░░  4 min left      │    │
 │              │  │   Covered storage                 ( View )         │    │
 │              │  ├────────────────────────────────────────────────────┤    │
-│              │  │ □ House Hall           120 Timber · 80 Stone       │    │
-│              │  │   Seat of the House    40 Supplies · 30 min        │    │
+│              │  │ □ Command Hall         120 Timber · 80 Stone       │    │
+│              │  │   Runs the settlement  40 Supplies · 30 min        │    │
 │              │  │                        ⚠ short 20 Timber           │    │
 │              │  ├────────────────────────────────────────────────────┤    │
 │              │  │ □ Quarry               60 Timber · 30 Supplies     │    │
@@ -268,7 +268,56 @@ The confirm step. Everything the player needs to decide, before they commit.
   with the primary on top.
 
 **While it runs** — no separate screen. The building row shows a progress bar,
-and the House Seat lists it under *Needs attention* when it is nearly due.
+and the Outpost lists it under *Needs attention* when it is nearly due.
+
+**While it runs** — no separate screen. The building row shows a progress bar,
+and the Outpost lists it under *Needs attention* when it is nearly due.
+
+### 5.1 Short of something — added by Prompt 6
+
+The shortfall **replaces** the confirm; it never sits beside a disabled one.
+It names the exact amounts, the total price and what is left afterwards, because
+"you cannot afford this" is not a decision the player can act on.
+
+```
+│   ┌───────────────────────────────────────────────────────────────┐       │
+│   │  ⚠ Short 20 Timber and 10 Supplies.                           │       │
+│   │                                                               │       │
+│   │  Procuring costs 30 Gold, leaving 220.                        │       │
+│   │                                                               │       │
+│   │  [ Procure the shortfall ]                                    │       │
+│   └───────────────────────────────────────────────────────────────┘       │
+│                                                                           │
+│   ( Cancel )                                                              │
+```
+
+- **All of it, or none of it.** Procurement buys every current shortfall in one
+  act. There is no per-resource quantity to choose, because a player choosing
+  amounts is doing the arithmetic the screen already did.
+- **Gold is never itself a shortfall.** There is no recursive way to procure
+  Gold; short of Gold is reported as short of Gold.
+- Once the shortfall clears, the confirm comes back and the flow continues
+  unchanged. The rate is a **balance placeholder**, like every other number here.
+
+### 5.2 While a command runs — added by Prompt 6
+
+The confirm takes a visible working state and is disabled while it is in flight.
+This is not the offline disabled state: it is momentary, it says what is
+happening, and it exists so a second click cannot spend twice.
+
+**Offline disables both commands** — beginning construction and procuring — each
+with the reason beside it. That is the one sanctioned disabled control.
+
+### 5.3 Arriving at a site that cannot be raised — added by Prompt 6
+
+The route is addressable, so the player can arrive at any of them. Each states
+what is true and offers no confirm: **complete** says it is already standing;
+**under construction** shows progress and time remaining; **previewed** names
+the unmet requirement. An unknown building is a not-found state with a way back,
+never a crash.
+
+**A previewed building becomes available the moment its prerequisite completes.**
+Barracks and Forge are previewed only while the Command Hall is unbuilt.
 
 ---
 
@@ -278,10 +327,10 @@ and the House Seat lists it under *Needs attention* when it is nearly due.
 
 ```
 ┌───────────────────────────────────────────────────────────────────────────┐
-│  ⌂  House Karrow · Ashen Reach                              [ Outpost ]   │
+│  ⌂  Arkazian Outpost                                        [ Outpost ]   │
 │  Gold 250   Provisions 200   Timber 120   Stone 180   Ore 120   Supp 40   │
 ├──────────────┬────────────────────────────────────────────────────────────┤
-│   Seat       │  The Forge                                                 │
+│   Outpost    │  The Forge                                                 │
 │   Settlement │  Smith on duty: <named smith>, Weaponsmith                 │
 │ ▸ Forge      │                                                            │
 │              │  ┌──────────────────────────────────────────────────┐      │
@@ -325,7 +374,7 @@ and the House Seat lists it under *Needs attention* when it is nearly due.
 
 ```
 ┌───────────────────────────────────────────────────────────────────────────┐
-│   Seat       │  Companies                                                 │
+│   Outpost    │  Companies                                                 │
 │   Settlement │                                                            │
 │   Forge      │  ┌──────────────────────────────────────────────────┐      │
 │ ▸ Army       │  │  ⚔ First Bastion                    Ready        │      │
@@ -364,7 +413,7 @@ and the House Seat lists it under *Needs attention* when it is nearly due.
 │                                                                           │
 │   ┌─────────────────────────────────────────────────────────────┐         │
 │   │            [ replay — later, PixiJS ]                       │         │
-│   │      ▶  ⏸   ──────●────────────  1×   ⚙                    │         │
+│   │      ▶  ⏸   ──────●────────────  1×   ⚙                    │          │
 │   │      < read the written report instead >                    │         │
 │   └─────────────────────────────────────────────────────────────┘         │
 │                                                                           │

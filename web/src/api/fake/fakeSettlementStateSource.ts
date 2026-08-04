@@ -2,17 +2,17 @@ import type {
   AttentionItem,
   Building,
   ChangeEntry,
-  HouseState,
-  HouseStateSource,
   ResourceBalance,
   ResourceKind,
+  SettlementState,
+  SettlementStateSource,
 } from '../types.ts';
 import { resourceOrder } from '../types.ts';
 import { FakeClock } from './clock.ts';
 import { buildingDefinitions, openingBalances, resourceDisplayNames } from './content.ts';
 
 /**
- * The two scenarios the mock ships. They are distinct states, not one state
+ * The scenarios the mock ships. They are distinct states, not one state
  * mutating into the other.
  *
  * - `firstSession` — nothing built. The Lumber Yard is available, and raising
@@ -20,6 +20,7 @@ import { buildingDefinitions, openingBalances, resourceDisplayNames } from './co
  * - `returningConstruction` — the Lumber Yard is already under construction and
  *   due shortly, so the development time control can carry it to completion and
  *   the settlement view can be seen to change.
+ * - `empty` — a settlement nobody has taken service at yet.
  */
 export type Scenario = 'firstSession' | 'returningConstruction' | 'empty';
 
@@ -37,11 +38,11 @@ function balances(spent: Partial<Record<ResourceKind, number>> = {}): ResourceBa
  * A fake source over an in-memory scenario.
  *
  * Time only moves when {@link advance} is called, and advancing does not touch
- * component state: the next {@link load} simply returns a state derived from the
- * new time. That is deliberately the same shape as a refetch against a real
+ * component state: the next {@link load} simply returns a state derived from
+ * the new time. That is deliberately the same shape as a refetch against a real
  * endpoint.
  */
-export class FakeHouseStateSource implements HouseStateSource {
+export class FakeSettlementStateSource implements SettlementStateSource {
   private readonly clock: FakeClock;
   private readonly scenario: Scenario;
   private readonly latencyMs: number;
@@ -57,7 +58,7 @@ export class FakeHouseStateSource implements HouseStateSource {
     this.clock.advance(minutes);
   }
 
-  async load(signal?: AbortSignal): Promise<HouseState> {
+  async load(signal?: AbortSignal): Promise<SettlementState> {
     if (this.latencyMs > 0) {
       await new Promise((resolve) => setTimeout(resolve, this.latencyMs));
     }
@@ -67,23 +68,20 @@ export class FakeHouseStateSource implements HouseStateSource {
     const now = this.clock.now();
 
     return {
-      house: {
-        name: 'House Karrow',
-        kingdom: 'Arkazia',
-        crestKey: 'heraldry/house-karrow',
-      },
       settlement: {
-        name: 'Ashen Reach',
+        name: 'Arkazian Outpost',
+        kingdom: 'Arkazia',
         stage: 'Outpost',
         geography:
           'A claimed site on the ridge road, where the pass narrows above the alpine forest. ' +
           'Stone to the north, iron in the slopes, timber on the lower ground.',
         loreHint:
           'The old road cuts through stone the masons say was marked before Arkazia had a name.',
+        crestKey: 'heraldry/arkazian-token',
       },
       resources: this.resourcesFor(),
       buildings: this.buildingsFor(now),
-      household: this.householdFor(),
+      residents: this.residentsFor(),
       changes: this.changesFor(now),
       attention: this.attentionFor(now),
       asOfUtc: now.toISOString(),
@@ -152,7 +150,7 @@ export class FakeHouseStateSource implements HouseStateSource {
     });
   }
 
-  private householdFor() {
+  private residentsFor() {
     if (this.scenario === 'empty') {
       return [];
     }
@@ -164,7 +162,7 @@ export class FakeHouseStateSource implements HouseStateSource {
         role: 'Smith',
         introduction:
           'Came up through the pass forges at Obsidia and stayed for the quiet. ' +
-          'He keeps his tools laid out for a workshop the House has not built yet.',
+          'He keeps his tools laid out for a workshop the settlement has not built yet.',
         portraitKey: 'people/halvard-stenn',
       },
     ];

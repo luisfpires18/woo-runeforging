@@ -6,13 +6,12 @@
 
 ## 1. The shape
 
-**The House Seat is home.** Not the map, not the War Council. The player leads a
-House that develops a settlement, and the home screen is that settlement's
-report — Workbase §5.
+**The Outpost is home.** Not the map, not the War Council. The player develops
+one settlement, and the home screen is that settlement's report — Workbase §5.
 
 ```mermaid
 flowchart TD
-    HS["<b>House Seat</b><br/><i>home · what changed · what needs attention</i>"]
+    HS["<b>Outpost</b><br/><i>home · what changed · what needs attention</i>"]
 
     ST["Settlement<br/><i>the site and its buildings</i>"]
     FO["Forge<br/><i>craft projects</i>"]
@@ -36,7 +35,7 @@ flowchart TD
 ```
 
 **Four destinations, three detail views.** Construction, Craft and Battle report
-are reached from their parent — and also **directly from a House Seat attention
+are reached from their parent — and also **directly from a Outpost attention
 item**, because the two-minute session must not require navigating a hierarchy
 to act on the thing the screen just told the player about.
 
@@ -44,7 +43,7 @@ to act on the thing the screen just told the player about.
 
 | Area | Prompt | Until then |
 |---|---|---|
-| House Seat, Settlement, Construction | 5–6 | — |
+| Outpost, Settlement, Construction | 5–6 | — |
 | Forge, Craft | 6 | Not present. **Not shown as locked** |
 | Army | 7 | Not present |
 | Reports, Battle report | 7 | Not present |
@@ -62,7 +61,7 @@ does.
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │ ⌂ HOUSE KARROW          GOLD  PROV  TIMBER  STONE  ORE  SUPP │  one HUD band,
-│   Ashen Reach [Outpost]  250   200     220    180  120   100 │  stone
+│   Arkazian Outpost [Outpost]  250   200     220    180  120   100 │  stone
 ├──────────┬───────────────────────────────────────────────────┤
 │▌ SEAT    │            screen content                         │  surface-0
 │  SETTLE… │                                                   │
@@ -73,7 +72,7 @@ does.
    rail                      max 90rem, centred
 ```
 
-- **One HUD band.** House identity, settlement state and the stores answer a
+- **One HUD band.** Settlement identity, settlement state and the stores answer a
   single question — what do I hold, and where — so they share one stone band
   rather than stacking into two. The band keeps a fixed minimum height, so it
   does not change size between the loading state and the loaded one.
@@ -82,7 +81,7 @@ does.
   alone.
 - **The resource bar is always visible.** Every commitment spends resources; the
   player must never navigate away to check whether they can afford something.
-- **The HUD names the House and settlement.** Identity, on every screen.
+- **The HUD names the settlement.** Identity, on every screen.
 
 ---
 
@@ -93,7 +92,7 @@ does.
 ```
 ┌────────────────────────┐
 │ ⌂ HOUSE KARROW         │  HUD, compact
-│   Ashen Reach [Outpost]│
+│   Arkazian Outpost [Outpost]│
 │ GOLD  PROV   TIMBER    │  stores, 3 across,
 │  250   200      220    │  labels kept
 │ STONE ORE  WORKSHOP    │
@@ -147,7 +146,7 @@ make.
 
 ---
 
-## 5. Layout of the House Seat
+## 5. Layout of the Outpost
 
 The home screen's regions, in priority order. This ordering is the same on both
 viewports — mobile stacks it, desktop may place *What changed* and *Needs
@@ -155,7 +154,7 @@ attention* side by side.
 
 | Region | Answers | Priority |
 |---|---|---|
-| Identity — House, settlement, stage | Who am I | Always visible |
+| Identity — settlement, kingdom, stage | Who am I | Always visible |
 | Resources | What do I hold | Always visible |
 | **Primary action** | What should I do now | First session: exactly one. Otherwise: see below |
 | What changed | What completed while I was away | Above the fold |

@@ -1,5 +1,4 @@
 using Woo.Api.Content;
-using Woo.Api.Features.Houses;
 using Woo.Api.Features.Resources;
 using Woo.Api.Features.Settlements;
 
@@ -49,14 +48,14 @@ public sealed class StarterContentTests
     }
 
     [Fact]
-    public void The_starter_house_is_an_arkazian_outpost()
+    public void The_starter_settlement_is_an_arkazian_outpost()
     {
-        var house = StarterContent.EstablishStarterHouse(Guid.NewGuid(), Guid.NewGuid());
+        var settlement = StarterContent.FoundStarterSettlement(Guid.NewGuid());
 
-        Assert.Equal(Kingdom.Arkazia, house.Kingdom);
-        Assert.Equal(SettlementStage.Outpost, house.Settlement.Stage);
-        Assert.Equal(Enum.GetValues<BuildingKind>().Length, house.Settlement.Buildings.Count);
-        Assert.All(house.Settlement.Buildings, building =>
+        Assert.Equal(Kingdom.Arkazia, settlement.Kingdom);
+        Assert.Equal(SettlementStage.Outpost, settlement.Stage);
+        Assert.Equal(Enum.GetValues<BuildingKind>().Length, settlement.Buildings.Count);
+        Assert.All(settlement.Buildings, building =>
             Assert.Equal(ConstructionStatus.NotBuilt, building.Status));
     }
 
@@ -64,11 +63,11 @@ public sealed class StarterContentTests
     public void The_opening_position_affords_any_first_building()
     {
         // There must always be a first move available, whichever the player picks.
-        var house = StarterContent.EstablishStarterHouse(Guid.NewGuid(), Guid.NewGuid());
+        var settlement = StarterContent.FoundStarterSettlement(Guid.NewGuid());
 
         Assert.All(BuildingCatalogue.Definitions.Values, definition =>
             Assert.True(
-                house.Resources.CanAfford(definition.Cost),
+                settlement.Resources.CanAfford(definition.Cost),
                 $"{definition.DisplayName} is unaffordable at the opening position."));
     }
 
@@ -78,7 +77,7 @@ public sealed class StarterContentTests
         // ...but not all of them, or there would be no decision to make. This is
         // the property that makes the first session a choice rather than a
         // checklist.
-        var house = StarterContent.EstablishStarterHouse(Guid.NewGuid(), Guid.NewGuid());
+        var settlement = StarterContent.FoundStarterSettlement(Guid.NewGuid());
 
         var everything = BuildingCatalogue.Definitions.Values
             .SelectMany(definition => definition.Cost.Entries)
@@ -88,6 +87,6 @@ public sealed class StarterContentTests
 
         Assert.Contains(
             everything,
-            entry => house.Resources.AmountOf(entry.Kind) < entry.Total);
+            entry => settlement.Resources.AmountOf(entry.Kind) < entry.Total);
     }
 }

@@ -1,9 +1,8 @@
 # Implementation status
 
 **Last updated:** 4 August 2026
-**Current stage:** Prompt 5 — the mocked House Seat ·
-**complete, committed, reviewed** (`f6214a6`)
-**In progress:** two visual passes over Prompt 5's presentation — uncommitted
+**Current stage:** Prompt 5 — the mocked outpost, **committed** (`f6214a6`, `3934729`)
+**Uncommitted:** the settlement terminology migration
 **Next:** Prompt 6 — the mocked construction and forging loop
 
 This document describes **what is true now**. The history of how it got here is
@@ -17,10 +16,12 @@ in the [change log](#9-change-log).
 | 3 | `bb1a1fa`, `97248cb` | The first domain model, starter content and migration |
 | 3 | `9483047` | Review corrections — the construction ordering defect |
 | 4 | `f084304` | The design package — documents only |
-| 5 | `f6214a6` | The mocked House Seat, from typed fake data |
+| 5 | `f6214a6` | The mocked outpost screen, from typed fake data |
+| 5 | `3934729` | The two visual passes over that presentation |
 
-`master` is level with `origin/master`. **CI is green on every pushed commit**,
-verified against the GitHub Actions API on 3 August 2026:
+**CI is green on every pushed commit**, verified against the GitHub Actions API
+on 3 August 2026. `3934729` was committed locally on 4 August and its CI result
+is not recorded here:
 
 ```
 f6214a6  validate  completed  success   run 30835450898
@@ -37,15 +38,15 @@ a1067a7  validate  completed  success
 
 | Area | State |
 |---|---|
-| Domain | `Houses`, `Settlements`, `Resources` feature folders — plain C#, no EF attributes, no clock reads |
+| Domain | `Settlements` and `Resources` feature folders — plain C#, no EF attributes, no clock reads |
 | Content | `Content/` — static C# catalogues keyed by the enums |
-| Persistence | The House aggregate: `Houses`, `Settlements`, `Buildings`, `ResourceBalances`, applied by the `InitialHouseAggregate` migration |
+| Persistence | The Settlement aggregate: `Settlements`, `Buildings`, `ResourceBalances`, applied by `InitialHouseAggregate` then `MergeHouseIntoSettlement` |
 | API | `/health` and `/api/v1/platform/status` only. **No endpoint exposes the domain** |
-| Tests | 32 backend, 14 frontend |
+| Tests | 33 backend, 14 frontend |
 | CI | `validate.yml` on `master` — backend against a real PostgreSQL service container, frontend, docs |
 | Canon | 12 files in [`project_sources/`](../../project_sources/), **present and read in full** |
 | Design | Seven documents in [`../design/`](../design/), amended twice by Prompt 5 |
-| Web | House Seat and settlement over **typed fake data**. No API over the domain, nothing saved |
+| Web | The outpost and its site over **typed fake data**. No API over the domain, nothing saved |
 
 **Not built:** forge, smith, crafts, equipment batches · companies, armies,
 battles · runes in any form · markets, contracts, Orders, Warfronts, seasons ·
@@ -55,7 +56,7 @@ idempotency keys · object storage · PixiJS · Azure, deployment, Kubernetes.
 
 ---
 
-## 1y. The visual-polish pass — uncommitted
+## 1y. The visual-polish pass — committed in `3934729`
 
 Prompt 5's presentation was functional but read as an internal dashboard. This
 pass re-grounds it in Arkazia. **Information architecture, routes, scenarios,
@@ -98,12 +99,12 @@ now and the actions stack.
 | # | Correction |
 |---|---|
 | 1 | `Settlement.test.tsx` advanced the clock **twice** — a direct `source.advance(20)` and then the button — totalling 40 minutes for a 15-minute build. The direct call is gone; **one click** now proves completion |
-| 2 | The empty-state test rendered `firstSession` and asserted sections were *absent*. It now renders the **`empty` scenario** and asserts the visible household empty state, and that it is not styled as an error |
+| 2 | The empty-state test rendered `firstSession` and asserted sections were *absent*. It now renders the **`empty` scenario** and asserts the visible residents empty state, and that it is not styled as an error |
 | 3 | `AGENTS.md` and this document record Prompt 5 as committed in `f6214a6`, pushed, reviewed, CI green (run `30835450898`) |
 
 ---
 
-## 1x. The second visual pass — uncommitted
+## 1x. The second visual pass — committed in `3934729`
 
 The polish pass fixed the palette but not the shape. Every piece of information
 still arrived in an equally styled rectangle, the artwork was icon-scale, and
@@ -116,7 +117,7 @@ accessibility rule are unchanged**, and no Prompt 6 functionality was added.
 
 ### 1x.1 What changed
 
-- **A settlement scene is the page.** `environment/ashen-reach.svg` — an
+- **A settlement scene is the page.** `environment/outpost.svg` — an
   authored panorama of the pass, drawn at `1600 × 700` — fills the frame, and
   the seven sites stand on their own ground inside it at fixed anchors held in
   `components/SettlementScene.tsx`. No building is painted into the scene, so it
@@ -124,7 +125,7 @@ accessibility rule are unchanged**, and no Prompt 6 functionality was added.
 - **Three visual levels, and only three:** the world, the command surface, the
   record. `.panel` is gone as a universal wrapper — a single container style
   applied to everything was the thing making the page read as software.
-- **One HUD band.** House identity, settlement state and the six balances share
+- **One HUD band.** Settlement identity, its state and the six balances share
   a single stone header instead of stacking two, with a fixed minimum height so
   the page does not jump between loading and loaded.
 - **The rail is welded to the HUD** — shared edge, no gap, a cloth tab for the
@@ -190,7 +191,76 @@ and the substitutions were reverted.
 
 ---
 
-## 1z. Prompt 5 — the mocked House Seat
+## 1w. The settlement terminology migration — uncommitted
+
+The "House" vocabulary read as *A Song of Ice and Fire* rather than as this
+game, and the product owner asked for plain settlement terminology with no
+replacement proper noun. Recorded in
+[ADR-0016](../adr/0016-settlement-terminology.md); **kept separate from Prompt 6
+in both the implementation and the tests**, because a rename across ~37 files is
+unreviewable tangled with new behaviour.
+
+**"House" is not canon.** `project_sources/` contains zero occurrences of the
+word. It comes from the Workbase (42) and the prompt sheet (30), which are the
+creator's working documents — so those two files are left exactly as written,
+and later prompt text saying "House" means the Settlement.
+
+### 1w.1 The merge
+
+`House` owned exactly one `Settlement` and nothing else, so a straight rename
+would have produced `Settlement.Settlement`. The two merged into **one
+`Settlement` aggregate** carrying name, kingdom, stage, buildings and resource
+pool, keeping `Settlement.Id` as the identity. The glossary rule "one settlement
+per House — no village spam" is now the shape of the model rather than an
+invariant to police.
+
+| From | To |
+|---|---|
+| `House` / `Houses` | `Settlement` / `Settlements` |
+| `House Karrow`, `Ashen Reach` | `Arkazian Outpost` — one name, and no proper noun |
+| House Seat | Outpost |
+| `HouseHall` / "House Hall" | `CommandHall` / "Command Hall" |
+| The household | Residents |
+| `HouseState`, `HouseStateProvider`, `useHouseState` | `SettlementState`, `SettlementStateProvider`, `useSettlementState` |
+
+**Routes are unchanged.** `/` and `/settlement` still address the same screens.
+
+### 1w.2 The migration, and what it had to carry
+
+`MergeHouseIntoSettlement` is **hand-written**, replacing the scaffolded body.
+The scaffolder dropped `Houses` before reading anything out of it and renamed
+`ResourceBalances.HouseId` straight to `SettlementId`, which would have left
+every balance pointing at a house id that no longer identifies anything.
+
+What the migration actually does, in order: add `Kingdom` to `Settlements` and
+backfill it from `Houses`; set the settlement name to `Arkazian Outpost` rather
+than copying the retired one; **carry `Buildings.Kind` from `HouseHall` to
+`CommandHall`**, because the enum is persisted as a string and materialisation
+would otherwise break on the next read; add a nullable `SettlementId` to
+`ResourceBalances` and populate it through `Settlements.HouseId`; rebuild that
+table's primary and foreign keys around it; drop the old columns; and drop
+`Houses` last, once nothing references it.
+
+`Buildings` was already keyed on `SettlementId` and needed no re-pointing.
+
+**`Down` is lossy in exactly one place** — the settlement's original name, which
+Up deliberately discards. Everything else round-trips.
+
+### 1w.3 Proving it against a populated database
+
+`PostgresFixture` migrates to the **latest** schema on initialisation, so
+nothing sharing it can observe a populated `InitialHouseAggregate` database.
+`MergeHouseIntoSettlementTests` therefore creates and drops a database of its
+own, uses `IMigrator` to migrate explicitly to the initial migration, inserts
+House-era rows with **raw SQL** — the current EF model has no `House` type and
+could not write them — then migrates up, asserts, migrates back down, and
+asserts again.
+
+That is why the backend count moved from 32 to 33.
+
+---
+
+## 1z. Prompt 5 — the mocked outpost
 
 **The first player-facing screen, from typed fake data.** No backend change, no
 persistence, no authentication.
@@ -207,9 +277,9 @@ persistence, no authentication.
 
 The deliverable that matters most, because Prompts 10–17 depend on it:
 
-- `api/types.ts` — `HouseState`, the contract components see. ISO strings on the
+- `api/types.ts` — `SettlementState`, the contract components see. ISO strings on the
   wire, parsed at the boundary; progress derived from timestamps.
-- `api/HouseStateProvider.tsx` — the only path to state, and the only path
+- `api/SettlementStateProvider.tsx` — the only path to state, and the only path
   through which it changes.
 - **Nothing under `features/` or `components/` may import `api/fake/`** —
   enforced by an ESLint `no-restricted-imports` rule rather than a grep test, so
@@ -218,7 +288,7 @@ The deliverable that matters most, because Prompts 10–17 depend on it:
 
 The development time control advances the fake clock **inside the source**, then
 reloads through the provider — the same path a real refetch will take.
-Components observe a new `HouseState` and never learn a clock exists.
+Components observe a new `SettlementState` and never learn a clock exists.
 
 `client.ts` and its live `/api/v1/platform/status` call are **kept** and now
 drive the offline banner, so Prompt 2's proven round trip stays true rather than
@@ -287,7 +357,7 @@ components and states, accessibility, and an index.
 ### 1a.1 Decisions it makes so Prompt 5 does not have to
 
 **The first useful action — raise the Lumber Yard.** Presented on the
-first-session House Seat as the single filled button. **A starter-balance and
+first-session outpost as the single filled button. **A starter-balance and
 playtest hypothesis, not canon:** it is the cheapest building and timber appears
 in every other cost. Nothing in `project_sources/` makes Arkazia timber-poor —
 `arkazia.md` lists alpine forests beside its iron-rich slopes. Prompt 8's
@@ -308,7 +378,7 @@ relationship or disposition**, because none of the sources this prompt works
 from establishes one.
 
 **One primary action is an onboarding device, not a law.** It holds for the
-first-session House Seat. Returning sessions may lead with a different action,
+first-session outpost. Returning sessions may lead with a different action,
 and several states correctly have none — an error offers a retry, not a next
 move. `COMPONENTS-AND-STATES.md` §4 records which is which.
 
@@ -345,7 +415,7 @@ advertisement.
 
 ## 2. Prompt 3 scope
 
-**One Arkazian House establishes an outpost, constructs buildings, and manages
+**One Arkazian settlement claims an outpost, constructs buildings, and manages
 resources.** All 12 canon files were read in full before any code was written.
 
 ### 2.1 The prompt was deliberately narrowed
@@ -383,12 +453,12 @@ apply to.
 
 ### 2.2 Delivered
 
-- `Features/Houses/` — `House` (the aggregate root), `Kingdom`
+- `Features/Settlements/` — `Settlement` (the aggregate root), `Kingdom`,
 - `Features/Settlements/` — `Settlement`, `Building`, `BuildingKind`,
   `ConstructionStatus`, `SettlementStage`, `InvalidConstructionStateException`
 - `Features/Resources/` — `ResourceKind`, `ResourcePool`, `ResourceBalance`,
   `ResourceCost`, `InsufficientResourcesException`
-- `Content/` — resource and building catalogues, and the opening Arkazian House
+- `Content/` — resource and building catalogues, and the opening Arkazian settlement
 - `Persistence/Configurations/`, the `InitialHouseAggregate` migration,
   `Microsoft.EntityFrameworkCore.Design`, and `.config/dotnet-tools.json`
   pinning `dotnet-ef` 10.0.10
@@ -426,10 +496,11 @@ to keep in step for no benefit.
 `dotnet ef migrations add` produces a build error (IDE0161, block-scoped
 namespace) and every future migration would need hand-editing.
 
-**The House and outpost names are invented, not canon.** Canon names Arkazia's
-capital (Obsidia) and its legendary smiths (Akron and Lewis Wright) but no minor
-House, so "House Karrow" of "Ashen Reach" are placeholders, labelled as such in
-the file.
+**The settlement has no proper name.** Canon names Arkazia's capital (Obsidia)
+and its legendary smiths (Akron and Lewis Wright) but no minor settlement. The
+first version invented two — "House Karrow" of "Ashen Reach" — and both were
+retired by [ADR-0016](../adr/0016-settlement-terminology.md): the outpost is
+described by what it is, and naming it is the player's to do later.
 
 ---
 
@@ -451,6 +522,7 @@ Passed!  - Failed: 0, Passed: 32, Skipped: 0, Total: 32
 
 $ dotnet ef migrations list --project src/Woo.Api
 20260803111510_InitialHouseAggregate
+20260804095831_MergeHouseIntoSettlement
 
 $ cd web && npm run lint && npm run typecheck && npm run build
 (clean; built in 131ms)
@@ -490,6 +562,42 @@ $ bash scripts/check-doc-links.sh
 checked 44 Markdown files — OK
 ```
 
+Re-run in full after the terminology migration, 4 August 2026:
+
+```
+$ dotnet format --verify-no-changes
+(no output, exit code 0)
+
+$ dotnet build -c Release
+Build succeeded.  0 Warning(s)  0 Error(s)
+
+$ dotnet test -c Release --no-build
+Passed!  - Failed: 0, Passed: 33, Skipped: 0, Total: 33
+
+$ cd web && npm run lint && npm run typecheck
+(no output from either)
+
+$ npm run test          # three consecutive runs
+Test Files  2 passed (2)      Tests  14 passed (14)      stderr: 0 bytes
+Test Files  2 passed (2)      Tests  14 passed (14)      stderr: 0 bytes
+Test Files  2 passed (2)      Tests  14 passed (14)      stderr: 0 bytes
+
+$ npm run build
+✓ built in 221ms
+
+$ bash scripts/check-adrs.sh
+checked 16 ADR(s) — OK
+$ bash scripts/check-doc-links.sh
+checked 45 Markdown files — OK
+```
+
+**The migration was proven the way a deployment meets it.**
+`MergeHouseIntoSettlementTests` creates its own database, migrates it to
+`InitialHouseAggregate`, inserts House-era rows with raw SQL — the current EF
+model has no `House` type and could not write them — migrates up, asserts, then
+migrates **back down** and asserts again. Buildings, balances, stage, kingdom
+and the `HouseHall` → `CommandHall` value all survive both directions.
+
 ### 4.2 The visual check
 
 Driven with `playwright-core` against the installed Edge, from a scratch
@@ -506,7 +614,7 @@ Measured, not eyeballed:
 |---|---|
 | `documentElement.scrollWidth` at 1440, 720 (≈200% zoom), 375 and 320 | Equal to `clientWidth` at every width, both routes — **no horizontal scroll** |
 | Tab order from a cold load | Skip link → Seat → Settlement → primary action → "See all options" → testing aid. Every stop reports a `2px solid` outline |
-| Keyboard selection of a plot | `Enter` on the Mine plate moves the ledge from House Hall to Mine; `aria-pressed` follows |
+| Keyboard selection of a plot | `Enter` on the Mine plate moves the ledge from Command Hall to Mine; `aria-pressed` follows |
 | `prefers-reduced-motion: reduce` | All three duration tokens compute to `0ms`; plate and button transition durations compute to `0s`; the hover and selected transforms are neutralised |
 | Interactive targets under 44px at 375px | None. *(The skip link was 141 × 42 and now carries `min-height: var(--target-min)`.)* |
 | Greyscale legibility | Every construction state still separable by glyph, word and frame — solid vs dashed, base rule, and a raised plate with a lit head rail for the selected site |
@@ -623,7 +731,7 @@ process.
 
 | # | Criterion | Result |
 |---|---|---|
-| 1 | The first useful action is obvious | **Met** — one filled button on the first-session House Seat, named, with its reasoning and its status as a hypothesis |
+| 1 | The first useful action is obvious | **Met** — one filled button on the first-session outpost, named, with its reasoning and its status as a hypothesis |
 | 2 | Settlement growth, forging, army readiness and consequence have distinct visual identities | **Met** — four accents, each paired with a shape cue and a label; greyscale test defined |
 | 3 | Mobile preserves all essential decisions | **Met** — the two-tap rule, a mobile wireframe per screen, no desktop-only decision |
 | 4 | Specific enough for Prompt 5 without inventing the product design | **Met as far as a document can be** — literal token values, a wireframe per screen, copy per state, and a handoff contract. **Only Prompt 5 can prove this**, by finding out whether it had to invent anything |
@@ -677,7 +785,7 @@ Three things Prompt 6 should know:
 
 - **The commit flow does not exist.** Prompt 5 shows buildings and their costs;
   nothing spends, and the primary action only navigates. Prompt 6 owns confirm.
-- **Extend the seam, do not bypass it.** New state joins `HouseState` and
+- **Extend the seam, do not bypass it.** New state joins `SettlementState` and
   arrives through the provider. The ESLint rule will stop a fixture import.
 - **The construction confirm screen is already designed** —
   `WIREFRAMES.md` §5, including the "after" column and the non-cancellable
@@ -699,3 +807,4 @@ Three things Prompt 6 should know:
 | 2026-08-03 | 3 (review) | `.claude/settings.json` untracked and `.claude/` ignored — per-machine tool permissions, not a project decision. **Ordering defect fixed:** `House.BeginConstruction` validated the duration only after spending the cost, so a zero or negative duration left the House poorer with nothing started. The guard moved ahead of the spend, proven by a test that fails against the old ordering. Status and `AGENTS.md` cleaned of claims the commits had made stale. Committed as `9483047`. |
 | 2026-08-03 | 5 | The mocked House Seat, from typed fake data: House Seat with first-session and returning shapes, settlement with all seven buildings, six resources, a named smith, seven states. The typed adapter seam with the fake-import boundary enforced by ESLint. Placeholder SVG art with a terminating fallback chain, the Forge asset deliberately absent. 14 frontend tests; Vitest added. **React Router removed on evidence** — every 7.x release carries a high-severity advisory; replaced by a ~40-line History-API router, `npm audit` now clean. **First browser inspection in the repository's history**, which found a clipped site row and an accessibility regression in the mobile resource bar; both fixed and the design package amended. Node floor raised to 22.22.2 for jsdom 30. |
 | 2026-08-03 | 4 | The design package — seven documents in `docs/design/`, no code. Journeys, navigation, wireframes for six screens on both viewports, visual language with computed contrast, components and states, accessibility. Four colours corrected after the first palette failed AA. The first useful action proposed as a **starter-balance hypothesis, not canon**; `accent-sylvara` reserved with no role assigned. |
+| 2026-08-04 | terminology | **"House" retired.** `House` and `Settlement` merged into one aggregate; House Seat → Outpost, House Hall → Command Hall, household → Residents, `HouseState` → `SettlementState`. "House Karrow" and "Ashen Reach" both dropped for `Arkazian Outpost` — no replacement proper noun, and the player names it later. A hand-written `MergeHouseIntoSettlement` migration carries the data, including `Buildings.Kind` from `HouseHall` to `CommandHall` because the enum is stored as a string; an isolated test proves it up and down against a populated database. The Workbase, the prompt sheet and `project_sources/` are untouched. [ADR-0016](../adr/0016-settlement-terminology.md). Behaviour-neutral: 14 frontend tests unchanged but for their vocabulary, backend 32 → 33. |

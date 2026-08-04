@@ -27,7 +27,7 @@ export const resourceOrder: readonly ResourceKind[] = [
 ];
 
 export type BuildingKind =
-  | 'HouseHall'
+  | 'CommandHall'
   | 'Storehouse'
   | 'LumberYard'
   | 'Quarry'
@@ -92,14 +92,16 @@ export interface AttentionItem {
   readonly href: string;
 }
 
-export interface HouseSummary {
-  readonly name: string;
-  readonly kingdom: 'Arkazia';
-  readonly crestKey: string;
-}
-
+/**
+ * The settlement's identity.
+ *
+ * One settlement per player, so this is also the player's identity. It has no
+ * proper name: it is an Arkazian outpost, and naming it is the player's to do
+ * later.
+ */
 export interface SettlementSummary {
   readonly name: string;
+  readonly kingdom: 'Arkazia';
   readonly stage: 'Outpost';
   readonly geography: string;
   /**
@@ -107,14 +109,15 @@ export interface SettlementSummary {
    * control, a panel or a disabled affordance.
    */
   readonly loreHint: string;
+  /** Asset key for the settlement's token, resolved through the chain. */
+  readonly crestKey: string;
 }
 
-export interface HouseState {
-  readonly house: HouseSummary;
+export interface SettlementState {
   readonly settlement: SettlementSummary;
   readonly resources: readonly ResourceBalance[];
   readonly buildings: readonly Building[];
-  readonly household: readonly Person[];
+  readonly residents: readonly Person[];
   readonly changes: readonly ChangeEntry[];
   readonly attention: readonly AttentionItem[];
   /** The server's notion of now, so nothing derives progress from a local clock. */
@@ -125,6 +128,6 @@ export interface HouseState {
  * The seam. Today a fake source; later an HTTP one. Components depend on this
  * interface and cannot tell which they were given.
  */
-export interface HouseStateSource {
-  load(signal?: AbortSignal): Promise<HouseState>;
+export interface SettlementStateSource {
+  load(signal?: AbortSignal): Promise<SettlementState>;
 }

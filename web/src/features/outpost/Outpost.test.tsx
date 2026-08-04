@@ -16,11 +16,11 @@ function primaryButtons(): HTMLElement[] {
     .filter((button) => button.classList.contains('button--primary'));
 }
 
-describe('House Seat — first session', () => {
+describe('Outpost — first session', () => {
   it('offers exactly one primary action, and it names the Lumber Yard', async () => {
     renderScenario('firstSession');
 
-    await screen.findByRole('heading', { name: /ashen reach/i, level: 1 });
+    await screen.findByRole('heading', { name: /arkazian outpost/i, level: 1 });
 
     const primaries = primaryButtons();
     expect(primaries).toHaveLength(1);
@@ -30,7 +30,7 @@ describe('House Seat — first session', () => {
   it('shows all six resources', async () => {
     renderScenario('firstSession');
 
-    await screen.findByRole('heading', { name: /ashen reach/i, level: 1 });
+    await screen.findByRole('heading', { name: /arkazian outpost/i, level: 1 });
 
     // Scoped to the resource bar: several of these names also appear in
     // building costs elsewhere on the screen.
@@ -50,7 +50,7 @@ describe('House Seat — first session', () => {
     const site = await screen.findByRole('region', { name: /the site/i });
 
     for (const name of [
-      'House Hall',
+      'Command Hall',
       'Storehouse',
       'Lumber Yard',
       'Quarry',
@@ -76,14 +76,14 @@ describe('House Seat — first session', () => {
   it('introduces the smith', async () => {
     renderScenario('firstSession');
 
-    const household = await screen.findByRole('region', { name: /the household/i });
-    expect(within(household).getByText('Halvard Stenn')).toBeInTheDocument();
+    const residents = await screen.findByRole('region', { name: /the residents/i });
+    expect(within(residents).getByText('Halvard Stenn')).toBeInTheDocument();
   });
 
   it('never tells the player that content is invented or replaceable', async () => {
     renderScenario('firstSession');
 
-    await screen.findByRole('heading', { name: /ashen reach/i, level: 1 });
+    await screen.findByRole('heading', { name: /arkazian outpost/i, level: 1 });
 
     for (const leak of [/placeholder/i, /invented/i, /replaceable/i, /sample data/i, /mock/i]) {
       expect(screen.queryByText(leak)).not.toBeInTheDocument();
@@ -91,7 +91,7 @@ describe('House Seat — first session', () => {
   });
 });
 
-describe('House Seat — the primary action', () => {
+describe('Outpost — the primary action', () => {
   it('navigates to the settlement and focuses the Lumber Yard, without starting construction', async () => {
     const user = userEvent.setup();
     renderScenario('firstSession');
@@ -99,7 +99,7 @@ describe('House Seat — the primary action', () => {
     const button = await screen.findByRole('button', { name: /raise the lumber yard/i });
     await user.click(button);
 
-    const heading = await screen.findByRole('heading', { name: /ashen reach — outpost/i });
+    const heading = await screen.findByRole('heading', { name: /arkazian outpost/i, level: 1 });
     expect(heading).toBeInTheDocument();
     expect(window.location.pathname).toBe('/settlement');
 
@@ -115,7 +115,7 @@ describe('House Seat — the primary action', () => {
   });
 });
 
-describe('House Seat — returning session', () => {
+describe('Outpost — returning session', () => {
   it('answers what changed and what needs attention, with attention items as links', async () => {
     renderScenario('returningConstruction');
 
@@ -128,11 +128,11 @@ describe('House Seat — returning session', () => {
   });
 });
 
-describe('House Seat — states without a primary action', () => {
+describe('Outpost — states without a primary action', () => {
   it('loading shows a busy placeholder and no primary action', async () => {
     renderApp(new NeverResolvingSource());
 
-    const region = screen.getByText(/reading word from the house/i).closest('.state');
+    const region = screen.getByText(/reading word from the outpost/i).closest('.state');
     expect(region).toHaveAttribute('aria-busy', 'true');
 
     // The connectivity probe settles after the synchronous render and sets
@@ -142,7 +142,7 @@ describe('House Seat — states without a primary action', () => {
 
     // Still loading, and still no primary action: nothing is known yet, so
     // there is nothing to offer.
-    expect(screen.getByText(/reading word from the house/i)).toBeInTheDocument();
+    expect(screen.getByText(/reading word from the outpost/i)).toBeInTheDocument();
     expect(primaryButtons()).toHaveLength(0);
   });
 
@@ -159,9 +159,9 @@ describe('House Seat — states without a primary action', () => {
     // the absence of a section.
     renderScenario('empty');
 
-    const household = await screen.findByRole('region', { name: /the household/i });
+    const residents = await screen.findByRole('region', { name: /the residents/i });
 
-    const message = within(household).getByText(/no one has taken service with the house yet/i);
+    const message = within(residents).getByText(/no one has taken service at the outpost yet/i);
     expect(message).toBeInTheDocument();
 
     // Empty is not an error: no alert, and none of the danger styling.

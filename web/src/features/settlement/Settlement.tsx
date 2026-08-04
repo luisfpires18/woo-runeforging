@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import type { Building, BuildingKind, HouseState } from '../../api/types.ts';
+import type { Building, BuildingKind, SettlementState } from '../../api/types.ts';
 import { BuildingRow } from '../../components/BuildingRow.tsx';
 import { SceneGround } from '../../components/SettlementScene.tsx';
 import { useRouter } from '../../app/router.tsx';
@@ -18,7 +18,7 @@ import { useRouter } from '../../app/router.tsx';
  * construction are Prompt 6. Choosing a plot here changes which site the
  * command ledge describes, and nothing else.
  */
-export function Settlement({ state }: { readonly state: HouseState }) {
+export function Settlement({ state }: { readonly state: SettlementState }) {
   const { navigationState } = useRouter();
   const focusTarget = readFocusTarget(navigationState);
   const rowRef = useRef<HTMLLIElement>(null);
@@ -41,11 +41,11 @@ export function Settlement({ state }: { readonly state: HouseState }) {
 
   return (
     <div className="settlement">
+      {/* The settlement has one name, so the stage belongs in the label rather
+          than trailing the title as a second half of it. */}
       <header className="intro">
-        <p className="intro__eyebrow">The site</p>
-        <h1 className="intro__title">
-          {state.settlement.name} — {state.settlement.stage}
-        </h1>
+        <p className="intro__eyebrow">The site · {state.settlement.stage}</p>
+        <h1 className="intro__title">{state.settlement.name}</h1>
         <p className="intro__prose">{state.settlement.geography}</p>
       </header>
 
@@ -155,7 +155,7 @@ function stateLine(building: Building, remaining: number | null): string {
         : `Work is under way — ${String(remaining)} minutes remain.`;
     case 'Previewed':
       return building.unavailableReason === null
-        ? 'Not yet within the House’s reach.'
+        ? 'Not yet within the settlement’s reach.'
         : `${building.unavailableReason} before this ground can be worked.`;
     default:
       return 'The ground is surveyed and the terms are set. Nothing has been set in motion here.';

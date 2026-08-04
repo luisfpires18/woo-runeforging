@@ -5,7 +5,7 @@
 **Consumed by:** Prompt 5 onward
 
 The design of the first playable experience, written **before** its screens are
-built. It exists so Prompt 5 can implement the House Seat without making a
+built. It exists so Prompt 5 can implement the Outpost without making a
 single product decision of its own.
 
 **Prompt 4 delivered documents only** — no component, no CSS, no change to
@@ -53,7 +53,7 @@ Every state has a glyph and a word as well as a hue. The test is greyscale.
 
 ## The first useful action
 
-**Raise the Lumber Yard**, presented on the first-session House Seat as the
+**Raise the Lumber Yard**, presented on the first-session Outpost as the
 single filled button.
 
 **This is a starter-balance and playtest hypothesis, not canon.** The reasoning
@@ -67,7 +67,7 @@ does say is that **Sylvara** is rich in lumber, herbs and game. Any framing of
 timber as an Arkazian weakness would be invention, and this package does not make
 it.
 
-The proposed opening order — Lumber Yard → Storehouse → House Hall, then Quarry
+The proposed opening order — Lumber Yard → Storehouse → Command Hall, then Quarry
 or Mine — is a hypothesis for the **Prompt 8 playtest** to confirm or overturn.
 The property worth protecting is not the order: it is that **every building is
 individually affordable while all five together are not**, which is what makes
@@ -90,7 +90,7 @@ the first session a decision rather than a checklist.
 
 ## Handoff contract for Prompt 5
 
-Prompt 5 builds the mocked House Seat and outpost onboarding over typed fake
+Prompt 5 builds the mocked Outpost and outpost onboarding over typed fake
 data. From this package it takes:
 
 | Needs | Source |
@@ -129,7 +129,7 @@ and are recorded here rather than left as drift:
 | Gap | Resolution |
 |---|---|
 | Prompt 5 names **barracks and forge**; this package drew five buildings | **Seven.** Barracks and Forge appear as previews with their requirement stated. `WIREFRAMES.md` carries the amendment |
-| Prompt 5 asks the player to **meet a named smith** | A household card on the House Seat. Fake data; he is idle until a forge exists |
+| Prompt 5 asks the player to **meet a named smith** | A residents card on the Outpost. Fake data; he is idle until a forge exists |
 | Prompt 5 asks to **assign or confirm basic production** | **Confirm** — a completed production site states what it yields, read-only. No workforce model was invented |
 
 Two further changes came out of looking at the built screens:
@@ -183,7 +183,7 @@ accessibility rule are unchanged.**
 |---|---|
 | **A settlement scene is the page** | `ashen-reach.svg` fills the frame and the seven sites stand on their own ground inside it. The subject of the screen is a place, so the place should be the screen. `VISUAL-LANGUAGE.md` §8.1 |
 | **Three levels, and only three** | World, command surface, record. A thing at one level is never dressed like a thing at another — which is why `.panel` is gone as a universal wrapper |
-| **One integrated HUD** | House identity, settlement state and the stores answer one question and share one stone band, instead of stacking two |
+| **One integrated HUD** | Settlement identity, settlement state and the stores answer one question and share one stone band, instead of stacking two |
 | **The rail is welded to the HUD** | Shared edge, no gap, cloth tab for the current area. It reads as part of the frame rather than a list beside it |
 | **A command ledge, not a card** | The objective is stated on a ledge joined to the bottom edge of the world, tied to the site it is about. The settlement screen uses the same ledge for the selected site |
 | **Site plots replace building rows** | An illustrated plate with a nameplate, standing where the building would stand — not a row in a list |

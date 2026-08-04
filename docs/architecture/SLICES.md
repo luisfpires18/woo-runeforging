@@ -49,17 +49,22 @@ Where each prompt's deliverables land. Read alongside
 background jobs, an outbox, object storage, PixiJS, Redis, a broker, a second
 `DbContext`, OpenTelemetry, architecture tests, Azure, deployment.
 
-### Prompt 3 — House, outpost, buildings and resources · **complete**
+### Prompt 3 — settlement, outpost, buildings and resources · **complete**
 
 The 12 canon files in [`../../project_sources/`](../../project_sources/) arrived
 on 3 August 2026 and were read in full for this prompt.
 
-**Delivered — one Arkazian House establishes an outpost, constructs buildings,
+**Delivered — one Arkazian settlement claims an outpost, constructs buildings,
 and manages resources:**
+
+> Prompt 3 shipped this as a `House` owning one `Settlement`. The two merged
+> into a single `Settlement` aggregate on 4 August 2026 —
+> [ADR-0016](../adr/0016-settlement-terminology.md). The deliverables are
+> unchanged; the names below are the current ones.
 
 | Deliverable | Lands in |
 |---|---|
-| One House and one Outpost settlement | `Features/Houses/`, `Features/Settlements/` |
+| One Outpost settlement | `Features/Settlements/` |
 | The six universal resources, with the spend rule | `Features/Resources/` |
 | The first buildings and construction state | `Features/Settlements/` |
 | Arkazian starter content | `Content/` |
@@ -111,16 +116,16 @@ correctly have none.
 The package assigns Sylvara no role or relationship — no source it works from
 establishes one.
 
-### Prompt 5 — Mock House Seat and outpost onboarding · **complete**
+### Prompt 5 — Mock Outpost and outpost onboarding · **complete**
 
-The first player-facing screen, from typed fake data. House Seat with
+The first player-facing screen, from typed fake data. Outpost with
 first-session and returning shapes, settlement view with all seven buildings, the
 six resources, a named smith, and the seven states.
 
 **The adapter seam** (`web/src/api/`) is the deliverable that matters most:
-components consume `HouseState` through a provider and cannot reach a fixture —
+components consume `SettlementState` through a provider and cannot reach a fixture —
 ESLint forbids it — so Prompts 10–17 replace fake state by writing a second
-`HouseStateSource`, not by rewriting components.
+`SettlementStateSource`, not by rewriting components.
 
 Two design-package amendments came out of it: the site holds **seven** buildings
 (Barracks and Forge previewed), and the mobile resource bar keeps its labels

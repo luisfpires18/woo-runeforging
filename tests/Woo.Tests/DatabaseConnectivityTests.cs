@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Woo.Api.Features.Houses;
 using Woo.Api.Features.Resources;
 using Woo.Api.Features.Settlements;
 using Woo.Api.Persistence;
@@ -35,7 +34,7 @@ public sealed class DatabaseConnectivityTests
     /// unplanned is added.
     /// </summary>
     [Fact]
-    public void The_model_maps_the_house_aggregate_and_nothing_else()
+    public void The_model_maps_the_settlement_aggregate_and_nothing_else()
     {
         var options = new DbContextOptionsBuilder<WooDbContext>()
             .UseNpgsql(WooApiFactory.ConnectionString)
@@ -53,7 +52,6 @@ public sealed class DatabaseConnectivityTests
         string[] expected =
         [
             nameof(Building),
-            nameof(House),
             nameof(ResourceBalance),
             nameof(ResourcePool),
             nameof(Settlement),

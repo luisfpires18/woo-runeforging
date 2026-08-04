@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Woo.Api.Persistence;
@@ -11,9 +12,11 @@ using Woo.Api.Persistence;
 namespace Woo.Api.Persistence.Migrations
 {
     [DbContext(typeof(WooDbContext))]
-    partial class WooDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260804095831_MergeHouseIntoSettlement")]
+    partial class MergeHouseIntoSettlement
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

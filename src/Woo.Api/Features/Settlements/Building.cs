@@ -8,8 +8,8 @@ namespace Woo.Api.Features.Settlements;
 /// Progress is <b>stored timestamps read on demand</b>, not a timer. Nothing
 /// fires when a building becomes due: the row records when work started and
 /// when it is due, and whoever reads or writes the settlement resolves it by
-/// passing the current time. A House left alone for three days has three days
-/// of work resolved on its next read.
+/// passing the current time. A settlement left alone for three days has three
+/// days of work resolved on its next read.
 /// </para>
 /// <para>
 /// What a completed building <i>does</i> — storage capacity, production rates,
@@ -51,7 +51,7 @@ public sealed class Building
                 Kind, $"cannot begin construction from {Status}.");
         }
 
-        // Also checked by House.BeginConstruction before it spends anything.
+        // Also checked by Settlement.BeginConstruction before it spends anything.
         // Kept here so the invariant holds for any future caller.
         ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(duration, TimeSpan.Zero);
 

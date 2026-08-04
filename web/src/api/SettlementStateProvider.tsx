@@ -8,42 +8,44 @@ import {
   type ReactNode,
 } from 'react';
 
-import type { HouseState, HouseStateSource } from './types.ts';
+import type { SettlementState, SettlementStateSource } from './types.ts';
 
 export type LoadPhase =
   | { readonly phase: 'loading' }
-  | { readonly phase: 'loaded'; readonly state: HouseState }
+  | { readonly phase: 'loaded'; readonly state: SettlementState }
   | { readonly phase: 'error'; readonly message: string };
 
-interface HouseStateContextValue {
+interface SettlementStateContextValue {
   readonly load: LoadPhase;
   /** Refetch. The only supported way to observe changed state. */
   readonly reload: () => void;
   /**
    * Development-only. Advances the source's clock and reloads through the same
-   * path a refetch takes, so components observe a new `HouseState` and never
-   * learn that a clock exists. `null` when the source cannot travel in time —
-   * which is what a real HTTP source will be.
+   * path a refetch takes, so components observe a new `SettlementState` and
+   * never learn that a clock exists. `null` when the source cannot travel in
+   * time — which is what a real HTTP source will be.
    */
   readonly advanceTime: ((minutes: number) => void) | null;
 }
 
-const HouseStateContext = createContext<HouseStateContextValue | null>(null);
+const SettlementStateContext = createContext<SettlementStateContextValue | null>(null);
 
 /** A source that can move its own clock. Only the fake one can. */
 interface TimeTravelling {
   advance(minutes: number): void;
 }
 
-function canTimeTravel(source: HouseStateSource): source is HouseStateSource & TimeTravelling {
+function canTimeTravel(
+  source: SettlementStateSource,
+): source is SettlementStateSource & TimeTravelling {
   return 'advance' in source && typeof (source as TimeTravelling).advance === 'function';
 }
 
-export function HouseStateProvider({
+export function SettlementStateProvider({
   source,
   children,
 }: {
-  readonly source: HouseStateSource;
+  readonly source: SettlementStateSource;
   readonly children: ReactNode;
 }) {
   const [load, setLoad] = useState<LoadPhase>({ phase: 'loading' });
@@ -68,7 +70,8 @@ export function HouseStateProvider({
         }
         setLoad({
           phase: 'error',
-          message: error instanceof Error ? error.message : 'The House could not be reached.',
+          message:
+            error instanceof Error ? error.message : 'The settlement could not be reached.',
         });
       });
 
@@ -88,7 +91,7 @@ export function HouseStateProvider({
     }
 
     // Advancing time goes through the same reload path a refetch will take, so
-    // components observe a new HouseState and never learn a clock exists.
+    // components observe a new state and never learn a clock exists.
     return (minutes: number) => {
       source.advance(minutes);
       setLoad({ phase: 'loading' });
@@ -96,19 +99,19 @@ export function HouseStateProvider({
     };
   }, [source]);
 
-  const value = useMemo<HouseStateContextValue>(
+  const value = useMemo<SettlementStateContextValue>(
     () => ({ load, reload, advanceTime }),
     [load, reload, advanceTime],
   );
 
-  return <HouseStateContext value={value}>{children}</HouseStateContext>;
+  return <SettlementStateContext value={value}>{children}</SettlementStateContext>;
 }
 
-export function useHouseState(): HouseStateContextValue {
-  const value = useContext(HouseStateContext);
+export function useSettlementState(): SettlementStateContextValue {
+  const value = useContext(SettlementStateContext);
 
   if (value === null) {
-    throw new Error('useHouseState must be used inside a HouseStateProvider.');
+    throw new Error('useSettlementState must be used inside a SettlementStateProvider.');
   }
 
   return value;

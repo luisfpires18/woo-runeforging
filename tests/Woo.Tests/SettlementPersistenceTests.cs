@@ -1,13 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Woo.Api.Content;
-using Woo.Api.Features.Houses;
 using Woo.Api.Features.Resources;
 using Woo.Api.Features.Settlements;
 
 namespace Woo.Tests;
 
 /// <summary>
-/// The House aggregate against a real PostgreSQL instance.
+/// The Settlement aggregate against a real PostgreSQL instance.
 /// </summary>
 /// <remarks>
 /// Each test generates its own identifiers and deletes what it wrote in a
@@ -16,15 +15,14 @@ namespace Woo.Tests;
 /// container and CI's service container, twice in a row, with the same result.
 /// </remarks>
 [Collection(nameof(PostgresCollection))]
-public sealed class HousePersistenceTests(PostgresFixture postgres)
+public sealed class SettlementPersistenceTests(PostgresFixture postgres)
 {
     private static readonly DateTimeOffset Noon =
         new(2026, 8, 3, 12, 0, 0, TimeSpan.Zero);
 
     [Fact]
-    public async Task A_house_round_trips_with_its_settlement_buildings_and_balances()
+    public async Task A_settlement_round_trips_with_its_buildings_and_balances()
     {
-        var houseId = Guid.NewGuid();
         var settlementId = Guid.NewGuid();
         var token = TestContext.Current.CancellationToken;
 
@@ -34,32 +32,29 @@ public sealed class HousePersistenceTests(PostgresFixture postgres)
 
             await using (var write = postgres.CreateContext())
             {
-                var house = StarterContent.EstablishStarterHouse(houseId, settlementId);
-                house.BeginConstruction(
+                var settlement = StarterContent.FoundStarterSettlement(settlementId);
+                settlement.BeginConstruction(
                     BuildingKind.Storehouse, definition.Cost, definition.Duration, Noon);
-                house.CompleteConstruction(BuildingKind.Storehouse, Noon + definition.Duration);
+                settlement.CompleteConstruction(
+                    BuildingKind.Storehouse, Noon + definition.Duration);
 
-                write.Houses.Add(house);
+                write.Settlements.Add(settlement);
                 await write.SaveChangesAsync(token);
             }
 
             await using var read = postgres.CreateContext();
 
-            var stored = await read.Houses
-                .Include(house => house.Settlement)
-                .ThenInclude(settlement => settlement.Buildings)
-                .Include(house => house.Resources)
+            var stored = await read.Settlements
+                .Include(settlement => settlement.Buildings)
+                .Include(settlement => settlement.Resources)
                 .ThenInclude(resources => resources.Balances)
-                .SingleAsync(house => house.Id == houseId, token);
+                .SingleAsync(settlement => settlement.Id == settlementId, token);
 
-            Assert.Equal(StarterContent.HouseName, stored.Name);
+            Assert.Equal(StarterContent.SettlementName, stored.Name);
             Assert.Equal(Kingdom.Arkazia, stored.Kingdom);
+            Assert.Equal(SettlementStage.Outpost, stored.Stage);
 
-            Assert.Equal(settlementId, stored.Settlement.Id);
-            Assert.Equal(StarterContent.OutpostName, stored.Settlement.Name);
-            Assert.Equal(SettlementStage.Outpost, stored.Settlement.Stage);
-
-            var storehouse = stored.Settlement.BuildingOf(BuildingKind.Storehouse);
+            var storehouse = stored.BuildingOf(BuildingKind.Storehouse);
             Assert.Equal(ConstructionStatus.Complete, storehouse.Status);
             Assert.Equal(Noon, storehouse.StartedAtUtc);
             Assert.Equal(Noon + definition.Duration, storehouse.CompletedAtUtc);
@@ -78,21 +73,21 @@ public sealed class HousePersistenceTests(PostgresFixture postgres)
         }
         finally
         {
-            await DeleteHouseAsync(houseId);
+            await DeleteSettlementAsync(settlementId);
         }
     }
 
     [Fact]
     public async Task Enums_are_stored_as_readable_strings_not_ordinals()
     {
-        var houseId = Guid.NewGuid();
+        var settlementId = Guid.NewGuid();
         var token = TestContext.Current.CancellationToken;
 
         try
         {
             await using (var write = postgres.CreateContext())
             {
-                write.Houses.Add(StarterContent.EstablishStarterHouse(houseId, Guid.NewGuid()));
+                write.Settlements.Add(StarterContent.FoundStarterSettlement(settlementId));
                 await write.SaveChangesAsync(token);
             }
 
@@ -101,19 +96,27 @@ public sealed class HousePersistenceTests(PostgresFixture postgres)
             // Read the raw column rather than the mapped property, so the
             // conversion itself is what is under test.
             var kingdom = await read.Database
-                .SqlQuery<string>($"""SELECT "Kingdom" AS "Value" FROM "Houses" WHERE "Id" = {houseId}""")
+                .SqlQuery<string>($"""SELECT "Kingdom" AS "Value" FROM "Settlements" WHERE "Id" = {settlementId}""")
                 .SingleAsync(token);
 
             Assert.Equal(nameof(Kingdom.Arkazia), kingdom);
 
             var stages = await read.Database
-                .SqlQuery<string>($"""SELECT "Stage" AS "Value" FROM "Settlements" WHERE "HouseId" = {houseId}""")
+                .SqlQuery<string>($"""SELECT "Stage" AS "Value" FROM "Settlements" WHERE "Id" = {settlementId}""")
                 .ToListAsync(token);
 
             Assert.Equal([nameof(SettlementStage.Outpost)], stages);
 
+            // The building kind is stored by name too, which is why renaming a
+            // member needs a migration for the rows as well as the code.
+            var buildingKinds = await read.Database
+                .SqlQuery<string>($"""SELECT "Kind" AS "Value" FROM "Buildings" WHERE "SettlementId" = {settlementId}""")
+                .ToListAsync(token);
+
+            Assert.Contains(nameof(BuildingKind.CommandHall), buildingKinds);
+
             var balanceKinds = await read.Database
-                .SqlQuery<string>($"""SELECT "Kind" AS "Value" FROM "ResourceBalances" WHERE "HouseId" = {houseId}""")
+                .SqlQuery<string>($"""SELECT "Kind" AS "Value" FROM "ResourceBalances" WHERE "SettlementId" = {settlementId}""")
                 .ToListAsync(token);
 
             Assert.Equivalent(
@@ -122,14 +125,14 @@ public sealed class HousePersistenceTests(PostgresFixture postgres)
         }
         finally
         {
-            await DeleteHouseAsync(houseId);
+            await DeleteSettlementAsync(settlementId);
         }
     }
 
     [Fact]
     public async Task A_completed_construction_stays_completed_across_a_reload()
     {
-        var houseId = Guid.NewGuid();
+        var settlementId = Guid.NewGuid();
         var token = TestContext.Current.CancellationToken;
 
         try
@@ -139,20 +142,20 @@ public sealed class HousePersistenceTests(PostgresFixture postgres)
 
             await using (var write = postgres.CreateContext())
             {
-                var house = StarterContent.EstablishStarterHouse(houseId, Guid.NewGuid());
-                house.BeginConstruction(BuildingKind.Quarry, definition.Cost, definition.Duration, Noon);
-                house.CompleteConstruction(BuildingKind.Quarry, due);
+                var settlement = StarterContent.FoundStarterSettlement(settlementId);
+                settlement.BeginConstruction(
+                    BuildingKind.Quarry, definition.Cost, definition.Duration, Noon);
+                settlement.CompleteConstruction(BuildingKind.Quarry, due);
 
-                write.Houses.Add(house);
+                write.Settlements.Add(settlement);
                 await write.SaveChangesAsync(token);
             }
 
             await using var read = postgres.CreateContext();
 
-            var stored = await read.Houses
-                .Include(house => house.Settlement)
-                .ThenInclude(settlement => settlement.Buildings)
-                .SingleAsync(house => house.Id == houseId, token);
+            var stored = await read.Settlements
+                .Include(settlement => settlement.Buildings)
+                .SingleAsync(settlement => settlement.Id == settlementId, token);
 
             // The rule survives the round trip: it is a property of the stored
             // state, not of an object that happens to be in memory.
@@ -161,20 +164,20 @@ public sealed class HousePersistenceTests(PostgresFixture postgres)
         }
         finally
         {
-            await DeleteHouseAsync(houseId);
+            await DeleteSettlementAsync(settlementId);
         }
     }
 
     /// <summary>
-    /// Removes only the rows this test wrote. Cascades take the settlement,
-    /// buildings and balances with the House.
+    /// Removes only the rows this test wrote. Cascades take the buildings and
+    /// balances with the settlement.
     /// </summary>
-    private async Task DeleteHouseAsync(Guid houseId)
+    private async Task DeleteSettlementAsync(Guid settlementId)
     {
         await using var cleanup = postgres.CreateContext();
 
-        await cleanup.Houses
-            .Where(house => house.Id == houseId)
+        await cleanup.Settlements
+            .Where(settlement => settlement.Id == settlementId)
             .ExecuteDeleteAsync(TestContext.Current.CancellationToken);
     }
 }

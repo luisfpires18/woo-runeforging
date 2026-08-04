@@ -94,7 +94,7 @@ woo-runeforging/
 │  ├─ Persistence/             # WooDbContext, Configurations/, Migrations/
 │  └─ Features/                # one folder per feature
 │     ├─ Health/  Platform/
-│     └─ Houses/  Settlements/  Resources/
+│     └─ Settlements/  Resources/
 │
 ├─ tests/Woo.Tests/            # the one test project
 │
@@ -125,8 +125,7 @@ configuration in one directory, so a change to construction touches
 | Folder | Holds |
 |---|---|
 | `Health`, `Platform` | Platform plumbing, no gameplay meaning |
-| `Houses` | `House` — the aggregate root — and `Kingdom` |
-| `Settlements` | `Settlement`, `Building`, `BuildingKind`, `ConstructionStatus`, `SettlementStage` |
+| `Settlements` | `Settlement` — the aggregate root — with `Kingdom`, `Building`, `BuildingKind`, `ConstructionStatus` and `SettlementStage` |
 | `Resources` | The six `ResourceKind` values, `ResourcePool`, `ResourceBalance`, `ResourceCost` |
 
 `Content/` sits alongside them and holds the starter catalogues.
@@ -162,9 +161,8 @@ or a schema per feature would buy nothing at this size and would make an
 ordinary cross-feature command — spend resources *and* start construction *and*
 write the ledger entry — awkward to keep in a single transaction.
 
-The context maps the **House aggregate**: `House`, its `Settlement`, that
-settlement's `Building`s, and its `ResourceBalance`s — four tables plus
-`__EFMigrationsHistory`. Forging, armies and battles are not modelled yet and
+The context maps the **Settlement aggregate**: `Settlement`, its `Building`s
+and its `ResourceBalance`s — three tables plus `__EFMigrationsHistory`. Forging, armies and battles are not modelled yet and
 so have nothing to persist.
 
 **The domain types carry no EF attributes.** Mapping lives in
@@ -206,7 +204,7 @@ time. They are represented as **stored timestamps**, not as timers:
 - progress is computed from those timestamps whenever the state is read;
 - any write settles the elapsed effect first, then applies the change.
 
-**There is no per-House timer, no scheduled task and no background job.** A
+**There is no per-settlement timer, no scheduled task and no background job.** A
 player who is away for three days has their progress resolved on the next read,
 in one query, and the server's workload tracks player decisions rather than
 player count multiplied by wall-clock time. This is what makes the deferral of
@@ -324,7 +322,7 @@ first implementation of each does not have to rediscover them.
    seed. The replay renders the event log and calculates nothing.
 7. Ordinary forging has a guaranteed quality floor and no hidden roll.
    Destructive chance belongs to Runeforging alone.
-8. Permanent House progression and seasonal state stay separable; a season can
+8. Permanent settlement progression and seasonal state stay separable; a season can
    never delete a settlement.
 
 Domain vocabulary is in [`../domain/GLOSSARY.md`](../domain/GLOSSARY.md).

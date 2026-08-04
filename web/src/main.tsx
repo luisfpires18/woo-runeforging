@@ -1,9 +1,9 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import { HouseStateProvider } from './api/HouseStateProvider.tsx';
-import type { Scenario } from './api/fake/fakeHouseStateSource.ts';
-import { FakeHouseStateSource } from './api/fake/fakeHouseStateSource.ts';
+import { SettlementStateProvider } from './api/SettlementStateProvider.tsx';
+import type { Scenario } from './api/fake/fakeSettlementStateSource.ts';
+import { FakeSettlementStateSource } from './api/fake/fakeSettlementStateSource.ts';
 import { App } from './app/App.tsx';
 import { Router } from './app/router.tsx';
 import './styles/global.css';
@@ -19,9 +19,9 @@ if (!container) {
  *
  * `?scenario=returning` opens the construction demo: the Lumber Yard is already
  * under way and the development time control can carry it to completion.
- * `?scenario=empty` opens a House with nobody in it, so the empty state can be
+ * `?scenario=empty` opens a settlement with nobody in it, so the empty state can be
  * looked at rather than only asserted. Swapping to real endpoints later means
- * constructing a different `HouseStateSource` here and changing nothing else.
+ * constructing a different `SettlementStateSource` here and changing nothing else.
  */
 const scenarios: Readonly<Record<string, Scenario>> = {
   returning: 'returningConstruction',
@@ -33,10 +33,10 @@ const scenario: Scenario = scenarios[requested] ?? 'firstSession';
 
 createRoot(container).render(
   <StrictMode>
-    <HouseStateProvider source={new FakeHouseStateSource(scenario)}>
+    <SettlementStateProvider source={new FakeSettlementStateSource(scenario)}>
       <Router>
         <App />
       </Router>
-    </HouseStateProvider>
+    </SettlementStateProvider>
   </StrictMode>,
 );

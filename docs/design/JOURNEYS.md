@@ -10,21 +10,21 @@ player will have hundreds of times.
 
 ## 1. First session
 
-**Goal: the player understands they lead one House, developing one settlement,
+**Goal: the player understands they lead one settlement, developing one settlement,
 and they make one real decision before they leave.**
 
 Not: build everything. Not: see every system. One decision, understood.
 
 ```mermaid
 flowchart TD
-    A["Arrive at the House Seat<br/><i>outpost claimed, nothing built</i>"]
+    A["Arrive at the Outpost<br/><i>outpost claimed, nothing built</i>"]
     B["Read the site<br/><i>who am I, where am I, what do I have</i>"]
     C["See the single primary action<br/><b>Raise the Lumber Yard</b>"]
     D{"Take it, or look around first?"}
     E["Settlement view<br/><i>five plots, four still bare</i>"]
     F["Construction<br/><i>cost, duration, what it leaves</i>"]
     G["Confirm — resources spent, work begins"]
-    H["Return to the House Seat<br/><i>the yard is now under way</i>"]
+    H["Return to the Outpost<br/><i>the yard is now under way</i>"]
     I["Second decision offered<br/><i>a different building, affordable</i>"]
     J["Leave"]
 
@@ -38,7 +38,7 @@ flowchart TD
 
 | Step | The player must come away knowing |
 |---|---|
-| Arrive | This is **my** House, and it has a name and a place |
+| Arrive | This is **my** settlement, and it has a place |
 | Read the site | I hold six resources; I have one settlement; it is an outpost |
 | Primary action | There is one obvious thing to do next |
 | Construction | What it costs, how long it takes, what I have left afterwards — **before** confirming |
@@ -48,7 +48,7 @@ flowchart TD
 
 ### The first useful action
 
-**Raise the Lumber Yard.** One filled button on the House Seat; everything else
+**Raise the Lumber Yard.** One filled button on the Outpost; everything else
 on the screen is quieter.
 
 **This is a starter-balance hypothesis, not canon.** The Lumber Yard is the
@@ -61,7 +61,7 @@ alongside its iron-rich slopes. The proposal rests on the numbers in
 Proposed opening order — **also a hypothesis**:
 
 ```
-Lumber Yard  →  Storehouse  →  House Hall  →  ( Quarry | Mine )
+Lumber Yard  →  Storehouse  →  Command Hall  →  ( Quarry | Mine )
 ```
 
 Every building is individually affordable at the opening position; **all five
@@ -86,11 +86,11 @@ than a checklist, and it is the property worth protecting if the numbers change.
 
 1. What completed while I was away?
 2. What needs attention?
-3. What can advance my House today?
+3. What can advance my settlement today?
 
 ```mermaid
 flowchart TD
-    A["Arrive at the House Seat"]
+    A["Arrive at the Outpost"]
     B["<b>What changed</b><br/><i>completed since last visit, newest first</i>"]
     C["<b>Needs attention</b><br/><i>due soon, blocked, short of a resource</i>"]
     D{"Time available?"}
@@ -114,7 +114,7 @@ The player never picks a "mode" — the screen simply supports all three.
 | Time | Path | Design consequence |
 |---|---|---|
 | **2 minutes** | Read the change list, start one queued thing, leave | The change list is above the fold and the primary action is one tap from arrival |
-| **10–20 minutes** | One build plus one other system — later a craft, a company, a report | Cross-navigation from the House Seat to any area is one step |
+| **10–20 minutes** | One build plus one other system — later a craft, a company, a report | Cross-navigation from the Outpost to any area is one step |
 | **30–60 minutes** | Compare, plan, sequence several commitments | Costs and durations are visible without opening each thing in turn |
 
 **Elapsed time resolves on arrival, not on a timer.** A player away for three

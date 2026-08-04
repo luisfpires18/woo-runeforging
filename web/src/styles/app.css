@@ -25,7 +25,7 @@
   isolation: isolate;
 }
 
-/* The pass above Ashen Reach, far behind everything. Quiet on purpose: the
+/* The pass above the outpost, far behind everything. Quiet on purpose: the
    scene is the picture, this only stops the page being flat black. */
 .shell__backdrop {
   position: fixed;
@@ -99,9 +99,9 @@
   min-width: 0;
 }
 
-/* The House name is a label, not a title: small, wide and steady, the way a
-   name stamped into steel reads. */
-.hud__house {
+/* The settlement name is a label, not a title: small, wide and steady,
+   the way a name stamped into steel reads. */
+.hud__name {
   color: var(--text-primary);
   font-size: var(--text-small);
   font-weight: 700;
@@ -109,7 +109,7 @@
   letter-spacing: var(--tracking-label);
 }
 
-.hud__settlement {
+.hud__where {
   display: flex;
   gap: var(--space-2);
   align-items: center;
@@ -848,7 +848,7 @@
 
 /* ---------- lore ---------- */
 
-.seat__lore {
+.outpost__lore {
   grid-column: 1 / -1;
   max-width: 60ch;
   padding-left: var(--space-4);

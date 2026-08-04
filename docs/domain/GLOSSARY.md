@@ -29,16 +29,15 @@ systems that do not exist yet.
 
 | Term | Meaning | Label |
 |---|---|---|
-| **House** | The player's organisation. The unit of ownership, identity, reputation and history. The player leads a *minor* House, not a kingdom | Foundation |
-| **House Seat** | The home screen. Answers: what completed while I was away, what needs attention, what advances my House today | Foundation |
-| **Settlement** | The single evolving site a House develops. **One settlement per House** — no village spam. *Implemented: `Settlement`* | Locked |
+| **Settlement** | The player's domain: one evolving site, and the unit of ownership, identity, reputation and history. **One settlement per player** — no village spam, and since the merge recorded in [ADR-0016](../adr/0016-settlement-terminology.md) that is the shape of the model rather than a rule to enforce. *Implemented: `Settlement`* | Locked |
+| **Outpost (the screen)** | The home screen. Answers: what completed while I was away, what needs attention, what advances the settlement today | Foundation |
 | **Settlement stage** | Outpost → Village → Fortified town → Regional capital → Runic seat. The last is a late capability layer on the regional capital, not a separate tier. *Implemented: `SettlementStage`, **Outpost only** — later stages join when they are reachable* | Open (exact stages, names and pace) |
-| **Outpost** | The founding stage: survival and claim. A House Hall, a storehouse, basic production, and later a militia and basic forge | Foundation |
-| **Building** | A structure in the settlement. Buildings unlock **capabilities**, not thirty levels of percentage increases. *Implemented: `Building`, `BuildingKind` — House Hall, Storehouse, Lumber Yard, Quarry, Mine* | Locked |
+| **Outpost (the stage)** | The founding stage: survival and claim. A Command Hall, a storehouse, basic production, and later a militia and basic forge. Village, Town and City are **possible** later stages and nothing more — none is implemented, and Fort, Castle and Capital describe strategic roles rather than tiers | Foundation |
+| **Building** | A structure in the settlement. Buildings unlock **capabilities**, not thirty levels of percentage increases. *Implemented: `Building`, `BuildingKind` — Command Hall, Storehouse, Lumber Yard, Quarry, Mine* | Locked |
 | **Construction state** | `NotBuilt → UnderConstruction → Complete`. Driven by stored timestamps read on demand, never by a timer. **A construction cannot complete twice.** *Implemented: `ConstructionStatus`* | — |
-| **Specialist** | A named person who performs work — smith, commander, scholar. The player makes House-level decisions; specialists do the work | Foundation |
+| **Specialist** | A named person who performs work — smith, commander, scholar. The player makes settlement-level decisions; specialists do the work | Foundation |
 | **Workforce** | Labour capacity. **A capacity, not an inventory resource** — it is never a spendable pile of tokens | Foundation |
-| **Crest / motto** | House heraldry. Also the terminal fallback for missing art | Foundation |
+| **Crest / motto** | The settlement's heraldry. Also the terminal fallback for missing art. The starting outpost carries an Arkazian token and no device of its own — it has no name yet | Foundation |
 
 ## 2. Economy
 
@@ -46,12 +45,12 @@ systems that do not exist yet.
 |---|---|---|
 | **Universal resources** | **Gold, Provisions, Timber, Stone, Ore, Workshop Supplies.** The six that support all ordinary play. *Implemented: `ResourceKind`* | Foundation |
 | **Workshop Supplies** | Abstraction over charcoal, nails, cloth, oils, rope, bindings, containers, ordinary hides, tools and maintenance inputs | Foundation |
-| **Resource pool** | A House's holdings across the six. **A spend can never take a balance below zero**, and a multi-resource cost is all-or-nothing: a cost that cannot be paid in full changes nothing at all. *Implemented: `ResourcePool`* | — |
+| **Resource pool** | A settlement's holdings across the six. **A spend can never take a balance below zero**, and a multi-resource cost is all-or-nothing: a cost that cannot be paid in full changes nothing at all. *Implemented: `ResourcePool`* | — |
 | **Cost** | What an action requires, across one or more resources. Always spent whole; never partially paid. *Implemented: `ResourceCost`* | — |
 | **Strategic material** | A named material appearing only when it creates a meaningful decision. Lives in a small separate inventory, never in the six | Foundation |
 | **Material family** | A broad recipe slot — Metal, Wood, Stone, Hide or textile, Fuel or supplies, Reagent, Runic component | Foundation |
 | **Ledger entry** | An append-only record of one resource movement: delta, reason, actor, correlation ID. **Every** gold and goods movement has one | — |
-| **Balance** | Current holding of one resource by one House. Carries `accrued_through_utc` — production is computed from elapsed time, never ticked | — |
+| **Balance** | Current holding of one resource by one settlement. Carries `accrued_through_utc` — production is computed from elapsed time, never ticked | — |
 | **Reservation** | Resources committed to a project but not yet consumed. Has explicit release and consume transitions | — |
 | **Bounded demand** | NPC and kingdom purchasing limited by budget, stockpile, deadline and world state. **There is no infinite vendor** | Foundation |
 
@@ -66,7 +65,7 @@ systems that do not exist yet.
 | **Technique** | A design or process emphasis chosen per craft. Part of smith identity and reputation | Foundation |
 | **Pattern** | An authored weapon design — `pattern.sword.infantry.arkazian` | — |
 | **Grade** | Material quality tier: improvised → bronze or low-grade iron → reliable iron → tempered → steel → rare-material masterwork → rune vessel | Foundation |
-| **Maker mark / provenance** | The record of who made an object and from what. Follows it into equipment records, battle history and House history | Foundation |
+| **Maker mark / provenance** | The record of who made an object and from what. Follows it into equipment records, battle history and the settlement's history | Foundation |
 | **Destination** | Where a finished craft goes: equip, kingdom contract, market listing, player commission, Order supply, export, retain. **Exclusive — one only** | Locked |
 | **Smith mastery** | Apprentice → Weaponsmith → Master Weaponsmith → Vessel Smith → Runeforger → Legendary Runeforger. Advanced by varied meaningful work, never by producing thousands of useless daggers | Foundation |
 
@@ -119,13 +118,13 @@ what the wielder does with it** — is adopted throughout.
 
 | Term | Meaning | Label |
 |---|---|---|
-| **Situation** | A short problem generated from House and world state, resolved using capabilities, specialists, armies, knowledge, gold, relationships or history | Foundation |
+| **Situation** | A short problem generated from settlement and world state, resolved using capabilities, specialists, armies, knowledge, gold, relationships or history | Foundation |
 | **Contract** | An agreement to supply goods: pattern, quantity, minimum quality, materials, fee, deadline, destination | Foundation |
 | **Commission** | A direct player-to-player crafting order. A **Runeforging commission** additionally fixes ownership, risk disclosure, loss allocation and per-outcome fees, accepted by both parties before the attempt becomes immutable | Foundation |
-| **Order** | A guild of Houses, coordinating what one House cannot do alone | Foundation |
+| **Order** | A guild of settlements, coordinating what one cannot do alone | Foundation |
 | **Warfront** | A temporary contested regional conflict. Creates demand and deeds. **Does not erase permanent settlements** | Locked |
 | **Season** | A cycle refreshing contested regions, rankings, offices and storyline. **No full account wipes** | Locked |
-| **Permanent state** | House, settlement, specialists, forge mastery, buildings, army roster, named and Runeforged weapons, relationships, titles, history | Locked |
+| **Permanent state** | Settlement, specialists, forge mastery, buildings, army roster, named and Runeforged weapons, relationships, titles, history | Locked |
 | **Seasonal state** | Contested regions, Warfront influence, temporary depots, crisis knowledge, rankings, offices, active storyline | Locked |
 | **History** | The append-only public record: construction, techniques, maker marks, owners, repairs, rune custody, **every Runeforging attempt including failures**, awakenings, battles, captures, recoveries | Foundation |
 
@@ -145,7 +144,7 @@ In use today:
 | Term | Meaning |
 |---|---|
 | **Feature folder** | A slice of the one application owning its endpoints, domain types and persistence configuration in one directory. Not a project, not an assembly |
-| **Aggregate** | A cluster of objects saved and loaded as a unit. **House** is the only one so far: it owns its settlement, that settlement's buildings, and its resource balances |
+| **Aggregate** | A cluster of objects saved and loaded as a unit. **Settlement** is the only one so far: it owns its buildings and its resource balances |
 | **Elapsed-time progression** | Progress stored as `StartedAtUtc` / `CompletesAtUtc` and computed when state is read. **No timer, no scheduler, no job row** |
 
 Vocabulary for infrastructure that is **deferred, not present** — see
@@ -158,7 +157,7 @@ that reintroduces each:
 | **Outbox** | Domain events written in the same transaction as their cause, dispatched after commit. **Post-commit reactions only — never maintains an invariant** | When a reaction must survive a crash and cannot be recomputed |
 | **Idempotency key** | A client-supplied key inserted in the effect transaction; a duplicate returns the stored response | Prompt 9 |
 | **Content version**, **rules version** | Identifiers persisted on a craft, battle or attempt so an old object stays explainable after balance changes | With authored content |
-| **`ActorContext`** | Who is acting: account, House, roles. **`HouseId` always comes from here, never from a request body** | Prompt 25 |
+| **`ActorContext`** | Who is acting: account, settlement, roles. **`SettlementId` always comes from here, never from a request body** | Prompt 25 |
 | **Correlation ID** | One identifier reconstructing a whole causal chain | With telemetry, Prompt 28 |
 
 ---
@@ -196,10 +195,10 @@ never as hard-coded rules:
 6. How standard Runestones re-enter the persistent world after destruction.
 7. Whether every Mythical rune is indestructible *(also §23.9)*.
 8. The full Order living-anchor and Fixation rule *(also §23.4)*.
-9. Whether a House can defect or change kingdom.
+9. Whether a settlement can defect or change kingdom.
 10. How often named weapons can be captured or permanently lost.
 11. The exact number and depth of secondary profession specializations.
-12. Whether the player character is also a visible smith or only the House leader employing smiths.
+12. Whether the player character is also a visible smith or only the leader employing smiths.
 13. How much control remains after an autobattle starts.
 14. The final commercial model.
 

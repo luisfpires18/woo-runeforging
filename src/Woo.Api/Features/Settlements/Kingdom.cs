@@ -1,7 +1,7 @@
-namespace Woo.Api.Features.Houses;
+namespace Woo.Api.Features.Settlements;
 
 /// <summary>
-/// The kingdom a House belongs to.
+/// The kingdom a settlement belongs to.
 /// </summary>
 /// <remarks>
 /// Only Arkazia exists so far. Canon defines seven kingdoms and makes Arkazia

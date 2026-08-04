@@ -1,7 +1,7 @@
 namespace Woo.Api.Features.Resources;
 
 /// <summary>
-/// A House's holdings of the six universal resources.
+/// A settlement's holdings of the six universal resources.
 /// </summary>
 /// <remarks>
 /// The rule this type exists to enforce: <b>a spend can never take a balance

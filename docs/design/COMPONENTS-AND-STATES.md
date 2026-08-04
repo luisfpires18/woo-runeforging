@@ -30,7 +30,7 @@ now three levels, and each has its own language —
 |---|---|---|
 | World | The settlement scene | Full-bleed artwork inside a steel frame. No inner boxes |
 | Command | Site plots, and the ledge welded under the scene | Stone plates, lit steel rims, an inset ledger for terms |
-| Record | Household, what changed, needs attention, lore | Open composition. A small wide label over a hairline rule, then rows. No border, no fill |
+| Record | Residents, what changed, needs attention, lore | Open composition. A small wide label over a hairline rule, then rows. No border, no fill |
 
 A thing at one level is never dressed like a thing at another. That rule is what
 the removed components were getting in the way of.
@@ -101,7 +101,7 @@ the screen a new player sees first.
 > Something failed. It is not the player's fault, and it may be recoverable.
 
 States what failed in plain words, offers **retry**, and preserves anything the
-player had entered. *"Could not reach the House. Your work is not lost."*
+player had entered. *"Could not reach the settlement. Your work is not lost."*
 
 **No stack traces, no codes, no blame.** An error offers a retry, **not a next
 move** — see §4.
@@ -147,7 +147,7 @@ What each screen shows. Only the structurally distinct cases are drawn in
 
 | Screen | Loading | Empty | Error | Unavailable | Success | Offline |
 |---|---|---|---|---|---|---|
-| **House Seat** | Placeholder per region | First session — the task card **is** the empty state | Retry; identity and resources stay | — | Site row updates in place | Banner; report readable, actions disabled |
+| **Outpost** | Placeholder per region | First session — the task card **is** the empty state | Retry; identity and resources stay | — | Site row updates in place | Banner; report readable, actions disabled |
 | **Settlement** | Building list placeholder | Never empty — five plots always | Retry the list | Per row: shortfall notice | Row becomes ▨ | Banner; list readable |
 | **Construction** | Cost placeholder | — | Retry; entered values kept | Confirm replaced by shortfall | Return to settlement, row changed | Confirm disabled with reason |
 | **Forge** | Project placeholder | "No projects. Choose a pattern to begin." | Retry | Steel shown with its requirement | Project appears in progress | Confirm disabled |
@@ -169,9 +169,9 @@ slot.
 
 | State | Primary action |
 |---|---|
-| House Seat — **first session** | **Exactly one.** The whole job is making the first move unmissable |
-| House Seat — returning, work available | **One**, and it may differ — collect a completion, resolve an attention item |
-| House Seat — returning, everything under way and nothing affordable | **None.** Say so: *"Everything you can start is under way."* |
+| Outpost — **first session** | **Exactly one.** The whole job is making the first move unmissable |
+| Outpost — returning, work available | **One**, and it may differ — collect a completion, resolve an attention item |
+| Outpost — returning, everything under way and nothing affordable | **None.** Say so: *"Everything you can start is under way."* |
 | Confirm screens | One — `Begin construction`, `Begin the craft` |
 | Error | **None.** A retry, not a next move |
 | Offline | **None.** Committing is what is unavailable |

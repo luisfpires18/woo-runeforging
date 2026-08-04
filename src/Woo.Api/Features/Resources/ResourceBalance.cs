@@ -1,7 +1,7 @@
 namespace Woo.Api.Features.Resources;
 
 /// <summary>
-/// How much of one resource a House holds. Quantities are whole numbers —
+/// How much of one resource a settlement holds. Quantities are whole numbers —
 /// there is no floating point anywhere in the economy.
 /// </summary>
 public sealed class ResourceBalance

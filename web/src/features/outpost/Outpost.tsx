@@ -3,18 +3,18 @@ import type {
   Building,
   BuildingKind,
   ChangeEntry,
-  HouseState,
+  SettlementState,
 } from '../../api/types.ts';
 import { Art } from '../../components/Art.tsx';
 import { SceneGround, siteAnchor } from '../../components/SettlementScene.tsx';
 import { EmptyRegion } from '../../components/StateRegion.tsx';
 import { Link, useRouter } from '../../app/router.tsx';
-import { Household } from '../household/Household.tsx';
+import { Residents } from '../residents/Residents.tsx';
 
 /**
  * The home screen.
  *
- * The outpost itself is the screen. Ashen Reach fills the frame, the seven
+ * The outpost itself is the screen. The settlement fills the frame, the seven
  * sites stand on their own ground inside it, and the one thing worth doing is
  * stated on a ledge welded to the bottom of that view rather than floated
  * beside it as a card.
@@ -23,14 +23,16 @@ import { Household } from '../household/Household.tsx';
  * making the first move unmissable, and a returning session that answers what
  * changed and what needs attention before the player has to ask.
  */
-export function HouseSeat({ state }: { readonly state: HouseState }) {
+export function Outpost({ state }: { readonly state: SettlementState }) {
   const returning = state.changes.length > 0 || state.attention.length > 0;
   const candidate = nextTask(state.buildings);
 
   return (
-    <div className="seat">
+    <div className="outpost">
       <header className="intro">
-        <p className="intro__eyebrow">The House Seat</p>
+        {/* The label names the screen, not the settlement — the title below it
+            and the HUD above it are already saying the name. */}
+        <p className="intro__eyebrow">Overview</p>
         <h1 className="intro__title">{state.settlement.name}</h1>
         <p className="intro__prose">{state.settlement.geography}</p>
       </header>
@@ -47,11 +49,11 @@ export function HouseSeat({ state }: { readonly state: HouseState }) {
           and what the stone remembers. Separators, not four more boxes. */}
       <div className="ledger">
         {returning ? <ReturningRegions state={state} /> : null}
-        <Household people={state.household} />
+        <Residents people={state.residents} />
         {/* Static prose. Runes are the long-term centre of the game and are
             not a system here — no inventory, no odds, no control, not even a
             disabled one, because a disabled control is an advertisement. */}
-        <p className="seat__lore">{state.settlement.loreHint}</p>
+        <p className="outpost__lore">{state.settlement.loreHint}</p>
       </div>
     </div>
   );
@@ -64,7 +66,7 @@ function nextTask(buildings: readonly Building[]): Building | undefined {
   );
 }
 
-function ReturningRegions({ state }: { readonly state: HouseState }) {
+function ReturningRegions({ state }: { readonly state: SettlementState }) {
   return (
     <>
       <section aria-labelledby="changed-heading" className="record">
@@ -136,7 +138,7 @@ function AttentionRow({ item }: { readonly item: AttentionItem }) {
 /**
  * The single primary action, on the ledge below the outpost.
  *
- * Exactly one on the first-session seat. It navigates to the settlement and
+ * Exactly one on the first-session outpost. It navigates to the settlement and
  * focuses the site in question — it does **not** start construction, and
  * nothing here implies anything was saved. Committing resources is Prompt 6.
  */
@@ -215,13 +217,13 @@ function PrimaryTask({
  * The outpost, seen whole.
  *
  * Compact markers rather than the settlement screen's full plates: from the
- * seat you are reading the site at a glance, not inspecting one part of it.
+ * outpost you are reading the site at a glance, not inspecting one part of it.
  */
 function SiteRow({
   state,
   focus,
 }: {
-  readonly state: HouseState;
+  readonly state: SettlementState;
   readonly focus: BuildingKind | null;
 }) {
   return (

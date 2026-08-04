@@ -4,7 +4,7 @@
        so a fallback still reads as part of this site rather than as a hole.
 
        It shares the building grammar exactly — same frame, same ridge, same
-       ground band — and shows only what the House has actually done here:
+       ground band — and shows only what the settlement has actually done here:
        cleared the footing, driven the stakes, set a line and left a flag. -->
   <defs><linearGradient id="akSky" x1="0" y1="0" x2="0" y2="1">
     <stop offset="0" stop-color="#1A1815"/><stop offset="1" stop-color="#12100E"/></linearGradient></defs>

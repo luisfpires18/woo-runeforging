@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 500" preserveAspectRatio="xMidYMax slice" role="img" aria-hidden="true">
-  <!-- The pass above Ashen Reach, as page backdrop.
+  <!-- The pass above the outpost, as page backdrop.
 
-       Deliberately quieter than `ashen-reach.svg`: that one is the scene the
+       Deliberately quieter than `outpost.svg`: that one is the scene the
        player looks at, this one only stops the page being flat black behind it.
        Three flat ridge layers, no detail, no light. -->
   <g fill="#1A1815">

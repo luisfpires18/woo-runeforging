@@ -1,18 +1,17 @@
-using Woo.Api.Features.Houses;
 using Woo.Api.Features.Resources;
 using Woo.Api.Features.Settlements;
 
 namespace Woo.Api.Content;
 
 /// <summary>
-/// The opening position: one minor Arkazian House with a frontier outpost.
+/// The opening position: one Arkazian frontier outpost.
 /// </summary>
 /// <remarks>
 /// <para>
-/// The House and outpost names below are <b>invented starter content, not
-/// canon</b>. The canon names Arkazia's capital as Obsidia and describes the
-/// kingdom's mountain holds, but it names no minor House — so these are
-/// placeholders chosen to sound Arkazian, and replacing them breaks nothing.
+/// The settlement has <b>no proper name</b>. Canon names Arkazia's capital as
+/// Obsidia and describes the kingdom's mountain holds, but it names no minor
+/// settlement — so rather than invent one, the outpost is described by what it
+/// is. Naming it is the player's to do later.
 /// </para>
 /// <para>
 /// Opening balances are enough to raise the first two or three buildings
@@ -22,11 +21,9 @@ namespace Woo.Api.Content;
 /// </remarks>
 public static class StarterContent
 {
-    public const string HouseName = "House Karrow";
+    public const string SettlementName = "Arkazian Outpost";
 
-    public const string OutpostName = "Ashen Reach";
-
-    public const Kingdom HouseKingdom = Kingdom.Arkazia;
+    public const Kingdom SettlementKingdom = Kingdom.Arkazia;
 
     public static ResourcePool OpeningResources() => ResourcePool.With(
         (ResourceKind.Gold, 250),
@@ -37,14 +34,13 @@ public static class StarterContent
         (ResourceKind.WorkshopSupplies, 100));
 
     /// <summary>
-    /// Builds the opening House. The caller supplies the identifiers so that
-    /// nothing here reaches for a random number or a clock.
+    /// Builds the opening settlement. The caller supplies the identifier so
+    /// that nothing here reaches for a random number or a clock.
     /// </summary>
-    public static House EstablishStarterHouse(Guid houseId, Guid settlementId) =>
-        House.Establish(
-            houseId,
-            HouseName,
-            HouseKingdom,
-            Settlement.FoundOutpost(settlementId, OutpostName),
+    public static Settlement FoundStarterSettlement(Guid settlementId) =>
+        Settlement.FoundOutpost(
+            settlementId,
+            SettlementName,
+            SettlementKingdom,
             OpeningResources());
 }

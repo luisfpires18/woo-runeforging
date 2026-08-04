@@ -4,10 +4,10 @@ import type { BuildingKind, ResourceCostEntry, ResourceKind } from '../types.ts'
  * Starter content, mirroring `src/Woo.Api/Content/` so the mock and the domain
  * do not drift.
  *
- * PLACEHOLDER CONTENT. The House and settlement names, the smith, and every
- * cost and duration below are starter values chosen so the first session
- * presents a choice — they are not balance decisions, and playtesting is
- * expected to replace them.
+ * PLACEHOLDER CONTENT. The settlement name, the smith, and every cost and
+ * duration below are starter values chosen so the first session presents a
+ * choice — they are not balance decisions, and playtesting is expected to
+ * replace them.
  *
  * Note for anyone editing: that caveat belongs in code and documentation only.
  * Nothing in the interface tells a player any of this is invented.
@@ -35,9 +35,9 @@ export interface BuildingDefinition {
 
 export const buildingDefinitions: readonly BuildingDefinition[] = [
   {
-    kind: 'HouseHall',
-    displayName: 'House Hall',
-    description: 'The seat of the House. Governance, reputation and standing.',
+    kind: 'CommandHall',
+    displayName: 'Command Hall',
+    description: 'Where the settlement is run. Governance, reputation and standing.',
     cost: [
       { kind: 'Timber', amount: 120 },
       { kind: 'Stone', amount: 80 },
@@ -50,7 +50,7 @@ export const buildingDefinitions: readonly BuildingDefinition[] = [
   {
     kind: 'Storehouse',
     displayName: 'Storehouse',
-    description: "Covered, guarded storage for the House's goods.",
+    description: "Covered, guarded storage for the settlement's goods.",
     cost: [
       { kind: 'Timber', amount: 90 },
       { kind: 'Stone', amount: 30 },
@@ -108,7 +108,7 @@ export const buildingDefinitions: readonly BuildingDefinition[] = [
     ],
     durationMinutes: 45,
     yieldSummary: null,
-    previewReason: 'Needs the House Hall',
+    previewReason: 'Needs the Command Hall',
   },
   {
     kind: 'Forge',
@@ -121,7 +121,7 @@ export const buildingDefinitions: readonly BuildingDefinition[] = [
     ],
     durationMinutes: 40,
     yieldSummary: null,
-    previewReason: 'Needs the House Hall',
+    previewReason: 'Needs the Command Hall',
   },
 ];
 

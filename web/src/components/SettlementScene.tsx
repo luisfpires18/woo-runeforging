@@ -1,10 +1,10 @@
 import type { CSSProperties } from 'react';
 
 import type { BuildingKind } from '../api/types.ts';
-import scene from '../assets/environment/ashen-reach.svg';
+import scene from '../assets/environment/outpost.svg';
 
 /**
- * Ashen Reach, drawn once.
+ * The outpost, drawn once.
  *
  * The scene is terrain, fortification and light — no building is painted into
  * it. The seven sites are laid over the top at fixed anchors, so the same site
@@ -31,7 +31,7 @@ import scene from '../assets/environment/ashen-reach.svg';
 const anchors: Readonly<Record<BuildingKind, { readonly x: number; readonly y: number }>> = {
   Quarry: { x: 10, y: 30 },
   Storehouse: { x: 31, y: 20 },
-  HouseHall: { x: 51, y: 38 },
+  CommandHall: { x: 51, y: 38 },
   Mine: { x: 88, y: 21 },
   Barracks: { x: 71, y: 54 },
   LumberYard: { x: 24, y: 68 },

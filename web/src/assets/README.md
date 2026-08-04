@@ -8,10 +8,10 @@ file is hand-written SVG in this repository.
 
 | Scale | File | Frame | Job |
 |---|---|---|---|
-| The world | `environment/ashen-reach.svg` | `0 0 1600 700` | The settlement panorama. One place, seen whole |
+| The world | `environment/outpost.svg` | `0 0 1600 700` | The settlement panorama. One place, seen whole |
 | A site | `buildings/*.svg`, `factions/arkazia.svg` | `0 0 160 112` | One structure and the ground it stands on |
 | The page | `environment/ridge.svg` | `0 0 1600 500` | Backdrop behind the whole shell, at low contrast |
-| The House | `heraldry/house-karrow.svg` | `0 0 64 76` | Crest, and the terminal fallback |
+| The settlement | `heraldry/arkazian-token.svg` | `0 0 64 76` | The settlement token, and the terminal fallback |
 
 **No building is drawn into the panorama.** The seven sites are laid over it at
 fixed anchors (`components/SettlementScene.tsx`), so the scene stays true as the
@@ -28,11 +28,11 @@ of icons:
 | Sky | `#1A1815 → #12100E` | Overcast mountain light |
 | Ridge behind | `#221D19`, `#2A2521` | Varies per site — the slope that one actually sits on |
 | Ground band | `#1A1815` | The near edge, shared by every site |
-| Raw slope | `#312C26`, `#3A342D` | Ground the House has not worked |
+| Raw slope | `#312C26`, `#3A342D` | Ground the settlement has not worked |
 | Worked stone | `#3E3831`, lit `#4A4239`, edge `#5C5248` | Arkazia builds in stone, and cut stone is the lighter thing |
 | Slate roof | `#2A2724` | Blackened, low and heavy |
 | Timber | `#4A3A2C`, lit `#5C4A38` | Beams, scaffolds, palisade, cart stock |
-| Crimson | `#8E2A24` | House cloth — sparing, one banner or one rack at most |
+| Crimson | `#8E2A24` | Arkazian cloth — sparing, one banner or one rack at most |
 | Forge light | `#E8974A` | Fire only. Never decoration |
 
 Canon: *blackened steel, crimson cloth, riveted plate, fortress stonework,
@@ -64,7 +64,7 @@ everything in front of it should read as cut out of the sky.
 ## The fallback chain
 
 ```
-buildings/<kind>.svg  →  factions/arkazia.svg  →  heraldry/house-karrow.svg
+buildings/<kind>.svg  →  factions/arkazia.svg  →  heraldry/arkazian-token.svg
 ```
 
 The last link is guaranteed present, so missing art can never block play.
@@ -76,7 +76,7 @@ file.
 
 Because the Forge is a preview on the settlement screen, `factions/arkazia.svg`
 is what a player actually looks at there. It is drawn at full site scale and
-shows exactly what the House has done on that ground: cleared the footing, driven
+shows exactly what the settlement has done on that ground: cleared the footing, driven
 and braced the stakes, run the set-out lines, dropped the first stone. It is a
 real answer to "what is there", not a graphic apologising for a missing file.
 

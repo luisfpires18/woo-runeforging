@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 
 import { getPlatformStatus } from '../api/client.ts';
-import { useHouseState } from '../api/HouseStateProvider.tsx';
+import { useSettlementState } from '../api/SettlementStateProvider.tsx';
 import { ErrorRegion, LoadingRegion } from '../components/StateRegion.tsx';
-import { HouseSeat } from '../features/houseSeat/HouseSeat.tsx';
+import { Outpost } from '../features/outpost/Outpost.tsx';
 import { Settlement } from '../features/settlement/Settlement.tsx';
 import { AppShell } from './AppShell.tsx';
 import { useRouter } from './router.tsx';
 
 export function App() {
-  const { load, reload } = useHouseState();
+  const { load, reload } = useSettlementState();
   const offline = useConnectivity();
 
   const state = load.phase === 'loaded' ? load.state : null;
@@ -17,7 +17,7 @@ export function App() {
   return (
     <AppShell state={state} offline={offline}>
       {load.phase === 'loading' && (
-        <LoadingRegion label="Reading word from the House…" minHeight="24rem" />
+        <LoadingRegion label="Reading word from the outpost…" minHeight="24rem" />
       )}
       {load.phase === 'error' && <ErrorRegion message={load.message} onRetry={reload} />}
       {load.phase === 'loaded' && <Screen />}
@@ -27,7 +27,7 @@ export function App() {
 
 function Screen() {
   const { path } = useRouter();
-  const { load } = useHouseState();
+  const { load } = useSettlementState();
 
   if (load.phase !== 'loaded') {
     return null;
@@ -37,7 +37,7 @@ function Screen() {
     return <Settlement state={load.state} />;
   }
 
-  return <HouseSeat state={load.state} />;
+  return <Outpost state={load.state} />;
 }
 
 /**

@@ -9,12 +9,15 @@ namespace Woo.Api.Features.Settlements;
 /// defence — and none of those capabilities is modelled yet. They join the
 /// prompts that give them something to do.
 ///
-/// Persisted as a string, never as an ordinal.
+/// Persisted as a string, never as an ordinal. Renaming a member therefore
+/// needs a migration for the stored values as well as the code — see
+/// <c>MergeHouseIntoSettlement</c>, which carried <c>HouseHall</c> across to
+/// <c>CommandHall</c>.
 /// </remarks>
 public enum BuildingKind
 {
     /// <summary>Governance, reputation and the settlement's stage.</summary>
-    HouseHall,
+    CommandHall,
 
     /// <summary>Resource storage. Capacity itself arrives with Prompt 10.</summary>
     Storehouse,
