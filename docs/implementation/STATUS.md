@@ -1,8 +1,9 @@
 # Implementation status
 
-**Last updated:** 3 August 2026
+**Last updated:** 4 August 2026
 **Current stage:** Prompt 5 — the mocked House Seat ·
-**complete, uncommitted, awaiting review**
+**complete, committed, reviewed** (`f6214a6`)
+**In progress:** two visual passes over Prompt 5's presentation — uncommitted
 **Next:** Prompt 6 — the mocked construction and forging loop
 
 This document describes **what is true now**. The history of how it got here is
@@ -16,12 +17,13 @@ in the [change log](#9-change-log).
 | 3 | `bb1a1fa`, `97248cb` | The first domain model, starter content and migration |
 | 3 | `9483047` | Review corrections — the construction ordering defect |
 | 4 | `f084304` | The design package — documents only |
-| 5 | *uncommitted* | The mocked House Seat, from typed fake data |
+| 5 | `f6214a6` | The mocked House Seat, from typed fake data |
 
 `master` is level with `origin/master`. **CI is green on every pushed commit**,
 verified against the GitHub Actions API on 3 August 2026:
 
 ```
+f6214a6  validate  completed  success   run 30835450898
 97248cb  validate  completed  success
 bb1a1fa  validate  completed  success
 a1067a7  validate  completed  success
@@ -50,6 +52,141 @@ battles · runes in any form · markets, contracts, Orders, Warfronts, seasons �
 settlement stages beyond Outpost · the other six kingdoms · resource accrual,
 storage capacity, procurement · authentication · background jobs, outbox,
 idempotency keys · object storage · PixiJS · Azure, deployment, Kubernetes.
+
+---
+
+## 1y. The visual-polish pass — uncommitted
+
+Prompt 5's presentation was functional but read as an internal dashboard. This
+pass re-grounds it in Arkazia. **Information architecture, routes, scenarios,
+the provider boundary, accessibility rules and mocked behaviour are unchanged**
+— it is styling, artwork and layout.
+
+### 1y.1 What changed
+
+- **The Arkazian action** replaces the amber CTA: crimson cloth over blackened
+  steel, rimmed in forge light. `#F0EAE2` on `#8E2A24` is **7.01:1**, and the
+  `#E8974A` rim carries the 3:1 boundary that deep crimson alone (2.27:1)
+  cannot.
+- **Stone, steel and timber tokens** for panels, rails and the header band.
+- **A ridge backdrop** behind the shell — decorative, `aria-hidden`.
+- **The sidebar joins the shell** as a stone rail sharing an edge.
+- **The resource strip is its own band**, six even cells with rules between.
+- **An authored building set** on one visual grammar — shared ridge, ground
+  line and palette (`web/src/assets/README.md`).
+- **Building states differ structurally**, not only by colour: border style,
+  opacity and a scaffold overlay, on top of the glyph and word already there.
+- **Content width 72rem → 90rem**, and *what changed* / *needs attention* now
+  lead the page instead of sitting in a sidebar.
+
+### 1y.2 Two defects only visible by looking
+
+Neither was caught by a passing build or a green test run.
+
+**Building art silently stopped rendering.** Vite inlined the new SVGs as an
+empty `data:image/svg+xml,`. The files are valid; they carry `#` in every colour
+and a `url(#…)` gradient reference, which a non-base64 data URI does not survive.
+`build.assetsInlineLimit: 0` — assets are emitted as real files, which also means
+the fallback chain behaves as it will in production.
+
+**Mobile clipped two things**: the "Workshop Supplies" label overflowed its cell,
+and "See all options" was pushed off by the full-width button. The label wraps
+now and the actions stack.
+
+### 1y.3 Three review corrections
+
+| # | Correction |
+|---|---|
+| 1 | `Settlement.test.tsx` advanced the clock **twice** — a direct `source.advance(20)` and then the button — totalling 40 minutes for a 15-minute build. The direct call is gone; **one click** now proves completion |
+| 2 | The empty-state test rendered `firstSession` and asserted sections were *absent*. It now renders the **`empty` scenario** and asserts the visible household empty state, and that it is not styled as an error |
+| 3 | `AGENTS.md` and this document record Prompt 5 as committed in `f6214a6`, pushed, reviewed, CI green (run `30835450898`) |
+
+---
+
+## 1x. The second visual pass — uncommitted
+
+The polish pass fixed the palette but not the shape. Every piece of information
+still arrived in an equally styled rectangle, the artwork was icon-scale, and
+the screen read as a dashboard with a good colour scheme rather than as a
+fortress strategy game.
+
+This pass recomposes the interface around the outpost itself. **Information
+architecture, routes, scenarios, the adapter seam, mocked behaviour and every
+accessibility rule are unchanged**, and no Prompt 6 functionality was added.
+
+### 1x.1 What changed
+
+- **A settlement scene is the page.** `environment/ashen-reach.svg` — an
+  authored panorama of the pass, drawn at `1600 × 700` — fills the frame, and
+  the seven sites stand on their own ground inside it at fixed anchors held in
+  `components/SettlementScene.tsx`. No building is painted into the scene, so it
+  stays true as the settlement changes.
+- **Three visual levels, and only three:** the world, the command surface, the
+  record. `.panel` is gone as a universal wrapper — a single container style
+  applied to everything was the thing making the page read as software.
+- **One HUD band.** House identity, settlement state and the six balances share
+  a single stone header instead of stacking two, with a fixed minimum height so
+  the page does not jump between loading and loaded.
+- **The rail is welded to the HUD** — shared edge, no gap, a cloth tab for the
+  current area, and `aria-current="page"`, which closes a gap
+  `ACCESSIBILITY.md` §4 had asked for and the first build had not delivered.
+- **A command ledge replaces the objective card.** It is joined to the bottom
+  edge of the world and states the one thing worth doing. The settlement screen
+  uses the same ledge for whichever site is selected.
+- **Site plots replace building rows** — an illustrated plate with a nameplate,
+  standing where the building stands. Selecting one is **local and visual
+  only**: it changes what the ledge describes. Nothing is committed, nothing is
+  saved, and there is no start control.
+- **Architectural vignettes replace symbolic icons.** Six drawn sites at
+  `160 × 112`, each with its own ridge, terrain, foundation and working detail.
+  The byte-identical ridge path shared by all seven files is gone — it made the
+  set read as tiling rather than as one place seen in parts.
+- **The faction placeholder was redrawn at site scale.** It is what the Forge
+  actually renders, so it now depicts surveyed, pegged-out ground rather than a
+  shrunken icon.
+- **A display treatment on the system stack** — names heavy and tight, labels
+  small and wide. Two registers, no third, and still no font file
+  (`VISUAL-LANGUAGE.md` §3.1).
+- **Mobile is composed rather than collapsed**: scene banner, then the ledge,
+  then the sites, so the current decision is never below seven plots.
+
+### 1x.2 Three defects only visible by looking
+
+**`--space-5` did not exist.** Four rules in `app.css` used `var(--space-5)`
+while `tokens.css` never defined it, so each declaration was invalid at
+computed-value time and fell back to the initial value: panels rendered with
+**zero padding**, buttons with zero side padding, and the building grid with no
+gap. Nothing failed — an unresolvable `var()` is not a build error, not a lint
+error and not a test failure. The token is defined now.
+
+**The panorama shipped invisible.** An SVG comment containing `----` is a
+double-hyphen, which is an XML parse error. The browser stops rendering at that
+point and reports it only if you open the file directly. The rule is written
+down in `web/src/assets/README.md` so it is not rediscovered.
+
+**The settlement screen scrolled horizontally at 375px.** A two-column title row
+sized the name track by content, leaving the prose a 14px track and 49px of
+content. The row wraps now, and the screenshot harness asserts
+`documentElement.scrollWidth` at every viewport it captures.
+
+### 1x.3 Reversed from the polish pass
+
+**"What changed" and "Needs attention" no longer lead the page.** They sit in
+the record band below the scene. The returning player's first question is now
+answered higher than before — by the site itself, where the Lumber Yard is
+visibly under construction and hatched with scaffolding — and the ledge states
+what is next.
+
+### 1x.4 Reachability, for looking at states
+
+`main.tsx` mapped only `?scenario=returning`. It now also accepts
+`?scenario=empty`, so the empty state can be **looked at** and not only
+asserted. This is the one place a fake source may be chosen, it changes no
+component, and it adds no gameplay.
+
+Loading and error remain unreachable from a URL by design — they were verified
+by temporarily substituting a slow source and a rejecting source in `main.tsx`,
+and the substitutions were reverted.
 
 ---
 
@@ -323,6 +460,59 @@ checked 14 ADR(s) — OK
 $ bash scripts/check-doc-links.sh
 checked 35 Markdown files — OK
 ```
+
+Re-run in full after the second visual pass, 4 August 2026:
+
+```
+$ dotnet format --verify-no-changes
+(no output, exit code 0)
+
+$ dotnet build -c Release
+Build succeeded.  0 Warning(s)  0 Error(s)
+
+$ dotnet test -c Release --no-build
+Passed!  - Failed: 0, Passed: 32, Skipped: 0, Total: 32, Duration: 4 s
+
+$ cd web && npm run lint && npm run typecheck
+(no output from either)
+
+$ npm run test          # three consecutive runs
+Test Files  2 passed (2)      Tests  14 passed (14)      stderr: 0 bytes
+Test Files  2 passed (2)      Tests  14 passed (14)      stderr: 0 bytes
+Test Files  2 passed (2)      Tests  14 passed (14)      stderr: 0 bytes
+
+$ npm run build
+✓ built in 234ms — 10 SVGs emitted as real files, none inlined
+
+$ bash scripts/check-adrs.sh
+checked 15 ADR(s) — OK
+$ bash scripts/check-doc-links.sh
+checked 44 Markdown files — OK
+```
+
+### 4.2 The visual check
+
+Driven with `playwright-core` against the installed Edge, from a scratch
+directory outside the repository — no dependency was added to `web/`. Captured
+at **1440 × 900** and **375 × 812**: first-session seat, returning seat,
+settlement with the Lumber Yard selected, construction under way, construction
+complete, empty, offline. Loading and error were captured by temporarily
+substituting a slow source and a rejecting source in `main.tsx`; both
+substitutions were reverted.
+
+Measured, not eyeballed:
+
+| Check | Result |
+|---|---|
+| `documentElement.scrollWidth` at 1440, 720 (≈200% zoom), 375 and 320 | Equal to `clientWidth` at every width, both routes — **no horizontal scroll** |
+| Tab order from a cold load | Skip link → Seat → Settlement → primary action → "See all options" → testing aid. Every stop reports a `2px solid` outline |
+| Keyboard selection of a plot | `Enter` on the Mine plate moves the ledge from House Hall to Mine; `aria-pressed` follows |
+| `prefers-reduced-motion: reduce` | All three duration tokens compute to `0ms`; plate and button transition durations compute to `0s`; the hover and selected transforms are neutralised |
+| Interactive targets under 44px at 375px | None. *(The skip link was 141 × 42 and now carries `min-height: var(--target-min)`.)* |
+| Greyscale legibility | Every construction state still separable by glyph, word and frame — solid vs dashed, base rule, and a raised plate with a lit head rail for the selected site |
+
+**Still not run:** axe or any automated a11y tool — deferred to the Prompt 8
+audit, unchanged. The sweep above is manual and mechanical, not a substitute.
 
 **Against an empty database, then twice in a row** — the two properties the
 persistence fixture exists to guarantee:

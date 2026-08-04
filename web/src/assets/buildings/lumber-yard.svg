@@ -1,9 +1,47 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 72" role="img" aria-hidden="true">
-  <rect width="96" height="72" fill="#1a1815"/>
-  <path d="M18 60V44h44v16Z" fill="#2e2823" stroke="#8c7d6c" stroke-width="2"/>
-  <path d="M14 44 40 32l26 12" fill="none" stroke="#8fa4b8" stroke-width="3"/>
-  <g stroke="#554a3e" stroke-width="2" fill="#241f1b">
-    <circle cx="72" cy="50" r="6"/><circle cx="82" cy="50" r="6"/><circle cx="77" cy="40" r="6"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 112" role="img" aria-hidden="true">
+  <!-- The Lumber Yard: an open saw shed on the forest bench, with felled stock and a skid. -->
+  <defs><linearGradient id="lySky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#1A1815"/><stop offset="1" stop-color="#12100E"/></linearGradient></defs>
+  <rect width="160" height="112" fill="url(#lySky)"/>
+
+  <!-- Ridge behind: the slope drops away, so the forest stands below the line. -->
+  <path d="M0 40 20 22l24 18 22-10 26 20 22-8 26 18 20-6v58H0Z" fill="#221D19"/>
+  <path d="M0 64 26 52l28 12 24-8 30 14 26-6 26 10v42H0Z" fill="#2A2521"/>
+
+  <!-- Alpine conifers, standing timber behind the yard. -->
+  <g fill="#1E1B17">
+    <path d="M18 76 28 52l10 24Z"/><path d="M18 66 28 46l10 20Z"/><path d="M26 78h4v10h-4Z"/>
+    <path d="M42 80 50 60l8 20Z"/><path d="M42 72 50 54l8 18Z"/><path d="M48 80h4v8h-4Z"/>
+    <path d="M132 78 142 54l10 24Z"/><path d="M132 68 142 48l10 20Z"/><path d="M140 78h4v10h-4Z"/>
   </g>
-  <rect x="0" y="60" width="96" height="12" fill="#12100e"/>
+  <path d="M6 88h148v4H6Z" fill="#2E2922"/>
+
+  <!-- Open-sided saw shed: posts, plate, pitched roof, no walls. -->
+  <path d="M60 50h56l-6-12H66Z" fill="#3E3128"/>
+  <path d="M60 50h56l-1-2H61Z" fill="#5C4A38"/>
+  <g stroke="#4A3A2C" stroke-width="4" stroke-linecap="square"><path d="M64 50v38M112 50v38M88 52v36"/></g>
+  <path d="M62 56h52v3H62Z" fill="#453629"/>
+
+  <!-- The frame saw over the pit. -->
+  <path d="M74 60h28v3H74Z" fill="#4A4239"/>
+  <path d="M78 63v14M98 63v14" stroke="#5C5248" stroke-width="2"/>
+  <path d="M76 78h26v3H76Z" fill="#5C5248"/>
+  <path d="M72 84h32v4H72Z" fill="#231F1B"/>
+
+  <!-- Log stack, cut ends toward us. -->
+  <g fill="#4A3A2C"><rect x="120" y="78" width="30" height="10" rx="2"/><rect x="124" y="68" width="22" height="10" rx="2"/></g>
+  <g fill="#5C4A38">
+    <circle cx="123" cy="83" r="4"/><circle cx="133" cy="83" r="4"/><circle cx="143" cy="83" r="4"/>
+    <circle cx="128" cy="73" r="4"/><circle cx="138" cy="73" r="4"/>
+  </g>
+  <g fill="#2A2724">
+    <circle cx="123" cy="83" r="1.5"/><circle cx="133" cy="83" r="1.5"/><circle cx="143" cy="83" r="1.5"/>
+    <circle cx="128" cy="73" r="1.5"/><circle cx="138" cy="73" r="1.5"/>
+  </g>
+
+  <!-- Skid track, where stock is dragged up from the slope. -->
+  <path d="M10 88 34 82" stroke="#3E3128" stroke-width="4" stroke-linecap="round"/>
+  <path d="M14 82h18v3H14Z" fill="#453629"/>
+
+  <rect y="92" width="160" height="20" fill="#1A1815"/>
 </svg>

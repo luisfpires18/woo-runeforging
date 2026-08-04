@@ -155,12 +155,17 @@ describe('House Seat — states without a primary action', () => {
   });
 
   it('empty regions read as empty, not as an error', async () => {
-    renderScenario('firstSession');
+    // The empty scenario, so this asserts a rendered empty state rather than
+    // the absence of a section.
+    renderScenario('empty');
 
-    // A first session has nothing in the household beyond the smith and no
-    // change history at all; the returning regions are simply not rendered.
-    await screen.findByRole('heading', { name: /ashen reach/i, level: 1 });
-    expect(screen.queryByRole('region', { name: /what changed/i })).not.toBeInTheDocument();
+    const household = await screen.findByRole('region', { name: /the household/i });
+
+    const message = within(household).getByText(/no one has taken service with the house yet/i);
+    expect(message).toBeInTheDocument();
+
+    // Empty is not an error: no alert, and none of the danger styling.
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(message.closest('.state')).toHaveClass('state--empty');
   });
 });

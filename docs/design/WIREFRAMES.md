@@ -131,46 +131,51 @@ First session, `< 48rem`. Returning session stacks in the order of §2.
 
 ```
 ┌──────────────────────────┐
-│ ⌂ Ashen Reach   [Outpost]│
-│ 250 200 220 180 120 100 ⌄│
+│ ⌂ HOUSE KARROW           │
+│   Ashen Reach  [Outpost] │
+│ GOLD PROV TIMBER         │
+│  250  200    220         │
+│ STONE ORE WORKSHOP       │
+│  180  120 SUPPLIES 100   │
 ├──────────────────────────┤
-│                          │
+│ THE HOUSE SEAT           │
 │ Ashen Reach              │
 │ A claimed site on the    │
 │ ridge road.              │
-│                          │
 │ ┌──────────────────────┐ │
-│ │ Your first task      │ │
-│ │                      │ │
+│ │▓▓▓ scene banner ▓▓▓▓ │ │  the world, compressed
+│ ├──────────────────────┤ │
+│ │ YOUR FIRST TASK      │ │  the ledge, straight after
 │ │ Lumber Yard          │ │
-│ │ 40 Timber            │ │
-│ │ 30 Supplies          │ │
-│ │ 15 min               │ │
-│ │                      │ │
+│ │ The site has timber… │ │
+│ │ 40 Timber · 30 Sup…  │ │
 │ │ [ Raise the        ] │ │
 │ │ [ Lumber Yard      ] │ │
-│ │                      │ │
 │ │ < see all options >  │ │
+│ ├──────────────────────┤ │
+│ │ THE SITE             │ │
+│ │ ┌───────┐ ┌───────┐  │ │  the sites, two across
+│ │ │ ▒art▒ │ │ ▒art▒ │  │ │
+│ │ │ House │ │ Store │  │ │
+│ │ │  □ … │ │  □ …  │  │ │
+│ │ └───────┘ └───────┘  │ │
 │ └──────────────────────┘ │
-│                          │
-│ THE SITE                 │
-│ ┌────────┐ ┌────────┐    │
-│ │   □    │ │   □    │    │
-│ │ House  │ │ Store- │  → │
-│ │  Hall  │ │ house  │    │
-│ └────────┘ └────────┘    │
-│  horizontal scroll       │
-│                          │
 ├──────────────────────────┤
-│   ⌂          ⌂⌂          │
-│  Seat     Settlement     │
+│   SEAT   │  SETTLEMENT   │
 └──────────────────────────┘
 ```
 
-- Cost breaks to one resource per line — never a wrapped run of numbers.
-- The primary button is **full width**, comfortably above the tab bar.
-- The site row scrolls horizontally; the row itself scrolls, **the page does
-  not**.
+- **Scene, decision, detail — in that order.** The ledge is ordered between the
+  scene banner and the site plots, so the thing worth doing is never below seven
+  plots. The three are siblings in one flex column purely so this reorder is
+  possible with CSS alone.
+- Cost stays on one wrapped line here; the settlement ledge breaks it out.
+- The primary button is **full width** and stacks above the secondary link, so
+  neither is pushed off the edge.
+- **The site plots wrap into two columns. Nothing scrolls horizontally** —
+  amended from the original "the row scrolls horizontally", because seven plots
+  do not fit across a 1280px viewport either, and a clipped final plot reads as
+  broken rather than as scrollable.
 - Everything the desktop offers is here. Nothing is dropped.
 
 ---

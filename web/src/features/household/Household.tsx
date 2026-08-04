@@ -10,8 +10,8 @@ import { EmptyRegion } from '../../components/StateRegion.tsx';
  */
 export function Household({ people }: { readonly people: readonly Person[] }) {
   return (
-    <section aria-labelledby="household-heading" className="panel">
-      <h2 id="household-heading" className="panel__heading">
+    <section aria-labelledby="household-heading" className="record">
+      <h2 id="household-heading" className="record__heading">
         The household
       </h2>
 

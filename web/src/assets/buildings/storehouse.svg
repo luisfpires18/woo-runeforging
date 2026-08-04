@@ -1,8 +1,36 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 72" role="img" aria-hidden="true">
-  <rect width="96" height="72" fill="#1a1815"/>
-  <path d="M22 60V38h52v22Z" fill="#2e2823" stroke="#8c7d6c" stroke-width="2"/>
-  <path d="M18 38 48 22l30 16" fill="none" stroke="#8fa4b8" stroke-width="3"/>
-  <rect x="34" y="46" width="10" height="10" fill="#12100e"/>
-  <rect x="52" y="46" width="10" height="10" fill="#12100e"/>
-  <rect x="0" y="60" width="96" height="12" fill="#12100e"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 112" role="img" aria-hidden="true">
+  <!-- The Storehouse: a squat store with a loading ramp, awning and stacked goods. -->
+  <defs><linearGradient id="stSky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#1A1815"/><stop offset="1" stop-color="#12100E"/></linearGradient></defs>
+  <rect width="160" height="112" fill="url(#stSky)"/>
+
+  <!-- Ridge behind: low and broad. This is the sheltered bench. -->
+  <path d="M0 56 28 40l22 10 30-16 26 14 24-10 30 16v52H0Z" fill="#221D19"/>
+  <path d="M0 70 36 58l30 10 26-8 32 12 36-8v48H0Z" fill="#2A2521"/>
+  <path d="M8 88h144v4H8Z" fill="#312C26"/>
+
+  <!-- The store: thick walls, low roof. -->
+  <path d="M30 54h74v34H30Z" fill="#3E3831"/>
+  <path d="M30 54h74v4H30Z" fill="#4A4239"/>
+  <path d="M26 54h82l-6-14H32Z" fill="#2A2724"/>
+  <path d="M26 54h82l-1-2H27Z" fill="#39332C"/>
+
+  <!-- Timber double doors, banded. -->
+  <path d="M54 62h26v26H54Z" fill="#4A3A2C"/>
+  <path d="M54 68h26v2H54ZM54 80h26v2H54Z" fill="#2A2724"/>
+  <path d="M66 62v26" stroke="#2A2724" stroke-width="2"/>
+  <path d="M80 88h26l10 4H80Z" fill="#453E36"/>
+
+  <!-- Awning on posts, sheltering the goods. -->
+  <path d="M104 52h44l-6 10h-38Z" fill="#3E3128"/>
+  <path d="M110 62v26M144 62v26" stroke="#4A3A2C" stroke-width="3"/>
+
+  <rect x="112" y="72" width="14" height="16" fill="#4A3A2C"/>
+  <rect x="112" y="72" width="14" height="2" fill="#5C5248"/>
+  <rect x="128" y="78" width="12" height="10" fill="#453629"/>
+  <rect x="119" y="62" width="12" height="10" fill="#453629"/>
+  <path d="M112 80h14M128 82h12" stroke="#2A2724" stroke-width="1.5"/>
+  <path d="M36 88c0-6 4-9 8-9s8 3 8 9Z" fill="#453E36"/>
+
+  <rect y="92" width="160" height="20" fill="#1A1815"/>
 </svg>

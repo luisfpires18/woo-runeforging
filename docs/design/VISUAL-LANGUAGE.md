@@ -99,6 +99,38 @@ Arkazian chrome accidentally claims it. **This document assigns Sylvara no role,
 relationship or disposition** — none of the sources this package works from
 establishes one.
 
+### 2.4a Arkazian structure — added by the polish pass
+
+Stone, steel and timber. **Surfaces and edges, never text**, so they sit below
+3:1 deliberately; anything that must be read uses the text tokens.
+
+| Token | Value | Use |
+|---|---|---|
+| `stone-dark` | `#2A2724` | Slate roofs, recessed bands |
+| `stone` | `#343029` | Panel and header ground |
+| `stone-lit` | `#3E3831` | Masonry face |
+| `steel` | `#4A4239` | Panel edges, rails, dividers |
+| `steel-lit` | `#5C5248` | Lit edge on a raised surface |
+| `timber` | `#4A3A2C` | Beams, scaffolding, palisade |
+
+### 2.4b The Arkazian action
+
+The first pass used an amber fill, which read as generic software. The action is
+now **crimson cloth over blackened steel, rimmed in forge light**.
+
+| Token | Value | Contrast |
+|---|---|---|
+| `action-bg` | `#8E2A24` | — |
+| `action-fg` | `#F0EAE2` | **7.01:1** on the fill — passes AA |
+| `action-bg-hover` | `#A03028` | 5.96:1 with the same text |
+| `action-rim` | `#E8974A` | **8.10:1** on `surface-0` |
+| `crimson-deep` | `#8E2A24` | Illustration and heraldry, where it carries no text |
+
+**The rim is structural, not decoration.** Deep crimson is only 2.27:1 against
+the page, which would fail the 3:1 boundary rule for a control's edge. The forge
+light carries that boundary — and it is also exactly the canon image of
+blackened steel taken out of the fire.
+
 ### 2.5 Feedback
 
 | Token | Value | Use |
@@ -168,6 +200,31 @@ while a timer ticks are the single most restless thing an idle screen can do.
 **Minimum 0.75rem.** Nothing smaller, at any viewport. Body text must survive
 200% zoom without a horizontal scrollbar.
 
+### 3.1 The display treatment — added by the second visual pass
+
+The system stack stands. A game screen still needs a voice for the House and
+the settlement that a data table does not have, and it is built from weight,
+scale and tracking rather than from a second typeface.
+
+| Token | Value | Use |
+|---|---|---|
+| `text-display-lg` | 2.75rem | The settlement name. Heavy, tight, one line |
+| `tracking-display` | -0.02em | Names — set tight, so the word reads as a mass |
+| `tracking-label` | 0.18em | Screen and region labels — set wide, small, and never bold enough to compete |
+| `tracking-wide` | 0.09em | Status words, units, nav |
+
+**Two registers, and only two.** A *name* is large, heavy and tightly tracked.
+A *label* is small, uppercase and widely tracked. Nothing sits between them, so
+a heading never has to be read twice to know which kind of thing it is.
+
+The House name is a label, not a title: it is stamped above the settlement name
+the way a name is stamped into steel. A screen label is followed by a hairline
+of `steel` capped in `action-rim` — a lit edge, drawn in CSS, not an image.
+
+> **Why not a display font.** The three reasons in §3 have not changed: a font
+> file is a network request, a licence and a loading state. A real one belongs
+> with the art pass that replaces the placeholder illustration, not before it.
+
 ---
 
 ## 4. Spacing
@@ -180,6 +237,7 @@ A 4px base. Only these steps.
 | `space-2` | 0.5rem |
 | `space-3` | 0.75rem |
 | `space-4` | 1rem |
+| `space-5` | 1.25rem |
 | `space-6` | 1.5rem |
 | `space-8` | 2rem |
 | `space-12` | 3rem |
@@ -195,8 +253,17 @@ as stone and iron.
 
 | Token | Value |
 |---|---|
-| `content-max` | 72rem |
+| `content-max` | 90rem |
 | `mobile-breakpoint` | 48rem |
+
+> `content-max` was raised from 72rem by the visual-polish pass — at 1440px the
+> old value left dead bands down both sides of a screen whose whole subject is a
+> place. `NAVIGATION.md` §2 carries the same figure.
+>
+> `space-5` was added by the second visual pass. It was already being *used* by
+> four rules in `app.css` while not existing in `tokens.css`, which made each of
+> those declarations invalid at computed-value time: panels rendered with no
+> padding, buttons with no side padding, and the building grid with no gap.
 
 ---
 
@@ -262,20 +329,62 @@ Domain shape cues, which double as the non-colour carrier from §2.3:
 
 ---
 
-## 8. Settlement illustration — notes for later
+## 8. Settlement illustration
 
-Not this prompt's work. Recorded so the eventual art brief inherits the
-constraints instead of rediscovering them.
+Rewritten by the second visual pass. What was a note for a later art brief is
+now the structure the screens are built on, and the constraints below are the
+ones the placeholder art already honours — a real art pass replaces the files,
+not the rules.
 
-- **Three-quarter or isometric view of one site that visibly evolves.** Growth
-  must be readable at a glance — Workbase §6.
-- **Each building needs four states:** not built (a cleared plot), under
-  construction (scaffold and materials), complete, damaged. Damage arrives with
-  battle consequences.
-- **Stage variants** beyond Outpost are later, but the composition should leave
-  room for a settlement that grows outward.
+### 8.1 The scene is separate from the sites
+
+**One authored panorama, and seven site plots laid over it at fixed anchors.**
+The panorama holds terrain, fortification and light. No building is drawn into
+it. The anchors are a single map from `BuildingKind` to a percentage position
+(`web/src/components/SettlementScene.tsx`), so a site stands in the same place
+on every screen that shows the outpost, and raising one does not mean reissuing
+the whole picture.
+
+This is what makes the site "visibly evolve" without a combinatorial asset set:
+the world is one file, and growth is carried by the plots on top of it.
+
+### 8.2 Value structure
+
+**The world is lighter than the plots.** Site plates are dark stone with a lit
+steel rim; if the ground behind them is drawn at the same value they read as
+holes rather than as objects standing on it. The scene therefore works in the
+stone range (`stone-dark` through `steel-lit`).
+
+**The skyline is the exception.** The far range is nearly black against a low
+warm band near the horizon — the only light in the picture. Everything in front
+of that band reads as cut out of the sky, which is what gives a flat vector
+drawing depth without a single blur or glow.
+
+### 8.3 States
+
+**Each site needs four states:** not built, under construction, complete,
+damaged. Damage arrives with battle consequences and is not drawn yet.
+
+State is carried **structurally**, not by a second file per state:
+
+| State | Frame | Art | Also |
+|---|---|---|---|
+| Not built | Steel, solid | Full | Glyph `□`, word "Not built" |
+| Under construction | Steel, `accent-settlement` base rule | Scaffold hatching overlaid | Glyph `▨`, word, `<progress>`, minutes left |
+| Complete | Steel, `success` base rule | Full | Glyph `■`, word, what it yields |
+| Previewed | **Dashed**, `border-strong` | Reduced and desaturated | Glyph `□`, word "Not yet available", the requirement |
+
+Four cues per state — frame language, art treatment, glyph and word — so the
+set survives greyscale and survives a player who cannot distinguish the hues.
+
+### 8.4 Standing constraints
+
+- **Stage variants** beyond Outpost are later, but the panorama leaves ground
+  unbuilt on both flanks so a settlement can grow outward into it.
 - **Fallback chain terminates.** Every asset falls back to a faction placeholder
-  and finally a heraldic token. Missing art can never block play.
+  and finally a heraldic token. Missing art can never block play. The faction
+  placeholder is drawn at full site scale and depicts surveyed, pegged-out
+  ground — a fallback is still a picture of somewhere.
 - Art ships with the application until the library outgrows it — ADR-0014.
 - **Never emoji. Never runtime-generated art.**
 

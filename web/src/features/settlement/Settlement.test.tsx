@@ -45,16 +45,17 @@ describe('Settlement', () => {
 
   it('shows a completed production site and what it yields', async () => {
     const user = userEvent.setup();
-    const { source } = renderScenario('returningConstruction');
+    renderScenario('returningConstruction');
 
     await goToSettlement(user);
 
     const row = () => document.querySelector('[data-kind="LumberYard"]');
     expect(row()).toHaveAttribute('data-status', 'UnderConstruction');
 
-    // Time moves through the source and the provider reloads — the same path a
-    // refetch against a real endpoint will take.
-    source.advance(20);
+    // One click of the control, and only one. The button advances the clock
+    // inside the source and reloads through the provider — the same path a
+    // refetch against a real endpoint will take. The Lumber Yard takes 15
+    // minutes, so a single 20-minute step must be enough on its own.
     await user.click(screen.getByRole('button', { name: /advance 20 minutes/i }));
 
     await waitFor(() => {

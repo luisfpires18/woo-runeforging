@@ -1,0 +1,220 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 700" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+  <!--
+    Ashen Reach — the pass above the alpine forest.
+
+    The settlement panorama. Terrain, fortification and light only: no building
+    is drawn into it, because the seven sites are overlaid on top and the scene
+    has to stay true as they change. Decorative, never information.
+
+    Values sit in the stone range (#2A2724 – #4A4239) rather than below it. The
+    plots that stand on this ground are darker than it is, so the world has to
+    be the lighter thing or they read as holes cut in black.
+
+    Terraces are cut so each site has flat ground under it:
+      far-left cut face · upper terrace · central plateau with its curtain ·
+      high right slope · palisaded right yard · lower forest bench.
+  -->
+  <defs>
+    <!--
+      The sky carries the light, and the range is cut out of it. Overcast
+      mountain dusk: dark overhead, a low warm band where the sun has already
+      gone behind the pass. Everything in front of that band is a silhouette,
+      which is what makes the ridges read at all.
+    -->
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0C0A09"/>
+      <stop offset="0.22" stop-color="#141110"/>
+      <stop offset="0.40" stop-color="#241C18"/>
+      <stop offset="0.50" stop-color="#3A2A1E"/>
+      <stop offset="0.58" stop-color="#2A211A"/>
+      <stop offset="1" stop-color="#181411"/>
+    </linearGradient>
+    <linearGradient id="horizonGlow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E8974A" stop-opacity="0"/>
+      <stop offset="0.55" stop-color="#E8974A" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#E8974A" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="haze" cx="0.5" cy="0.9" r="0.8">
+      <stop offset="0" stop-color="#E8974A" stop-opacity="0.14"/>
+      <stop offset="0.5" stop-color="#8E2A24" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#E8974A" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="fire" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#E8974A" stop-opacity="0.6"/>
+      <stop offset="0.4" stop-color="#E8974A" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#E8974A" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="smoke" x1="0" y1="1" x2="0.35" y2="0">
+      <stop offset="0" stop-color="#B9AFA3" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#B9AFA3" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="700" fill="url(#sky)"/>
+  <rect y="230" width="1600" height="150" fill="url(#horizonGlow)"/>
+
+  <!-- Distant range: black teeth against the lit band. Sharp, because this is
+       a hard mountain realm and the skyline is the first thing that says so. -->
+  <path d="M0 300 70 196l46 62 74-158 62 118 54-64 84-176 96 210 58-92 76 118 66-146 88 176 62-96 74 116 70-168 92 202 66-104 78 128 56-86 66 112 60-64 52 76v240H0Z" fill="#0E0C0A"/>
+
+  <!-- Second range, closer and a step out of silhouette. -->
+  <path d="M0 328 96 246l74 52 118-92 92 78 84-36 132 92 88-62 122 86 96-58 110 66 92-34 88 62 108-42 100 58v104H0Z" fill="#1A1613"/>
+
+  <!-- Third, where the ground begins to be ground rather than sky. -->
+  <path d="M0 388 130 340l112 40 140-52 120 46 132-40 150 54 128-44 146 52 130-38 140 48 152-40 120 44v90H0Z" fill="#241F1A"/>
+
+  <!-- The pass: two rock walls narrowing the frame. -->
+  <path d="M0 118 92 168l58 96 44 130 36 156 22 74H0Z" fill="#2B2620"/>
+  <path d="M1600 96l-104 62-70 108-52 140-30 148-16 88h272Z" fill="#2B2620"/>
+  <path d="M0 214l64 44 44 92 34 128 26 152H0Z" fill="#342E27"/>
+  <path d="M1600 190l-78 50-52 100-40 136-24 148h194Z" fill="#342E27"/>
+
+  <!-- Strata in the pass walls, so the rock has grain instead of being a shape. -->
+  <g stroke="#2A2724" stroke-width="3" opacity="0.55" fill="none">
+    <path d="M10 268l70 22M22 328l72 20M38 396l70 18M56 470l68 16"/>
+    <path d="M1590 250l-76 24M1576 314l-74 22M1560 386l-72 20M1544 462l-70 18"/>
+  </g>
+  <g stroke="#4A4239" stroke-width="2" opacity="0.4" fill="none">
+    <path d="M12 282l68 22M40 410l68 18"/>
+    <path d="M1588 264l-74 24M1558 400l-72 20"/>
+  </g>
+
+  <!-- Near slope: the ground the outpost stands on. -->
+  <path d="M0 424 128 386l142 34 118-46 154 30 136-54 148 42 132-58 148 46 140-34 154 44v266H0Z" fill="#322C26"/>
+  <path d="M0 424 128 386l142 34 118-46 154 30 136-54 148 42 132-58 148 46 140-34 154 44v14l-154-44-140 34-148-46-132 58-148-42-136 54-154-30-118 46-142-34L0 438Z" fill="#3E372F"/>
+
+  <!-- Outcrops and scoured patches, so the slope has surface rather than being
+       one wash of colour. -->
+  <g fill="#2C2721">
+    <path d="M180 500c26-16 54-14 76 4 18 14 10 26-14 28-34 3-78-14-62-32Z"/>
+    <path d="M560 560c30-18 68-14 88 6 16 16 4 26-24 26-40 0-84-16-64-32Z"/>
+    <path d="M980 612c34-20 76-16 98 6 18 18 4 28-28 28-44 0-90-18-70-34Z"/>
+    <path d="M1380 566c26-16 58-12 74 6 14 14 2 24-22 24-36 0-68-14-52-30Z"/>
+  </g>
+  <g fill="#3E372F" opacity="0.55">
+    <path d="M240 452c40-10 90-4 118 12-38 8-92 6-118-12Z"/>
+    <path d="M760 508c46-12 100-4 130 14-42 8-100 6-130-14Z"/>
+    <path d="M1120 596c40-10 88-2 116 16-40 6-92 4-116-16Z"/>
+  </g>
+
+  <!-- Cut faces and terraces, left to right. -->
+
+  <!-- Far-left quarry face, worked in stepped benches. -->
+  <path d="M20 244h188l-16 42H60Z" fill="#3E3831"/>
+  <path d="M40 292h172l-14 40H74Z" fill="#443D34"/>
+  <path d="M62 338h160l-12 38H92Z" fill="#3A342D"/>
+  <path d="M20 244h188l-4 12H26Z" fill="#4A4239"/>
+  <path d="M40 292h172l-4 12H46Z" fill="#4F473C"/>
+  <path d="M62 338h160l-4 12H68Z" fill="#4A4239"/>
+
+  <!-- Upper terrace, mid-left: a bench cut back into the slope and held by a
+       dressed retaining wall. The face is what you see; the bench behind it is
+       only the sliver of flat ground on top. -->
+  <path d="M280 340 318 282h384l44 58Z" fill="#2C2721"/>
+  <path d="M336 256h318l22 26H318Z" fill="#332E28"/>
+  <path d="M318 282h384v40H318Z" fill="#3E3831"/>
+  <path d="M318 282h384v5H318Z" fill="#4F473C"/>
+  <path d="M318 322h384v10H318Z" fill="#241F1B"/>
+  <g stroke="#332F29" stroke-width="3">
+    <path d="M366 287v33M414 287v33M462 287v33M510 287v33M558 287v33M606 287v33M654 287v33"/>
+    <path d="M318 303h384"/>
+  </g>
+
+  <!-- Central plateau: the seat of the outpost, ringed by a low curtain wall. -->
+  <path d="M636 356h432l40 58H600Z" fill="#3E3831"/>
+  <path d="M600 414h508v24H600Z" fill="#4A4239"/>
+  <path d="M600 414h508v5H600Z" fill="#5C5248"/>
+  <path d="M600 438h508v14H600Z" fill="#2A2724"/>
+  <g fill="#453E36">
+    <rect x="612" y="396" width="26" height="18"/><rect x="664" y="396" width="26" height="18"/>
+    <rect x="716" y="396" width="26" height="18"/><rect x="768" y="396" width="26" height="18"/>
+    <rect x="820" y="396" width="26" height="18"/><rect x="872" y="396" width="26" height="18"/>
+    <rect x="924" y="396" width="26" height="18"/><rect x="976" y="396" width="26" height="18"/>
+    <rect x="1028" y="396" width="26" height="18"/><rect x="1080" y="396" width="26" height="18"/>
+  </g>
+  <g fill="#5C5248">
+    <rect x="612" y="396" width="26" height="4"/><rect x="664" y="396" width="26" height="4"/>
+    <rect x="716" y="396" width="26" height="4"/><rect x="768" y="396" width="26" height="4"/>
+    <rect x="820" y="396" width="26" height="4"/><rect x="872" y="396" width="26" height="4"/>
+    <rect x="924" y="396" width="26" height="4"/><rect x="976" y="396" width="26" height="4"/>
+    <rect x="1028" y="396" width="26" height="4"/><rect x="1080" y="396" width="26" height="4"/>
+  </g>
+
+  <!-- Gate tower on the curtain, and the House colours over it. -->
+  <path d="M834 330h58v84h-58Z" fill="#443D34"/>
+  <path d="M834 330h58v6h-58Z" fill="#5C5248"/>
+  <path d="M826 322h74v12h-74Z" fill="#2A2724"/>
+  <path d="M852 358h22v40h-22Z" fill="#100D0B"/>
+  <path d="M652 300v96" stroke="#4A3A2C" stroke-width="6"/>
+  <path d="M656 306h46l-12 16 12 16h-46Z" fill="#8E2A24"/>
+  <path d="M656 306h46l-12 16 12 16h-46Z" fill="#100D0B" opacity="0.25"/>
+
+  <!-- High right bench, where the shaft goes into the slope. -->
+  <path d="M1210 366 1244 312h332l40 54Z" fill="#2C2721"/>
+  <path d="M1268 286h256l24 26h-304Z" fill="#332E28"/>
+  <path d="M1244 312h332v34h-332Z" fill="#3E3831"/>
+  <path d="M1244 312h332v5h-332Z" fill="#4F473C"/>
+  <path d="M1244 346h332v10h-332Z" fill="#241F1B"/>
+  <g stroke="#332F29" stroke-width="3">
+    <path d="M1292 317v29M1340 317v29M1388 317v29M1436 317v29M1484 317v29M1532 317v29"/>
+    <path d="M1244 331h332"/>
+  </g>
+
+  <!-- Palisaded right-hand yard. -->
+  <path d="M1042 470h368l28 42h-424Z" fill="#322C26"/>
+  <path d="M1014 512h452v18h-452Z" fill="#453E36"/>
+  <g stroke="#5C4A38" stroke-width="8" stroke-linecap="round">
+    <path d="M1030 470v-44M1058 470v-50M1086 470v-46M1114 470v-52M1142 470v-46M1170 470v-50M1198 470v-44M1226 470v-50M1254 470v-46M1282 470v-52M1310 470v-46M1338 470v-48M1366 470v-44M1394 470v-50"/>
+  </g>
+  <path d="M1022 428h384v9h-384Z" fill="#4A3A2C"/>
+
+  <!-- Lower forest bench, left. Alpine conifers below the ridgeline. -->
+  <path d="M60 528h420l34 44H26Z" fill="#3A342D"/>
+  <path d="M26 572h488v16H26Z" fill="#2C2823"/>
+  <g fill="#201D19">
+    <path d="M96 522l24 48H72Z"/><path d="M96 494l18 36H78Z"/>
+    <path d="M150 526l22 44h-44Z"/><path d="M150 500l16 32h-32Z"/>
+    <path d="M206 518l26 52h-52Z"/><path d="M206 490l19 36h-38Z"/>
+    <path d="M262 528l21 42h-42Z"/><path d="M262 504l15 30h-30Z"/>
+    <path d="M318 520l24 50h-48Z"/><path d="M318 494l17 34h-34Z"/>
+    <path d="M374 530l20 40h-40Z"/><path d="M374 508l14 28h-28Z"/>
+    <path d="M430 522l23 48h-46Z"/><path d="M430 496l16 32h-32Z"/>
+  </g>
+
+  <!-- The ridge road, cut through stone. It ties the terraces together. -->
+  <path d="M1600 640 1180 596 900 542 700 470 520 448 300 396 120 356" fill="none" stroke="#2A2724" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M1600 640 1180 596 900 542 700 470 520 448 300 396 120 356" fill="none" stroke="#4A4239" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M1600 633 1180 589 900 535 700 463 520 441 300 389 120 349" fill="none" stroke="#5C5248" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/>
+
+  <!-- Foreground lip, so the scene has a near edge to stand behind. -->
+  <path d="M0 612 176 588l188 40 174-30 210 46 196-26 200 44 178-22 278 40v20H0Z" fill="#2A2622"/>
+  <path d="M0 656h1600v44H0Z" fill="#211D19"/>
+
+  <!--
+    Fire, and only fire. Three iron braziers: one on the gate, one in the yard,
+    one down at the forest bench. They are small — a brazier is a pot of coals,
+    not a bonfire — and the light they throw is what carries the warmth.
+  -->
+  <g id="braziers">
+    <ellipse cx="906" cy="386" rx="120" ry="80" fill="url(#fire)"/>
+    <path d="M900 384h14v-8h-14Z" fill="#2A2724"/>
+    <path d="M898 376h18l-3 -6h-12Z" fill="#4A4239"/>
+    <path d="M902 370c-1-9 6-12 4-22 5 6 3 13 6 16 2-4 1-7 3-10 3 7 5 10 4 16Z" fill="#E8974A"/>
+
+    <ellipse cx="1214" cy="502" rx="96" ry="64" fill="url(#fire)"/>
+    <path d="M1208 500h13v-8h-13Z" fill="#2A2724"/>
+    <path d="M1206 492h17l-3 -6h-11Z" fill="#4A4239"/>
+    <path d="M1210 486c-1-8 6-11 4-20 5 5 3 12 6 15 2-4 1-7 3-9 3 6 5 9 4 14Z" fill="#E8974A"/>
+
+    <ellipse cx="336" cy="562" rx="86" ry="56" fill="url(#fire)"/>
+    <path d="M330 560h12v-7h-12Z" fill="#2A2724"/>
+    <path d="M328 553h16l-3 -6h-10Z" fill="#4A4239"/>
+    <path d="M332 547c-1-7 5-10 3-18 5 5 3 11 5 14 2-3 1-6 3-8 3 6 4 8 3 12Z" fill="#E8974A"/>
+  </g>
+
+  <!-- Forge smoke, drifting off toward the pass. -->
+  <path d="M912 366c22-38 4-70 26-104 18 34 4 68 20 86 12-28 4-50 18-68 16 44 6 74-6 110Z" fill="url(#smoke)"/>
+  <path d="M1220 482c18-30 4-56 24-84 14 28 2 54 16 68 10-22 2-40 14-54 13 36 5 60-5 88Z" fill="url(#smoke)"/>
+
+  <rect width="1600" height="700" fill="url(#haze)"/>
+</svg>

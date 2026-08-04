@@ -57,30 +57,32 @@ does.
 
 ## 2. Desktop
 
-`≥ 48rem`. Content column maxes at `content-max` (72rem) and centres.
+`≥ 48rem`. Content column maxes at `content-max` (90rem) and centres.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│  ⌂ House Karrow · Ashen Reach              [Outpost]         │  header, surface-1
-│  Gold 250   Prov 200   Timber 220   Stone 180   Ore 120  ⋯   │  resource bar
-├────────────┬─────────────────────────────────────────────────┤
-│            │                                                 │
-│  Seat      │                                                 │
-│  Settle…   │            screen content                       │  surface-0
-│  Forge     │                                                 │
-│  Army      │                                                 │
-│  Reports   │                                                 │
-│            │                                                 │
-└────────────┴─────────────────────────────────────────────────┘
-   sidebar                    max 72rem, centred
-   surface-1
+│ ⌂ HOUSE KARROW          GOLD  PROV  TIMBER  STONE  ORE  SUPP │  one HUD band,
+│   Ashen Reach [Outpost]  250   200     220    180  120   100 │  stone
+├──────────┬───────────────────────────────────────────────────┤
+│▌ SEAT    │            screen content                         │  surface-0
+│  SETTLE… │                                                   │
+│  rail,   │                                                   │
+│  welded  │                                                   │
+│  to HUD  │                                                   │
+└──────────┴───────────────────────────────────────────────────┘
+   rail                      max 90rem, centred
 ```
 
-- **Persistent left sidebar.** Current area marked by `accent` fill **and** a
-  left rule **and** `aria-current="page"` — never colour alone.
+- **One HUD band.** House identity, settlement state and the stores answer a
+  single question — what do I hold, and where — so they share one stone band
+  rather than stacking into two. The band keeps a fixed minimum height, so it
+  does not change size between the loading state and the loaded one.
+- **A rail welded to it.** Shared edge, no gap. Current area marked by a cloth
+  fill **and** a forge-light rule **and** `aria-current="page"` — never colour
+  alone.
 - **The resource bar is always visible.** Every commitment spends resources; the
   player must never navigate away to check whether they can afford something.
-- **The header names the House and settlement.** Identity, on every screen.
+- **The HUD names the House and settlement.** Identity, on every screen.
 
 ---
 
@@ -90,26 +92,29 @@ does.
 
 ```
 ┌────────────────────────┐
-│ ⌂ Ashen Reach  [Outpost]│  header, compact
-│ 250 200 220 180 120 ⌄  │  resource bar, tap to expand
+│ ⌂ HOUSE KARROW         │  HUD, compact
+│   Ashen Reach [Outpost]│
+│ GOLD  PROV   TIMBER    │  stores, 3 across,
+│  250   200      220    │  labels kept
+│ STONE ORE  WORKSHOP    │
+│  180  120  SUPPLIES 100│
 ├────────────────────────┤
-│                        │
 │                        │
 │    screen content      │  single column
 │                        │
-│                        │
-│                        │
 ├────────────────────────┤
-│  ⌂    ⌂⌂    ⚒    ⚔   ▤ │  bottom tabs, 44px min
-│ Seat  Settl Forge Army Rep│
+│   SEAT    │ SETTLEMENT │  bottom tabs, 44px min
 └────────────────────────┘
 ```
 
-- **Bottom tab bar**, thumb-reachable, `44 × 44px` minimum per target, icon
-  **and** label always — never icon alone.
-- **The resource bar collapses to values**, expanding on tap to show names.
-  It never disappears.
-- Tabs appear only for areas that exist; with three areas there are three tabs.
+- **Bottom tab bar**, thumb-reachable, `44 × 44px` minimum per target, always
+  labelled — never icon alone.
+- **The resource bar keeps its labels**, wrapping to two rows of three. It never
+  disappears. *(Amended by Prompt 5: the original "collapses to values, expanding
+  on tap" was implemented literally with `display: none` and removed the names
+  from the accessibility tree as well as the screen, leaving a row of bare
+  numbers with nothing to say what they counted.)*
+- Tabs appear only for areas that exist; with two areas there are two tabs.
 
 ### The mobile rule
 

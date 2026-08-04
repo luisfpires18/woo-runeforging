@@ -1,7 +1,38 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 72" role="img" aria-hidden="true">
-  <rect width="96" height="72" fill="#1a1815"/>
-  <path d="M16 60V40h64v20Z" fill="#2e2823" stroke="#8c7d6c" stroke-width="2"/>
-  <path d="M12 40 48 26l36 14" fill="none" stroke="#8fa4b8" stroke-width="3"/>
-  <path d="M44 44h8v10l-4 4-4-4Z" fill="#e97a6f"/>
-  <rect x="0" y="60" width="96" height="12" fill="#12100e"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 112" role="img" aria-hidden="true">
+  <!-- The Barracks: quarters behind a timber palisade, with a drill yard, pells
+       and a rack of Arkazian kite shields. -->
+  <defs><linearGradient id="bkSky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#1A1815"/><stop offset="1" stop-color="#12100E"/></linearGradient></defs>
+  <rect width="160" height="112" fill="url(#bkSky)"/>
+
+  <!-- Ridge behind: a long even wall of rock, the sheltered side of the pass. -->
+  <path d="M0 52 30 34l26 14 28-12 24 16 28-10 24 14v66H0Z" fill="#221D19"/>
+  <path d="M0 68 40 56l30 10 30-8 32 12 28-6v40H0Z" fill="#2A2521"/>
+  <path d="M0 88h160v4H0Z" fill="#2E2922"/>
+
+  <!-- Quarters: long, low, few openings. -->
+  <path d="M20 56h72v32H20Z" fill="#3E3831"/>
+  <path d="M20 56h72v4H20Z" fill="#4A4239"/>
+  <path d="M14 56h84l-8-14H22Z" fill="#2A2724"/>
+  <path d="M14 56h84l-1-2H15Z" fill="#39332C"/>
+  <g fill="#1A1815">
+    <rect x="28" y="64" width="6" height="10"/><rect x="42" y="64" width="6" height="10"/>
+    <rect x="56" y="64" width="6" height="10"/><rect x="70" y="64" width="6" height="10"/>
+  </g>
+  <path d="M44 88V78h12v10Z" fill="#12100E"/>
+
+  <!-- Palisade closing the yard, gate posts heavier than the stakes. -->
+  <g stroke="#4A3A2C" stroke-width="4" stroke-linecap="round">
+    <path d="M100 88V64M108 88V60M116 88V64M124 88V58M132 88V64M140 88V60M148 88V64"/>
+  </g>
+  <path d="M98 68h52v4H98Z" fill="#3E3128"/>
+
+  <!-- Drill yard: two pells, and a shield rack in House colours. -->
+  <path d="M96 88V72" stroke="#453629" stroke-width="4" stroke-linecap="round"/>
+  <path d="M112 50h26v3h-26Z" fill="#4A3A2C"/>
+  <path d="M114 53v6M136 53v6" stroke="#4A3A2C" stroke-width="2"/>
+  <path d="M116 42h10v9c0 4-3 6-5 7-2-1-5-3-5-7Z" fill="#8E2A24" stroke="#2A2724" stroke-width="1.2"/>
+  <path d="M128 42h10v9c0 4-3 6-5 7-2-1-5-3-5-7Z" fill="#8E2A24" stroke="#2A2724" stroke-width="1.2"/>
+
+  <rect y="92" width="160" height="20" fill="#1A1815"/>
 </svg>

@@ -1,8 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 72" role="img" aria-hidden="true">
-  <rect width="96" height="72" fill="#1a1815"/>
-  <path d="M0 60 26 28l20 16 18-14 32 30Z" fill="#2e2823" stroke="#8c7d6c" stroke-width="2"/>
-  <g fill="#241f1b" stroke="#554a3e" stroke-width="1.5">
-    <rect x="30" y="48" width="12" height="10"/><rect x="46" y="50" width="14" height="8"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 112" role="img" aria-hidden="true">
+  <!-- The Quarry: a worked face in stepped benches, with a derrick and dressed blocks. -->
+  <defs><linearGradient id="qrSky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#1A1815"/><stop offset="1" stop-color="#12100E"/></linearGradient></defs>
+  <rect width="160" height="112" fill="url(#qrSky)"/>
+
+  <!-- Ridge behind: one blunt mass. Most of it has been cut into. -->
+  <path d="M0 50 34 26l30 20 26-14 34 24 36-14v70H0Z" fill="#221D19"/>
+
+  <!-- The face, cut in three benches, each with a lit top edge. -->
+  <path d="M0 34h104l-10 20H0Z" fill="#343029"/>
+  <path d="M0 34h104l-2 4H0Z" fill="#4A4239"/>
+  <path d="M0 54h94l-12 20H0Z" fill="#3E3831"/>
+  <path d="M0 54h94l-2 4H0Z" fill="#544B41"/>
+  <path d="M0 74h82l-10 14H0Z" fill="#332F29"/>
+  <path d="M0 74h82l-2 4H0Z" fill="#4A4239"/>
+  <g stroke="#2A2724" stroke-width="1.5" opacity="0.8">
+    <path d="M20 38v14M44 38v14M68 38v14M14 58v14M38 58v14M62 58v14"/>
   </g>
-  <rect x="0" y="60" width="96" height="12" fill="#12100e"/>
+  <path d="M0 88h160v4H0Z" fill="#2E2922"/>
+
+  <!-- Timber derrick over the working floor. -->
+  <path d="M118 88V34" stroke="#4A3A2C" stroke-width="5" stroke-linecap="round"/>
+  <path d="M118 36 80 46" stroke="#4A3A2C" stroke-width="4" stroke-linecap="round"/>
+  <path d="M118 38l24 30" stroke="#3E3128" stroke-width="3" stroke-linecap="round"/>
+  <path d="M84 46v20" stroke="#2A2724" stroke-width="1.5"/>
+  <path d="M78 66h12v8H78Z" fill="#4A4239"/>
+  <path d="M78 66h12v2H78Z" fill="#5C5248"/>
+
+  <!-- Dressed blocks, squared and stacked ready. -->
+  <g fill="#453E36"><rect x="100" y="76" width="18" height="12"/><rect x="122" y="80" width="16" height="8"/><rect x="106" y="64" width="14" height="12"/></g>
+  <g fill="#544B41"><rect x="100" y="76" width="18" height="2"/><rect x="122" y="80" width="16" height="2"/><rect x="106" y="64" width="14" height="2"/></g>
+  <g stroke="#2A2724" stroke-width="1"><path d="M109 76v12M130 80v8M113 64v12"/></g>
+  <path d="M140 88c2-8 8-11 14-11l6 11Z" fill="#332F29"/>
+
+  <rect y="92" width="160" height="20" fill="#1A1815"/>
 </svg>

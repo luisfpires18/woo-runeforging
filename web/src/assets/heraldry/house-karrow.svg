@@ -1,8 +1,34 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 72" role="img" aria-hidden="true">
-  <!-- House Karrow. The terminal fallback: every asset chain ends here, so this
-       file must always exist. Placeholder art. -->
-  <path d="M4 4h56v40c0 14-12 21-28 24C16 65 4 58 4 44Z" fill="#241f1b" stroke="#8c7d6c" stroke-width="2"/>
-  <path d="M32 16 42 34H22Z" fill="#e97a6f"/>
-  <rect x="20" y="38" width="24" height="5" fill="#8c7d6c"/>
-  <path d="M32 46v12" stroke="#8fa4b8" stroke-width="3" stroke-linecap="square"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 76" role="img" aria-hidden="true">
+  <!-- House Karrow. The terminal fallback: every chain ends here, so this file
+       must always exist. Arkazian kite shield — blackened steel over crimson
+       cloth, riveted, with the pass and its fortified line as the charge. -->
+  <defs>
+    <linearGradient id="hkCloth" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#A03028"/>
+      <stop offset="1" stop-color="#7A231E"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M5 3h54v41c0 17-15 25-27 29C20 69 5 61 5 44Z" fill="url(#hkCloth)" stroke="#2A2724" stroke-width="3"/>
+  <path d="M32 5v67C21 68 7 60 7 44V5Z" fill="#12100E" opacity="0.22"/>
+
+  <!-- Rivets along the steel rim. -->
+  <g fill="#5C5248">
+    <circle cx="11" cy="9" r="1.6"/><circle cx="32" cy="7" r="1.6"/><circle cx="53" cy="9" r="1.6"/>
+    <circle cx="9" cy="30" r="1.6"/><circle cx="55" cy="30" r="1.6"/>
+    <circle cx="13" cy="52" r="1.6"/><circle cx="51" cy="52" r="1.6"/>
+  </g>
+
+  <!-- The pass: two peaks over a crenellated line. -->
+  <path d="M13 43 25 21l8 13 8-15 12 24Z" fill="#231F1B"/>
+  <path d="M25 21l4 6-9 16h-7Z" fill="#332F29"/>
+  <rect x="13" y="45" width="38" height="7" fill="#4A4239"/>
+  <rect x="13" y="45" width="38" height="2" fill="#5C5248"/>
+  <g fill="#4A4239">
+    <rect x="14" y="40" width="6" height="5"/><rect x="25" y="40" width="6" height="5"/>
+    <rect x="36" y="40" width="6" height="5"/><rect x="45" y="40" width="6" height="5"/>
+  </g>
+
+  <!-- Forge light held below the wall. -->
+  <path d="M32 55v9" stroke="#E8974A" stroke-width="3.5" stroke-linecap="square"/>
 </svg>

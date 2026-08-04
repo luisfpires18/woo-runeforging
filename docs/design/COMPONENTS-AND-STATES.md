@@ -15,11 +15,25 @@ screens** or by carrying a rule that must not be reimplemented twice.
 
 | Component | Purpose | Notes |
 |---|---|---|
-| `AppShell` | Header, navigation, content region | Switches sidebar ↔ bottom tabs at `48rem` |
-| `ResourceBar` | The six balances, always visible | Collapses to values on mobile; expands on tap |
-| `Panel` | Titled region on `surface-1` | The default container |
-| `Card` | Discrete item on `surface-2` | Building row, company, report block |
+| `AppShell` | HUD, navigation, content region | One stone band; rail ↔ bottom tabs at `48rem` |
+| `ResourceBar` | The six balances, always visible | **Keeps its labels on mobile**, wrapping to two rows of three |
+| `SettlementScene` | The outpost, and where each site stands in it | One panorama plus a `BuildingKind → anchor` map. Used by both screens |
+| `BuildingRow` | One site plot standing in the scene | Illustrated plate, nameplate, state. Selecting one is local and visual |
 | `Breadcrumb` | Detail-view ancestry | Detail views only |
+
+**`Panel` and `Card` were removed by the second visual pass.** A single container
+style applied to everything is what made the screen read as a dashboard: the
+world, the decision and the record all arrived in the same rectangle. There are
+now three levels, and each has its own language —
+
+| Level | What it is | Language |
+|---|---|---|
+| World | The settlement scene | Full-bleed artwork inside a steel frame. No inner boxes |
+| Command | Site plots, and the ledge welded under the scene | Stone plates, lit steel rims, an inset ledger for terms |
+| Record | Household, what changed, needs attention, lore | Open composition. A small wide label over a hairline rule, then rows. No border, no fill |
+
+A thing at one level is never dressed like a thing at another. That rule is what
+the removed components were getting in the way of.
 
 ### Content
 
@@ -30,7 +44,7 @@ screens** or by carrying a rule that must not be reimplemented twice.
 | `CostAfterTable` | Cost beside resulting balance | The construction and craft confirm step |
 | `ProgressBar` | Elapsed-time progress | Derived from timestamps, never from a client tick |
 | `TimeRemaining` | "4 min left", "complete at 14:35" | Both forms; absolute time for anything over an hour |
-| `StatusChip` | ■ complete / ▨ building / □ not built | **Glyph plus text.** Never colour alone |
+| `StatusChip` | ■ complete / ▨ building / □ not built | **Glyph plus text.** Never colour alone. On a site plot the frame language carries it too — see `VISUAL-LANGUAGE.md` §8.3 |
 | `AttentionItem` | One row of "needs attention" | **Always a link** to where it is resolved |
 | `ChangeItem` | One row of "what changed" | Relative time; aggregates when a long absence produces many |
 | `EmptySlot` | An unfilled equipment slot | Visible, not hidden — a decision waiting |

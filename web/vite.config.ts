@@ -7,6 +7,17 @@ import { defineConfig } from 'vitest/config';
 // backend needs no CORS configuration: to the browser, both are one origin.
 export default defineConfig({
   plugins: [react()],
+
+  // Never inline assets as data URIs.
+  //
+  // Vite's SVG inliner emitted an empty `data:image/svg+xml,` for the building
+  // artwork — the files are valid, but they carry `#` in every colour and a
+  // `url(#…)` gradient reference, which a non-base64 data URI does not survive
+  // reliably. Emitting real files also means the asset fallback chain is
+  // exercised the way it will behave in production, rather than against
+  // strings baked into the bundle.
+  build: { assetsInlineLimit: 0 },
+
   server: {
     port: 5173,
     proxy: {

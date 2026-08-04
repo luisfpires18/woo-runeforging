@@ -1,14 +1,16 @@
 # Foundations of Iron — design package
 
-**Status:** Proposed — **awaiting design approval**
-**Produced by:** Prompt 4
+**Status:** **Approved** and built against — see the amendments at the foot
+**Produced by:** Prompt 4 (`f084304`)
 **Consumed by:** Prompt 5 onward
 
 The design of the first playable experience, written **before** its screens are
 built. It exists so Prompt 5 can implement the House Seat without making a
 single product decision of its own.
 
-**This package is documents only.** No component, no CSS, no change to `web/`.
+**Prompt 4 delivered documents only** — no component, no CSS, no change to
+`web/`. Prompt 5 built from them, and where it found a gap the fix landed here
+rather than inside a component.
 
 ---
 
@@ -139,6 +141,75 @@ Two further changes came out of looking at the built screens:
   "collapses to values"; implemented literally with `display: none`, that
   removed the names from the accessibility tree as well as the screen, leaving
   everyone with a row of bare numbers. It now wraps to two lines instead.
+
+## The visual-polish pass (3 August 2026)
+
+The first build of Prompt 5 was functional but read as an internal dashboard.
+A focused pass re-grounded the presentation in Arkazia without touching the
+information architecture, routes, scenarios, provider boundary or accessibility
+rules.
+
+| Change | Why |
+|---|---|
+| **Arkazian action style** replaces the amber CTA | Crimson cloth over blackened steel, rimmed in forge light. `VISUAL-LANGUAGE.md` §2.4b, with the contrast working |
+| **Stone, steel and timber structure tokens** | Panels, rails and headers read as fortress stonework rather than flat cards. §2.4a |
+| **A ridge backdrop** behind the shell | Depth, so the page is a place rather than a black rectangle. Decorative, `aria-hidden`, never information |
+| **The sidebar joins the shell** | A stone rail with a shared edge, not a detached list |
+| **The resource strip is its own band** | Six even cells with rules between them; labels wrap on mobile rather than being dropped |
+| **An authored building set** on one visual grammar | Shared ridge, ground line and palette, so the site reads as one place seen in parts. `web/src/assets/README.md` |
+| **Building states are visually distinct** | Complete, under construction, not built, and previewed each differ in border, opacity and overlay — on top of the glyph and word they already carried |
+| **Content width raised to 90rem** | The old 72rem left large dead bands at 1440px |
+| **"What changed" and "Needs attention" lead the page** | They are the returning player's first two questions, not sidebar material |
+
+Two defects were found only by looking at the running app, not by any test:
+
+- **Building art silently stopped rendering.** Vite inlined the SVGs as an empty
+  `data:image/svg+xml,` — the files are valid, but they carry `#` in every
+  colour and a `url(#…)` gradient reference. Assets are no longer inlined.
+- **Mobile clipped "Workshop Supplies" and "See all options."** Both now wrap or
+  stack.
+
+## The second visual pass (4 August 2026)
+
+The polish pass fixed the palette but not the shape: every piece of information
+still sat in an equally styled rectangle, and the artwork was icon-scale. The
+screen read as a dashboard with a good colour scheme rather than as a game.
+
+This pass recomposes it around the outpost itself. **Information architecture,
+routes, scenarios, the provider boundary, mocked behaviour and every
+accessibility rule are unchanged.**
+
+| Change | Why |
+|---|---|
+| **A settlement scene is the page** | `ashen-reach.svg` fills the frame and the seven sites stand on their own ground inside it. The subject of the screen is a place, so the place should be the screen. `VISUAL-LANGUAGE.md` §8.1 |
+| **Three levels, and only three** | World, command surface, record. A thing at one level is never dressed like a thing at another — which is why `.panel` is gone as a universal wrapper |
+| **One integrated HUD** | House identity, settlement state and the stores answer one question and share one stone band, instead of stacking two |
+| **The rail is welded to the HUD** | Shared edge, no gap, cloth tab for the current area. It reads as part of the frame rather than a list beside it |
+| **A command ledge, not a card** | The objective is stated on a ledge joined to the bottom edge of the world, tied to the site it is about. The settlement screen uses the same ledge for the selected site |
+| **Site plots replace building rows** | An illustrated plate with a nameplate, standing where the building would stand — not a row in a list |
+| **Selecting a site is local and visual** | It changes which site the ledge describes. Nothing is committed, nothing is saved, and there is no start control, because starting construction is Prompt 6 |
+| **Architectural vignettes replace symbols** | Each of the six drawn sites has its own silhouette, terrain, foundation and working detail. The shared ridge path that made them look tiled is gone. `web/src/assets/README.md` |
+| **A display treatment, still on the system stack** | Names set heavy and tight, labels set small and wide. Two registers, no third, and no font file. `VISUAL-LANGUAGE.md` §3.1 |
+| **Mobile is composed, not collapsed** | Scene banner, then the ledge, then the sites — so the current decision is never below seven plots |
+
+Three defects found the same way as last time, by looking:
+
+- **`--space-5` did not exist.** Four rules in `app.css` used it anyway, so each
+  was invalid at computed-value time — panels had no padding, buttons no side
+  padding, the building grid no gap. The token is now defined; `VISUAL-LANGUAGE.md`
+  §4 records it.
+- **The panorama shipped invisible.** An SVG comment containing `----` is an XML
+  parse error, and the browser stops rendering at that point without reporting
+  it. The rule is now written down in the asset README.
+- **The settlement screen scrolled horizontally at 375px.** A two-column title
+  row gave the prose a 14px track. The title row wraps instead.
+
+Reversed from the polish pass:
+
+- **"What changed" and "Needs attention" no longer lead the page.** They sit in
+  the record band below the scene. The returning player's first question is
+  answered higher up than before — by the site itself, where the Lumber Yard is
+  visibly under construction — and the ledge states what is next.
 
 ## Approval
 

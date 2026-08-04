@@ -94,11 +94,14 @@ export function Link({
   children,
   className,
   state,
+  current = false,
 }: {
   readonly to: string;
   readonly children: ReactNode;
   readonly className?: string;
   readonly state?: unknown;
+  /** Marks the link as the page you are on — ACCESSIBILITY.md §4. */
+  readonly current?: boolean;
 }) {
   const { navigate } = useRouter();
 
@@ -106,6 +109,7 @@ export function Link({
     <a
       href={to}
       className={className}
+      aria-current={current ? 'page' : undefined}
       onClick={(event) => {
         if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) {
           return;

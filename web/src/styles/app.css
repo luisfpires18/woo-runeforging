@@ -1,49 +1,115 @@
-/* Screen and component styling. Tokens only — no literal colours below. */
+/*
+ * Screen and component styling. Tokens only — no literal colours below, except
+ * alpha compositions of token hexes written as rgb(… / %).
+ *
+ * The look is Arkazian: fortress stonework, blackened steel, crimson cloth,
+ * forge light. Depth comes from layered surfaces and hairline edges rather than
+ * from glow, because the ordinary must look ordinary for Aura to land later
+ * (VISUAL-LANGUAGE.md §1).
+ *
+ * Three levels, and only three:
+ *   1. the world  — the settlement scene, which is looked at
+ *   2. the command surface — the plots and the ledge, which are acted on
+ *   3. the record — everything below, which is referred to
+ * A thing at one level must not be dressed like a thing at another. That is why
+ * there is no general-purpose panel class in this file any more.
+ */
+
+/* ---------- shell ---------- */
 
 .shell {
+  position: relative;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  isolation: isolate;
+}
+
+/* The pass above Ashen Reach, far behind everything. Quiet on purpose: the
+   scene is the picture, this only stops the page being flat black. */
+.shell__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgb(232 151 74 / 4%), transparent 62%),
+    var(--backdrop-image) bottom center / cover no-repeat,
+    var(--surface-0);
+}
+
+.shell__backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(130% 90% at 50% 35%, transparent 35%, rgb(18 16 14 / 92%) 100%);
 }
 
 .offline {
   padding: var(--space-2) var(--space-4);
-  background: var(--surface-3);
+  background: var(--stone-dark);
   border-bottom: 1px solid var(--warning);
   color: var(--text-primary);
   font-size: var(--text-small);
+  text-align: center;
 }
 
-/* ---------- header ---------- */
+/* ---------- the HUD: one stone band ---------- */
 
-.shell__header {
+.hud {
+  position: relative;
+  background: linear-gradient(180deg, var(--stone) 0%, var(--surface-1) 100%);
+  border-bottom: 1px solid var(--steel);
+  box-shadow:
+    0 1px 0 rgb(140 125 108 / 14%) inset,
+    0 8px 22px rgb(0 0 0 / 50%);
+}
+
+/* A fixed minimum so the band does not change height between the loading state
+   and the loaded one — the page should not jump under the player's cursor. */
+.hud__inner {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-4);
+  gap: var(--space-4) var(--space-8);
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-3) var(--space-4);
-  background: var(--surface-1);
-  border-bottom: 1px solid var(--border-strong);
+  width: 100%;
+  min-height: 4.5rem;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-6);
 }
 
-.shell__identity {
+.hud__identity {
   display: flex;
   gap: var(--space-3);
   align-items: center;
+  min-width: 0;
 }
 
-.shell__crest {
-  width: 2rem;
+.hud__crest {
+  width: 2.5rem;
   height: auto;
+  filter: drop-shadow(0 2px 5px rgb(0 0 0 / 70%));
 }
 
-.shell__house {
-  display: block;
-  font-weight: 600;
+.hud__names {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
-.shell__settlement {
+/* The House name is a label, not a title: small, wide and steady, the way a
+   name stamped into steel reads. */
+.hud__house {
+  color: var(--text-primary);
+  font-size: var(--text-small);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+}
+
+.hud__settlement {
   display: flex;
   gap: var(--space-2);
   align-items: center;
@@ -51,157 +117,586 @@
   font-size: var(--text-small);
 }
 
-.shell__stage {
-  padding: 0 var(--space-2);
+.hud__stage {
+  padding: 1px var(--space-2);
+  background: var(--stone-dark);
   border: 1px solid var(--border-interactive);
   border-radius: var(--radius-sm);
+  color: var(--text-secondary);
   font-size: var(--text-caption);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--tracking-wide);
+}
+
+/* ---------- the stores, inside the same band ---------- */
+
+.resource-bar {
+  min-width: 0;
 }
 
 .resource-bar__list {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2) var(--space-4);
+  justify-content: flex-end;
 }
 
 .resource-bar__item {
   display: flex;
-  gap: var(--space-2);
-  align-items: baseline;
+  flex-direction: column;
+  gap: 1px;
+  padding: var(--space-1) var(--space-4);
+  border-left: 1px solid rgb(74 66 57 / 55%);
+}
+
+.resource-bar__item:first-child {
+  border-left: 0;
 }
 
 .resource-bar__name {
-  color: var(--text-secondary);
+  color: var(--text-muted);
   font-size: var(--text-caption);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--tracking-wide);
+  white-space: nowrap;
 }
 
 .resource-bar__amount {
-  font-size: var(--text-small);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: var(--text-primary);
 }
 
-/* ---------- layout ---------- */
+/* ---------- body: the rail hangs off the HUD ---------- */
 
 .shell__body {
-  display: flex;
+  display: grid;
+  grid-template-columns: 11rem minmax(0, 1fr);
   flex: 1;
-  gap: var(--space-6);
   width: 100%;
   max-width: var(--content-max);
   margin: 0 auto;
-  padding: var(--space-6) var(--space-4);
+  padding: 0 var(--space-6) var(--space-8);
 }
 
-.shell__nav ul {
+.rail {
+  padding: var(--space-4) var(--space-4) var(--space-6) 0;
+  border-right: 1px solid var(--steel);
+  background: linear-gradient(180deg, rgb(52 48 41 / 42%), transparent 70%);
+}
+
+.rail__list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
-  min-width: 9rem;
+  gap: 2px;
+  position: sticky;
+  top: var(--space-4);
 }
 
+/* A cloth tab on a stone rail, not a rounded pill. */
 .nav-link {
   position: relative;
   display: flex;
   align-items: center;
   min-height: var(--target-min);
   padding: 0 var(--space-3);
-  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  border-right: 0;
   color: var(--text-secondary);
+  font-size: var(--text-small);
+  font-weight: 500;
   text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  transition:
+    background var(--duration-fast) var(--easing-standard),
+    color var(--duration-fast) var(--easing-standard);
 }
 
 .nav-link:hover {
-  background: var(--surface-2);
+  background: rgb(52 48 41 / 60%);
   color: var(--text-primary);
 }
 
 .nav-link--current {
-  background: var(--surface-2);
+  background: linear-gradient(90deg, rgb(142 42 36 / 28%), rgb(52 48 41 / 20%));
+  border-color: var(--steel);
   color: var(--text-primary);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .nav-link__marker {
   position: absolute;
-  left: 0;
+  left: -1px;
   width: 3px;
   height: 60%;
-  background: var(--accent-settlement);
-  border-radius: var(--radius-sm);
+  background: var(--action-rim);
 }
 
 .shell__main {
-  flex: 1;
+  min-width: 0;
+  padding: var(--space-6) 0 var(--space-6) var(--space-6);
+}
+
+/* ---------- screen titles ---------- */
+
+/* Name and place on one line: the screen title should cost a strip of the
+   viewport, not a third of it. The scene is what the height is for. */
+.intro {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-8);
+  align-items: baseline;
+  margin-bottom: var(--space-4);
+}
+
+.intro__eyebrow {
+  flex: 1 0 100%;
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+}
+
+/* A hairline of steel under the label, capped in forge light. The whole
+   display treatment is weight, scale and tracking — there is no display font. */
+.intro__eyebrow::after {
+  content: '';
+  display: block;
+  width: 100%;
+  max-width: 30rem;
+  height: 1px;
+  margin-top: var(--space-2);
+  background: linear-gradient(90deg, var(--action-rim) 0 1.5rem, var(--steel) 1.5rem 100%);
+}
+
+.intro__title {
+  font-size: var(--text-display-lg);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: var(--tracking-display);
+}
+
+.intro__prose {
+  flex: 1 1 24rem;
+  min-width: 0;
+  max-width: 58ch;
+  color: var(--text-secondary);
+  font-size: var(--text-small);
+}
+
+/* ---------- the theatre: world above, command below, one object ---------- */
+
+.theatre {
+  --scene-height: clamp(22rem, 52vh, 34rem);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--steel);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(180deg, rgb(26 24 21 / 70%), rgb(18 16 14 / 92%));
+  box-shadow:
+    0 1px 0 rgb(140 125 108 / 12%) inset,
+    0 18px 44px rgb(0 0 0 / 55%);
+  overflow: hidden;
+}
+
+.scene__ground {
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--scene-height);
+  background: var(--scene-image) center bottom / cover no-repeat;
+}
+
+/* Edges fall away so the plots read against the ground rather than fight it. */
+.scene__vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(130% 110% at 50% 45%, transparent 55%, rgb(18 16 14 / 55%) 100%),
+    linear-gradient(180deg, rgb(18 16 14 / 32%) 0%, transparent 22%, rgb(18 16 14 / 45%) 100%);
+}
+
+.site {
+  position: relative;
+  height: var(--scene-height);
+}
+
+/* The heading is a stone tab set into the top edge of the world, not a row of
+   text above a card. */
+.site__heading {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  padding: var(--space-2) var(--space-4);
+  background: linear-gradient(180deg, var(--stone) 0%, rgb(18 16 14 / 88%) 100%);
+  border-right: 1px solid var(--steel);
+  border-bottom: 1px solid var(--steel);
+  border-radius: 0 0 var(--radius-sm) 0;
+  color: var(--text-secondary);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+}
+
+.site-row,
+.building-list {
+  position: absolute;
+  inset: 0;
+}
+
+/* ---------- the sites, standing on their own ground ---------- */
+
+.site-plot,
+.plot {
+  position: absolute;
+  left: var(--site-x);
+  top: var(--site-y);
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--steel);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(180deg, rgb(52 48 41 / 90%), rgb(18 16 14 / 94%));
+  box-shadow:
+    0 1px 0 rgb(140 125 108 / 14%) inset,
+    0 10px 22px rgb(0 0 0 / 60%);
+  transition:
+    transform var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard),
+    box-shadow var(--duration-fast) var(--easing-standard);
+}
+
+.site-plot {
+  width: 9.5rem;
+}
+
+.plot {
+  width: 11.5rem;
+}
+
+.site-plot__frame,
+.plot__frame {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-bottom: 1px solid var(--steel);
+}
+
+.site-plot__art,
+.plot__art {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 8;
+  object-fit: cover;
+  object-position: center 58%;
+}
+
+/* Scaffolding: the construction overlay, drawn over the silhouette rather than
+   shipped as a second file per state. */
+.site-plot__scaffold,
+.plot__scaffold {
+  position: absolute;
+  inset: 0;
+  display: none;
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgb(74 58 44 / 60%) 0 3px,
+    transparent 3px 10px
+  );
+}
+
+.site-plot[data-status='UnderConstruction'] .site-plot__scaffold,
+.plot[data-status='UnderConstruction'] .plot__scaffold {
+  display: block;
+}
+
+/* -- the seat's compact markers -- */
+
+.site-plot__name {
+  display: block;
+  padding: var(--space-2) var(--space-2) 0;
+  font-size: var(--text-small);
+  font-weight: 600;
+  line-height: var(--leading-snug);
+}
+
+.site-plot__status {
+  display: block;
+  padding: 0 var(--space-2) var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+/* The site the ledge below is talking about. */
+.site-plot[data-focus='true'] {
+  border-color: var(--action-rim);
+  box-shadow:
+    0 0 0 1px var(--action-rim) inset,
+    0 12px 26px rgb(0 0 0 / 65%);
+}
+
+.site-plot[data-focus='true']::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 1px;
+  height: var(--space-6);
+  background: linear-gradient(180deg, var(--action-rim), transparent);
+}
+
+/* -- the settlement's full plates -- */
+
+.plot__name {
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+.plot__select {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  width: 100%;
+  min-height: var(--target-min);
+  padding: 0 var(--space-3);
+  background: transparent;
+  border: 0;
+  color: var(--text-primary);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.plot__glyph {
+  color: var(--accent-settlement);
+}
+
+.plot[data-status='Complete'] .plot__glyph {
+  color: var(--success);
+}
+
+.plot__label {
   min-width: 0;
 }
 
-/* ---------- panels ---------- */
-
-.panel {
-  padding: var(--space-4);
-  margin-bottom: var(--space-6);
-  background: var(--surface-1);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-md);
-}
-
-.panel__heading {
-  margin-bottom: var(--space-3);
-  color: var(--text-secondary);
+.plot__status,
+.plot__progress,
+.plot__yield,
+.plot__unavailable {
+  padding: 0 var(--space-3);
   font-size: var(--text-caption);
+  line-height: 1.35;
+}
+
+.plot__status:last-child,
+.plot__progress:last-child,
+.plot__yield:last-child,
+.plot__unavailable:last-child {
+  padding-bottom: var(--space-2);
+}
+
+.plot__unavailable,
+.plot__yield,
+.plot__progress {
+  padding-top: var(--space-1);
+  padding-bottom: var(--space-2);
+}
+
+.plot__status {
+  color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--tracking-wide);
 }
 
-.seat__title,
-.settlement__title {
-  font-size: var(--text-display);
-  line-height: var(--leading-tight);
+.plot__progress {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  color: var(--text-secondary);
 }
 
-.seat__geography,
-.settlement__geography {
-  max-width: 65ch;
+.plot__yield {
+  color: var(--success);
+}
+
+.plot__unavailable {
+  color: var(--warning);
+}
+
+/* Hover and selection are weight, not colour wash: the plate lifts a little,
+   the way a steel plate settles into a new seat. */
+.plot:hover {
+  transform: translate(-50%, calc(-50% - 2px));
+  border-color: var(--border-interactive);
+}
+
+/* Selected sits proudest of the ground and carries a lit head rail. Raised and
+   railed are both structural, so the chosen site is still obvious in greyscale
+   and to anyone who cannot separate the forge light from the steel. */
+.plot[data-selected='true'] {
+  transform: translate(-50%, calc(-50% - 4px));
+  border-color: var(--action-rim);
+  box-shadow:
+    0 0 0 1px var(--action-rim) inset,
+    0 18px 34px rgb(0 0 0 / 75%);
+}
+
+.plot[data-selected='true'] .plot__frame {
+  border-top: 3px solid var(--action-rim);
+}
+
+.plot__select:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+.site-plot:focus-visible,
+.plot:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* -- construction state, on both -- */
+
+.site-plot[data-status='Complete'],
+.plot[data-status='Complete'] {
+  border-bottom-color: var(--success);
+  box-shadow:
+    0 -2px 0 var(--success) inset,
+    0 10px 22px rgb(0 0 0 / 60%);
+}
+
+.site-plot[data-status='UnderConstruction'],
+.plot[data-status='UnderConstruction'] {
+  border-bottom-color: var(--accent-settlement);
+  box-shadow:
+    0 -2px 0 var(--accent-settlement) inset,
+    0 10px 22px rgb(0 0 0 / 60%);
+}
+
+.site-plot[data-status='NotBuilt'] .site-plot__art,
+.plot[data-status='NotBuilt'] .plot__art {
+  opacity: 0.82;
+}
+
+/* Previewed: visible, and clearly not yet yours to raise. */
+.site-plot[data-status='Previewed'],
+.plot[data-status='Previewed'] {
+  border-style: dashed;
+  border-color: var(--border-strong);
+}
+
+.site-plot[data-status='Previewed'] .site-plot__art,
+.plot[data-status='Previewed'] .plot__art {
+  opacity: 0.42;
+  filter: grayscale(0.7);
+}
+
+/* ---------- the command ledge ---------- */
+
+.orders {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(11rem, 15rem) minmax(0, 1fr) auto;
+  gap: var(--space-4) var(--space-6);
+  align-items: start;
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--steel);
+  background: linear-gradient(180deg, rgb(52 48 41 / 62%), rgb(18 16 14 / 92%));
+  box-shadow: 0 1px 0 rgb(140 125 108 / 12%) inset;
+}
+
+.orders__heading {
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+}
+
+/* The task ledge carries the House's authority, so it gets the cloth. */
+.orders--task .orders__heading {
+  display: inline-block;
+  padding: 2px var(--space-2);
+  background: var(--action-bg);
+  border-left: 2px solid var(--action-rim);
+  color: var(--action-fg);
+}
+
+.orders__title {
+  margin-top: var(--space-2);
+  font-size: var(--text-heading);
+  font-weight: 700;
+  letter-spacing: var(--tracking-display);
+}
+
+.orders__prose {
+  max-width: 56ch;
+  color: var(--text-secondary);
+  font-size: var(--text-small);
+}
+
+.orders__state {
+  margin-top: var(--space-2);
+  max-width: 56ch;
+  color: var(--text-primary);
+  font-size: var(--text-small);
+}
+
+.orders__terms-line {
+  margin-top: var(--space-3);
+  color: var(--text-secondary);
+  font-size: var(--text-small);
+}
+
+/* An inset ledger, cut into the ledge rather than boxed on top of it. */
+.orders__terms {
+  padding: var(--space-2) var(--space-4);
+  background: rgb(18 16 14 / 55%);
+  border-left: 1px solid var(--steel);
+}
+
+.orders__terms-heading {
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+.terms {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
   margin-top: var(--space-2);
   color: var(--text-secondary);
+  font-size: var(--text-small);
 }
 
-.seat__intro,
-.settlement__intro {
-  margin-bottom: var(--space-6);
+.terms__entry {
+  display: flex;
+  gap: var(--space-2);
+  align-items: baseline;
+  justify-content: space-between;
 }
 
-.seat__returning {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-4);
+.terms__amount {
+  order: 2;
+  color: var(--text-primary);
 }
 
-.seat__returning .panel {
-  margin-bottom: var(--space-6);
-}
-
-.seat__lore {
-  max-width: 60ch;
-  padding-left: var(--space-4);
-  border-left: 2px solid var(--border-strong);
+.terms__entry--time {
+  margin-top: var(--space-1);
+  padding-top: var(--space-1);
+  border-top: 1px solid rgb(74 66 57 / 50%);
   color: var(--text-muted);
-  font-style: italic;
-}
-
-/* ---------- the primary task ---------- */
-
-.task__reason {
-  max-width: 60ch;
-  margin-bottom: var(--space-3);
-}
-
-.task__terms {
-  margin-bottom: var(--space-4);
-  color: var(--text-secondary);
 }
 
 .task__actions {
@@ -209,51 +704,95 @@
   flex-wrap: wrap;
   gap: var(--space-4);
   align-items: center;
+  align-self: center;
 }
+
+/* ---------- the Arkazian action ---------- */
 
 .button {
   min-height: var(--target-min);
-  padding: 0 var(--space-4);
-  border-radius: var(--radius-md);
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-sm);
   font: inherit;
+  letter-spacing: 0.04em;
   cursor: pointer;
-  transition: background var(--duration-instant) var(--easing-standard);
+  transition:
+    background var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard),
+    transform var(--duration-instant) var(--easing-standard);
 }
 
+/* Crimson cloth over blackened steel, rimmed in forge light. The rim carries
+   the 3:1 boundary the crimson alone cannot. */
 .button--primary {
-  background: var(--accent-forge);
-  border: 1px solid var(--accent-forge);
-  color: var(--on-accent);
-  font-weight: 600;
+  background: linear-gradient(180deg, var(--action-bg-hover), var(--action-bg));
+  border: 1px solid var(--action-rim);
+  color: var(--action-fg);
+  font-weight: 700;
+  text-transform: uppercase;
+  box-shadow:
+    0 1px 0 rgb(232 151 74 / 30%) inset,
+    0 4px 14px rgb(142 42 36 / 40%);
 }
 
 .button--primary:hover {
-  background: var(--warning);
+  background: var(--action-bg-hover);
+  border-color: var(--warning);
+}
+
+.button--primary:active {
+  transform: translateY(1px);
 }
 
 .button--secondary {
-  background: transparent;
+  background: linear-gradient(180deg, rgb(74 66 57 / 55%), rgb(26 24 21 / 70%));
   border: 1px solid var(--border-interactive);
   color: var(--text-primary);
 }
 
 .button--secondary:hover {
-  background: var(--surface-3);
+  background: var(--steel);
 }
 
 .link,
 .attention__link {
   color: var(--accent-settlement);
+  text-underline-offset: 3px;
 }
 
-/* ---------- lists ---------- */
+/* ---------- the record: everything below the theatre ---------- */
+
+.ledger {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6) var(--space-8);
+  align-items: start;
+  margin-top: var(--space-6);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--steel);
+}
+
+.record {
+  min-width: 0;
+}
+
+.record__heading {
+  padding-bottom: var(--space-2);
+  margin-bottom: var(--space-3);
+  border-bottom: 1px solid rgb(74 66 57 / 50%);
+  color: var(--text-secondary);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+}
 
 .change,
 .attention {
   display: flex;
   gap: var(--space-3);
   padding: var(--space-2) 0;
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid rgb(74 66 57 / 35%);
 }
 
 .change:last-child,
@@ -276,146 +815,6 @@
   font-size: var(--text-small);
 }
 
-/* ---------- the site row ---------- */
-
-/* A grid that wraps, not a row that clips. Seven plots do not fit across a
-   1280px viewport, and a half-cut final plot reads as broken rather than as
-   scrollable — which undermines the whole point of showing the site. */
-.site-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
-  gap: var(--space-3);
-}
-
-.site-plot {
-  padding: var(--space-2);
-  background: var(--surface-2);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-md);
-  text-align: center;
-}
-
-.site-plot[data-status='Complete'] {
-  border-color: var(--success);
-}
-
-.site-plot[data-status='UnderConstruction'] {
-  border-color: var(--accent-settlement);
-}
-
-.site-plot[data-status='Previewed'] {
-  opacity: 0.72;
-}
-
-.site-plot__art {
-  width: 100%;
-  height: auto;
-  border-radius: var(--radius-sm);
-}
-
-.site-plot__name {
-  display: block;
-  margin-top: var(--space-2);
-  font-size: var(--text-small);
-  font-weight: 600;
-}
-
-.site-plot__status {
-  display: block;
-  color: var(--text-muted);
-  font-size: var(--text-caption);
-}
-
-/* ---------- building list ---------- */
-
-.building {
-  display: flex;
-  gap: var(--space-4);
-  padding: var(--space-4) 0;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.building:last-child {
-  border-bottom: 0;
-}
-
-.building--highlighted {
-  background: var(--surface-2);
-  box-shadow: inset 3px 0 0 var(--accent-forge);
-}
-
-.building:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: -2px;
-}
-
-.building__art {
-  flex: 0 0 8rem;
-  width: 8rem;
-  height: auto;
-  border-radius: var(--radius-sm);
-}
-
-.building__body {
-  min-width: 0;
-}
-
-.building__name {
-  display: flex;
-  gap: var(--space-2);
-  align-items: baseline;
-  font-size: var(--text-heading);
-}
-
-.building__glyph {
-  color: var(--accent-settlement);
-}
-
-.building[data-status='Complete'] .building__glyph {
-  color: var(--success);
-}
-
-.building__status {
-  color: var(--text-secondary);
-  font-size: var(--text-small);
-}
-
-.building__description {
-  max-width: 60ch;
-  margin-top: var(--space-2);
-  color: var(--text-secondary);
-}
-
-.building__yield {
-  margin-top: var(--space-2);
-  color: var(--success);
-  font-size: var(--text-small);
-}
-
-.building__unavailable {
-  margin-top: var(--space-2);
-  color: var(--warning);
-  font-size: var(--text-small);
-}
-
-.building__progress {
-  display: flex;
-  gap: var(--space-2);
-  align-items: center;
-  margin-top: var(--space-2);
-  color: var(--text-secondary);
-  font-size: var(--text-small);
-}
-
-.building__cost {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1) var(--space-4);
-  margin-top: var(--space-2);
-  color: var(--text-muted);
-  font-size: var(--text-small);
-}
-
 /* ---------- household ---------- */
 
 .person {
@@ -424,8 +823,8 @@
 }
 
 .person__portrait {
-  flex: 0 0 4rem;
-  width: 4rem;
+  flex: 0 0 3.25rem;
+  width: 3.25rem;
   height: auto;
 }
 
@@ -435,13 +834,27 @@
 
 .person__role {
   color: var(--accent-forge);
-  font-size: var(--text-small);
+  font-size: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
 }
 
 .person__introduction {
-  max-width: 60ch;
+  max-width: 52ch;
   margin-top: var(--space-2);
   color: var(--text-secondary);
+  font-size: var(--text-small);
+}
+
+/* ---------- lore ---------- */
+
+.seat__lore {
+  grid-column: 1 / -1;
+  max-width: 60ch;
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--steel);
+  color: var(--text-muted);
+  font-style: italic;
 }
 
 /* ---------- states ---------- */
@@ -453,11 +866,12 @@
   align-items: flex-start;
   justify-content: center;
   padding: var(--space-4);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
 }
 
 .state--loading {
-  background: var(--surface-1);
+  background: rgb(26 24 21 / 70%);
+  border: 1px solid var(--steel);
   color: var(--text-muted);
 }
 
@@ -468,7 +882,7 @@
 }
 
 .state--error {
-  background: var(--surface-2);
+  background: rgb(26 24 21 / 80%);
   border: 1px solid var(--danger);
 }
 
@@ -476,10 +890,13 @@
 
 .dev-tools {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-3);
   align-items: center;
+  justify-content: center;
+  margin-top: auto;
   padding: var(--space-2) var(--space-4);
-  background: var(--surface-2);
+  background: var(--surface-0);
   border-top: 1px dashed var(--border-interactive);
 }
 
@@ -487,84 +904,253 @@
   color: var(--text-muted);
   font-size: var(--text-caption);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--tracking-wide);
+}
+
+/* ---------- wide but not enormous ---------- */
+
+@media (width < 80rem) {
+  .orders {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .orders__head {
+    grid-column: 1 / -1;
+  }
 }
 
 /* ---------- mobile ---------- */
 
 @media (width < 48rem) {
-  .shell__body {
-    flex-direction: column;
-    gap: var(--space-4);
-    padding: var(--space-4) var(--space-3);
+  .hud__inner {
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
   }
 
-  .seat__returning {
-    grid-template-columns: 1fr;
+  .resource-bar {
+    width: 100%;
+    padding-top: var(--space-2);
+    border-top: 1px solid rgb(74 66 57 / 55%);
+  }
+
+  /* Three across, two rows: labels stay, numbers stay legible. */
+  .resource-bar__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    row-gap: var(--space-1);
+  }
+
+  .resource-bar__item {
+    justify-content: flex-end;
+    padding: var(--space-1) var(--space-2);
+  }
+
+  .resource-bar__item:nth-child(3n + 1) {
+    border-left: 0;
+  }
+
+  .resource-bar__name {
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    /* "Workshop Supplies" does not fit one line in a third of 375px. Let it
+       wrap rather than clip — the label is what makes the number mean
+       anything. */
+    white-space: normal;
+  }
+
+  .shell__body {
+    display: block;
+    padding: 0 var(--space-3) var(--space-8);
+  }
+
+  .shell__main {
+    padding: var(--space-4) 0 calc(var(--target-min) + var(--space-8));
+  }
+
+  .intro__title {
+    font-size: var(--text-display);
   }
 
   /* Navigation becomes a bottom tab bar, thumb-reachable, labels always shown. */
-  .shell__nav {
+  .rail {
     position: fixed;
     right: 0;
     bottom: 0;
     left: 0;
     z-index: 5;
-    background: var(--surface-1);
-    border-top: 1px solid var(--border-strong);
-    order: 2;
+    padding: 0;
+    background: linear-gradient(180deg, var(--stone), var(--surface-1));
+    border-top: 1px solid var(--steel);
+    border-right: 0;
+    box-shadow: 0 -4px 16px rgb(0 0 0 / 50%);
   }
 
-  .shell__nav ul {
+  .rail__list {
+    position: static;
     flex-direction: row;
+    gap: 0;
   }
 
-  .shell__nav li {
+  .rail li {
     flex: 1;
   }
 
   .nav-link {
     justify-content: center;
-    min-height: var(--target-min);
-    border-radius: 0;
+    border-right: 1px solid transparent;
+  }
+
+  .nav-link--current {
+    background: rgb(142 42 36 / 30%);
+    border-color: transparent;
   }
 
   .nav-link__marker {
     top: 0;
-    left: 20%;
-    width: 60%;
+    left: 25%;
+    width: 50%;
     height: 3px;
   }
 
-  .shell__main {
-    padding-bottom: calc(var(--target-min) + var(--space-6));
+  /* The world becomes a banner, the ledge follows it immediately, and the
+     sites stack underneath. Scene, decision, detail — in that order, so the
+     part that matters is never below seven plots. */
+  .scene__ground {
+    position: relative;
+    inset: auto;
+    order: 1;
+    height: 8.5rem;
+    border-bottom: 1px solid var(--steel);
   }
 
-  .building {
+  .orders {
+    order: 2;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-3);
+    padding: var(--space-4);
+    border-top: 0;
+  }
+
+  .orders__head {
+    grid-column: auto;
+  }
+
+  .orders__terms {
+    padding: var(--space-3) 0 0;
+    border-left: 0;
+    border-top: 1px solid rgb(74 66 57 / 50%);
+    background: transparent;
+  }
+
+  .terms {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+  }
+
+  .terms__entry {
+    justify-content: flex-start;
+  }
+
+  .terms__entry--time {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  /* Stack, so the secondary link is not pushed off the edge by a full-width
+     button. */
+  .task__actions {
     flex-direction: column;
-  }
-
-  .building__art {
-    width: 100%;
+    align-items: stretch;
+    gap: var(--space-3);
   }
 
   .task__actions .button--primary {
-    flex: 1;
     width: 100%;
   }
 
-  /* The bar wraps rather than dropping the labels. `display: none` would take
-     the resource names out of the accessibility tree too, leaving a screen
-     reader with a row of bare numbers — and a sighted player with the same. */
-  .resource-bar__list {
-    gap: var(--space-1) var(--space-3);
+  .task__actions .link {
+    text-align: center;
   }
 
-  .resource-bar__name {
-    font-size: 0.6875rem;
+  .site {
+    position: static;
+    order: 3;
+    height: auto;
+    border-top: 1px solid var(--steel);
   }
 
-  .site-row {
-    grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+  .site__heading {
+    position: static;
+    display: block;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid rgb(74 66 57 / 50%);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .site-row,
+  .building-list {
+    position: static;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4) var(--space-4);
+  }
+
+  .site-plot,
+  .plot {
+    position: static;
+    width: auto;
+    transform: none;
+    box-shadow: 0 1px 0 rgb(140 125 108 / 12%) inset;
+  }
+
+  .plot:hover,
+  .plot[data-selected='true'] {
+    transform: none;
+  }
+
+  /* No room to raise a plate in a two-column stack, so the rail runs down the
+     leading edge instead. */
+  .plot[data-selected='true'] {
+    border-left-width: 3px;
+    border-left-color: var(--action-rim);
+  }
+
+  .site-plot[data-focus='true']::after {
+    display: none;
+  }
+
+  .site-plot[data-status='Complete'],
+  .plot[data-status='Complete'] {
+    box-shadow: 0 -2px 0 var(--success) inset;
+  }
+
+  .site-plot[data-status='UnderConstruction'],
+  .plot[data-status='UnderConstruction'] {
+    box-shadow: 0 -2px 0 var(--accent-settlement) inset;
+  }
+
+  .ledger {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-5);
+  }
+
+  .dev-tools {
+    margin-bottom: var(--target-min);
+  }
+}
+
+/* Nothing moves for a player who has asked for stillness. The duration tokens
+   are already zeroed in tokens.css; this removes the transforms too. */
+@media (prefers-reduced-motion: reduce) {
+  .plot:hover:not([data-selected='true']) {
+    transform: translate(-50%, -50%);
+  }
+
+  .button--primary:active {
+    transform: none;
   }
 }

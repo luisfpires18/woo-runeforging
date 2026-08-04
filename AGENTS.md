@@ -213,9 +213,14 @@ There is no content validator yet; it arrives with authored content.
 
 ## 8. Current stage
 
-**Prompt 5 (the mocked House Seat) is complete, uncommitted, awaiting review.**
-The web client now shows a House Seat and settlement for a new minor Arkazian
-House, built from **typed fake data**. No API over the domain, nothing saved.
+**Prompt 5 (the mocked House Seat) is complete, committed and reviewed** —
+`f6214a6`, pushed, CI green (validate run `30835450898`). The web client shows a
+House Seat and settlement for a new minor Arkazian House, built from **typed
+fake data**. No API over the domain, nothing saved.
+
+A **visual-polish pass** over that presentation is in progress and uncommitted.
+It changes styling and artwork only — routes, scenarios, the provider boundary,
+accessibility rules and mocked behaviour are unchanged.
 
 **Prompt 4 (UX and visual design) is committed** — `f084304`. The design package
 lives in [`docs/design/`](docs/design/) and Prompt 5 amended it in two places
