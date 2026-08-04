@@ -1154,3 +1154,199 @@
     transform: none;
   }
 }
+
+/* ---------- the confirm step ---------- */
+
+.breadcrumb {
+  display: flex;
+  gap: var(--space-2);
+  align-items: baseline;
+  margin-bottom: var(--space-4);
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+.breadcrumb__separator {
+  color: var(--steel-lit);
+}
+
+/* A breadcrumb link is small text, but it is still a target — 44px of height
+   around it, without changing how the row reads. */
+.breadcrumb .link,
+.breadcrumb [aria-current='page'] {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-min);
+}
+
+.breadcrumb [aria-current='page'] {
+  color: var(--text-secondary);
+}
+
+/* One column. The settlement ledge splits into three because it summarises a
+   site beside its terms; the confirm is a single argument read top to bottom. */
+.orders--commit {
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: var(--space-4);
+}
+
+.orders--commit .task__actions {
+  align-self: start;
+}
+
+/* The confirm has no world above it, so the frame carries no scene height. */
+.theatre--flat {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+  align-items: stretch;
+}
+
+.terms-panel {
+  padding: var(--space-6);
+}
+
+/* Cost beside the balance it leaves. Numbers align because a column of
+   quantities that does not is a column nobody reads. */
+.ledger-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.ledger-table th,
+.ledger-table td {
+  padding: var(--space-2) var(--space-4) var(--space-2) 0;
+  border-bottom: 1px solid rgb(74 66 57 / 40%);
+}
+
+.ledger-table thead th {
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+}
+
+.ledger-table tbody th {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.ledger-table td {
+  color: var(--text-secondary);
+}
+
+.ledger-table__after {
+  color: var(--text-muted);
+}
+
+.ledger-table__after strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* A balance that would go under is marked here as well as in the notice —
+   colour is never the only carrier. */
+.ledger-table tr[data-short='true'] .ledger-table__after strong {
+  color: var(--warning);
+}
+
+.ledger-table tr[data-short='true'] th[scope='row']::after {
+  content: ' ⚠';
+  color: var(--warning);
+}
+
+.orders__duration {
+  margin-top: var(--space-4);
+  color: var(--text-secondary);
+  font-size: var(--text-small);
+}
+
+.orders__label {
+  display: block;
+  margin-bottom: var(--space-1);
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+}
+
+/* The boundary, stated before rather than discovered after. */
+.orders__warning {
+  padding: var(--space-3) var(--space-4);
+  background: rgb(18 16 14 / 55%);
+  border-left: 2px solid var(--warning);
+  color: var(--text-primary);
+  font-size: var(--text-small);
+}
+
+.orders__rejection {
+  margin-top: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: rgb(18 16 14 / 55%);
+  border-left: 2px solid var(--danger);
+  color: var(--text-primary);
+  font-size: var(--text-small);
+}
+
+/* ---------- the shortfall, which replaces the confirm ---------- */
+
+.shortfall {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-4);
+  background: rgb(18 16 14 / 55%);
+  border-left: 2px solid var(--warning);
+}
+
+.shortfall__summary {
+  color: var(--text-primary);
+}
+
+.shortfall__glyph {
+  color: var(--warning);
+}
+
+.shortfall__price,
+.shortfall__reason {
+  color: var(--text-secondary);
+  font-size: var(--text-small);
+}
+
+@media (width < 48rem) {
+  .theatre--flat {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .terms-panel {
+    padding: var(--space-4);
+  }
+
+  .ledger-table th,
+  .ledger-table td {
+    padding-right: var(--space-2);
+  }
+}
+
+/* A disabled control must look disabled as well as behave that way — the
+   reason for it is always beside it, never left to the styling alone. */
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  filter: grayscale(0.4);
+}
+
+.button--primary:disabled:hover {
+  background: linear-gradient(180deg, var(--action-bg-hover), var(--action-bg));
+  border-color: var(--action-rim);
+}
+
+.button--secondary:disabled:hover {
+  background: linear-gradient(180deg, rgb(74 66 57 / 55%), rgb(26 24 21 / 70%));
+}

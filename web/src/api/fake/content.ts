@@ -29,9 +29,24 @@ export interface BuildingDefinition {
   readonly cost: readonly ResourceCostEntry[];
   readonly durationMinutes: number;
   readonly yieldSummary: string | null;
-  /** Buildings that cannot be raised yet, and why. */
-  readonly previewReason: string | null;
+  /**
+   * What must be standing first. A building with a prerequisite is `Previewed`
+   * while that prerequisite is not `Complete`, and becomes raisable the moment
+   * it is — the preview is a statement about the site, not a permanent label.
+   */
+  readonly requires: BuildingKind | null;
 }
+
+/**
+ * What buying a shortfall costs, per missing unit.
+ *
+ * A PLACEHOLDER, like every number above. Real pricing is bounded demand
+ * against a real economy and belongs to Prompt 10; this exists so a player
+ * short of 20 Timber has something to do about it other than wait for a system
+ * that does not exist yet. Gold is deliberately not procurable: there is no
+ * recursive way to buy the thing you buy with.
+ */
+export const goldPerMissingUnit = 1;
 
 export const buildingDefinitions: readonly BuildingDefinition[] = [
   {
@@ -45,7 +60,7 @@ export const buildingDefinitions: readonly BuildingDefinition[] = [
     ],
     durationMinutes: 30,
     yieldSummary: null,
-    previewReason: null,
+    requires: null,
   },
   {
     kind: 'Storehouse',
@@ -58,7 +73,7 @@ export const buildingDefinitions: readonly BuildingDefinition[] = [
     ],
     durationMinutes: 20,
     yieldSummary: null,
-    previewReason: null,
+    requires: null,
   },
   {
     kind: 'LumberYard',
@@ -70,7 +85,7 @@ export const buildingDefinitions: readonly BuildingDefinition[] = [
     ],
     durationMinutes: 15,
     yieldSummary: 'Timber, steadily, from the slopes below',
-    previewReason: null,
+    requires: null,
   },
   {
     kind: 'Quarry',
@@ -82,7 +97,7 @@ export const buildingDefinitions: readonly BuildingDefinition[] = [
     ],
     durationMinutes: 20,
     yieldSummary: 'Stone, cut and squared',
-    previewReason: null,
+    requires: null,
   },
   {
     kind: 'Mine',
@@ -95,7 +110,7 @@ export const buildingDefinitions: readonly BuildingDefinition[] = [
     ],
     durationMinutes: 25,
     yieldSummary: 'Ore, raised from the shaft',
-    previewReason: null,
+    requires: null,
   },
   {
     kind: 'Barracks',
@@ -108,7 +123,7 @@ export const buildingDefinitions: readonly BuildingDefinition[] = [
     ],
     durationMinutes: 45,
     yieldSummary: null,
-    previewReason: 'Needs the Command Hall',
+    requires: 'CommandHall',
   },
   {
     kind: 'Forge',
@@ -121,7 +136,7 @@ export const buildingDefinitions: readonly BuildingDefinition[] = [
     ],
     durationMinutes: 40,
     yieldSummary: null,
-    previewReason: 'Needs the Command Hall',
+    requires: 'CommandHall',
   },
 ];
 

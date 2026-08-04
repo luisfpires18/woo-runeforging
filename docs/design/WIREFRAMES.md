@@ -270,9 +270,6 @@ The confirm step. Everything the player needs to decide, before they commit.
 **While it runs** — no separate screen. The building row shows a progress bar,
 and the Outpost lists it under *Needs attention* when it is nearly due.
 
-**While it runs** — no separate screen. The building row shows a progress bar,
-and the Outpost lists it under *Needs attention* when it is nearly due.
-
 ### 5.1 Short of something — added by Prompt 6
 
 The shortfall **replaces** the confirm; it never sits beside a disabled one.

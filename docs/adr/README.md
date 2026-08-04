@@ -28,6 +28,7 @@ one without reading the others.
 | [0013](0013-persistence.md) | **Persistence** — PostgreSQL 18, one `WooDbContext`, default schema, EF Core migrations from Prompt 3, explicit transactions, elapsed time as stored timestamps | Accepted |
 | [0014](0014-local-development-and-ci.md) | **Local development and CI** — Compose for PostgreSQL only on host port 5433, GitHub Actions for build/test/lint/typecheck, no deployment or infrastructure code | Accepted |
 | [0016](0016-settlement-terminology.md) | **Settlement terminology** — the player's domain is a Settlement, not a House; `House` and `Settlement` merge into one aggregate; the outpost carries no proper name; the Workbase and prompt sheet keep their own wording | Accepted |
+| [0017](0017-commands-over-the-settlement-state-seam.md) | **Commands over the settlement state seam** — commands sit beside `load` and return the whole resulting state; no optimistic updates; the source re-checks and is authoritative; commands name intent, never amounts; duplicates are rejected, not ignored | Accepted |
 
 ## Superseded by the Prompt 2 correction
 

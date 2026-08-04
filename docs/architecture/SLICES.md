@@ -134,11 +134,28 @@ rather than collapsing to bare numbers.
 **Not built:** the construction commit flow — reserving resources, resolving
 shortages and confirming — which is Prompt 6.
 
+### Prompt 6 — the construction half · **delivered, uncommitted**
+
+The commit flow: a confirm route stating cost, what it leaves, duration and the
+non-cancellable boundary; spend at confirm, all-or-nothing; shortages replaced
+by a procure action at a placeholder rate; completion resolved on read; the
+Command Hall ending the Barracks and Forge previews; and construction
+telemetry through a typed no-op sink.
+
+The seam grew commands — [ADR-0017](../adr/0017-commands-over-the-settlement-state-seam.md).
+They sit beside `load`, return the whole resulting state, and name intent rather
+than amounts.
+
+**Deferred with reasons** (`../implementation/STATUS.md` §1v.3): the forging
+half, worker assignment, any concurrency limit, real pricing, and forging
+telemetry.
+
 | Prompt | Deliverable | Lands in |
 |---|---|---|
-| 6 | Reserve resources, resolve shortages, assign a specialist, complete construction | `web/src/` |
+| 6 ✓ | Confirm, spend, resolve shortages, complete construction | `web/src/` |
 | 6 | Iron sword pattern, grade, technique, smith; cost, duration and guaranteed quality floor before confirming | `web/src/` |
 | 6 | **Exactly one destination** — equip, contract, sell, retain | Destination state machine |
+| 6 | Worker or specialist assignment, and any limit on concurrent construction | Undecided — see STATUS §1v.3 |
 | 7 | Bastion company, recruitment, morale, equipment summary | `web/src/` |
 | 7 | Formation plan and a mocked deterministic event log | `web/src/` |
 | 7 | Battle replay — **PixiJS enters the repository here** | `web/src/` |

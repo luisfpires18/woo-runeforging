@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { slugFor } from '../../api/construction.ts';
 import type { Building, BuildingKind, SettlementState } from '../../api/types.ts';
 import { BuildingRow } from '../../components/BuildingRow.tsx';
 import { SceneGround } from '../../components/SettlementScene.tsx';
-import { useRouter } from '../../app/router.tsx';
+import { Link, useRouter } from '../../app/router.tsx';
 
 /**
  * The site and its buildings.
@@ -13,10 +14,10 @@ import { useRouter } from '../../app/router.tsx';
  * sees the whole outpost and what it will become; growth needs somewhere
  * visible to go.
  *
- * Prompt 5 shows the sites and their terms. It does **not** implement the
- * commit flow — reserving resources, resolving shortages and confirming a
- * construction are Prompt 6. Choosing a plot here changes which site the
- * command ledge describes, and nothing else.
+ * Choosing a plot changes which site the command ledge describes, and nothing
+ * else. The ledge is where the decision starts: for a site that can be raised
+ * it offers the way through to the confirm screen, which is the only place
+ * anything is spent.
  */
 export function Settlement({ state }: { readonly state: SettlementState }) {
   const { navigationState } = useRouter();
@@ -79,9 +80,9 @@ export function Settlement({ state }: { readonly state: SettlementState }) {
 /**
  * The command ledge.
  *
- * It reports the chosen site and what raising it would take. There is no
- * control on it, because there is nothing here to commit: the terms are stated
- * and the decision belongs to a prompt that has not been built.
+ * It reports the chosen site and what raising it would take. Nothing is
+ * committed here — the primary action leads to the confirm screen, which states
+ * the terms again and is the only place a cost is spent.
  */
 function SiteOrders({
   building,
@@ -136,6 +137,17 @@ function SiteOrders({
               <span className="terms__unit">Minutes</span>
             </li>
           </ul>
+        </div>
+      )}
+
+      {building.status === 'NotBuilt' && (
+        <div className="task__actions">
+          <Link
+            to={`/settlement/${slugFor(building.kind)}`}
+            className="button button--primary"
+          >
+            Raise the {building.displayName}
+          </Link>
         </div>
       )}
     </section>

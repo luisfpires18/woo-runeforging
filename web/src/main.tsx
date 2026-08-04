@@ -6,6 +6,7 @@ import type { Scenario } from './api/fake/fakeSettlementStateSource.ts';
 import { FakeSettlementStateSource } from './api/fake/fakeSettlementStateSource.ts';
 import { App } from './app/App.tsx';
 import { Router } from './app/router.tsx';
+import { TelemetryProvider } from './telemetry/TelemetryProvider.tsx';
 import './styles/global.css';
 
 const container = document.getElementById('root');
@@ -31,12 +32,16 @@ const scenarios: Readonly<Record<string, Scenario>> = {
 const requested = new URLSearchParams(window.location.search).get('scenario') ?? '';
 const scenario: Scenario = scenarios[requested] ?? 'firstSession';
 
+// The telemetry sink defaults to a no-op: Prompt 6 instruments the construction
+// loop without adding an analytics service, and nothing leaves the process.
 createRoot(container).render(
   <StrictMode>
-    <SettlementStateProvider source={new FakeSettlementStateSource(scenario)}>
-      <Router>
-        <App />
-      </Router>
-    </SettlementStateProvider>
+    <TelemetryProvider>
+      <SettlementStateProvider source={new FakeSettlementStateSource(scenario)}>
+        <Router>
+          <App />
+        </Router>
+      </SettlementStateProvider>
+    </TelemetryProvider>
   </StrictMode>,
 );

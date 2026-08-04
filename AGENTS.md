@@ -221,11 +221,19 @@ data**. No API over the domain, nothing saved.
 **Two visual passes** over that presentation are committed as `3934729` —
 styling, artwork and layout only.
 
-**The settlement terminology migration** sits on top, **uncommitted** — "House"
-retired, `House` and `Settlement` merged into one aggregate, the outpost left
-without a proper name. [ADR-0016](docs/adr/0016-settlement-terminology.md). The
-Workbase, the prompt sheet and `project_sources/` keep their own wording, so
-**later prompt text saying "House" means the Settlement**.
+Two further changes sit on top, **both uncommitted**:
+
+- **The settlement terminology migration** — "House" retired, `House` and
+  `Settlement` merged into one aggregate, the outpost left without a proper
+  name. [ADR-0016](docs/adr/0016-settlement-terminology.md). The Workbase, the
+  prompt sheet and `project_sources/` keep their own wording, so **later prompt
+  text saying "House" means the Settlement**.
+- **Prompt 6, the construction half** — the confirm route, spending at confirm,
+  shortages with mocked procurement, completion on read, and the Command Hall
+  unlocking Barracks and Forge.
+  [ADR-0017](docs/adr/0017-commands-over-the-settlement-state-seam.md). The
+  forging half, worker assignment and any concurrency limit are **deferred with
+  reasons** in `docs/implementation/STATUS.md` §1v.3.
 
 **Prompt 4 (UX and visual design) is committed** — `f084304`. The design package
 lives in [`docs/design/`](docs/design/) and Prompt 5 amended it in two places
@@ -255,7 +263,9 @@ Do not begin it without the product owner's instruction.
 Two standing rules the frontend now depends on:
 
 - **The adapter seam.** Components consume `SettlementState` through
-  `web/src/api/SettlementStateProvider.tsx`. Nothing under `features/` or
+  `web/src/api/SettlementStateProvider.tsx`, and change it only through the
+  commands on `SettlementStateSource`, which return the whole resulting state.
+  Nothing under `features/` or
   `components/` may import from `api/fake/` — ESLint enforces it, so that
   replacing fake state with real endpoints stays a change in one file.
 - **Read [`docs/design/README.md`](docs/design/README.md) before building a

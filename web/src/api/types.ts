@@ -124,10 +124,79 @@ export interface SettlementState {
   readonly asOfUtc: string;
 }
 
+/** One resource a construction is short of, and what buying it would cost. */
+export interface Shortfall {
+  readonly kind: ResourceKind;
+  readonly displayName: string;
+  /** How many units are missing. Always greater than zero. */
+  readonly short: number;
+  readonly goldPrice: number;
+}
+
+/** Why a site cannot be raised, when it cannot. */
+export type Ineligibility =
+  | 'AlreadyStanding'
+  | 'UnderConstruction'
+  | 'PrerequisiteUnmet'
+  | 'Unknown';
+
+/**
+ * Everything the confirm screen needs, derived from a state it already holds.
+ *
+ * For reading only. The source recomputes all of it at command time — between
+ * a render and a click the settlement may have moved, and the screen is not
+ * the authority on what it can afford.
+ */
+export interface ConstructionQuote {
+  readonly building: Building;
+  readonly cost: readonly ResourceCostEntry[];
+  readonly durationMinutes: number;
+  /** When it would be done, if begun at `asOfUtc`. */
+  readonly completesAtUtc: string;
+  /** Every balance, as it would stand after the spend. */
+  readonly after: readonly ResourceBalance[];
+  readonly shortfalls: readonly Shortfall[];
+  readonly totalGoldPrice: number;
+  /** Gold remaining after procuring the shortfalls. Negative when unaffordable. */
+  readonly goldAfterProcurement: number;
+  /** `null` when the site can be raised. */
+  readonly ineligibility: Ineligibility | null;
+}
+
+/** A command the source refused, with a reason fit to show a player. */
+export class CommandRejection extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'CommandRejection';
+  }
+}
+
 /**
  * The seam. Today a fake source; later an HTTP one. Components depend on this
  * interface and cannot tell which they were given.
+ *
+ * **Every command returns the whole resulting state** — the shape a POST
+ * followed by a re-read takes. Nothing here mutates state a component holds,
+ * and no command takes an amount: the source decides how much, because a caller
+ * that could choose could choose wrong. See
+ * [ADR-0017](../../../docs/adr/0017-commands-over-the-settlement-state-seam.md).
  */
 export interface SettlementStateSource {
   load(signal?: AbortSignal): Promise<SettlementState>;
+
+  /**
+   * Spends the whole cost and starts the work in one transition, or changes
+   * nothing and rejects.
+   */
+  beginConstruction(kind: BuildingKind, signal?: AbortSignal): Promise<SettlementState>;
+
+  /**
+   * Buys every resource this construction is currently short of, in one
+   * all-or-nothing act. Rejects when there is no shortfall, when Gold is
+   * insufficient, or when the site is no longer eligible.
+   */
+  procureConstructionShortfalls(
+    kind: BuildingKind,
+    signal?: AbortSignal,
+  ): Promise<SettlementState>;
 }

@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 
 import { getPlatformStatus } from '../api/client.ts';
+import { kindFromSlug } from '../api/construction.ts';
 import { useSettlementState } from '../api/SettlementStateProvider.tsx';
 import { ErrorRegion, LoadingRegion } from '../components/StateRegion.tsx';
+import { Construction } from '../features/construction/Construction.tsx';
 import { Outpost } from '../features/outpost/Outpost.tsx';
 import { Settlement } from '../features/settlement/Settlement.tsx';
 import { AppShell } from './AppShell.tsx';
@@ -20,17 +22,38 @@ export function App() {
         <LoadingRegion label="Reading word from the outpost…" minHeight="24rem" />
       )}
       {load.phase === 'error' && <ErrorRegion message={load.message} onRetry={reload} />}
-      {load.phase === 'loaded' && <Screen />}
+      {load.phase === 'loaded' && <Screen offline={offline} />}
     </AppShell>
   );
 }
 
-function Screen() {
+/**
+ * Route dispatch.
+ *
+ * `/settlement/<site>` is parsed here rather than in the router: a single
+ * prefix match is not "loaders, params or nested layouts", which is the trigger
+ * `router.tsx` names for reconsidering React Router.
+ */
+function Screen({ offline }: { readonly offline: boolean }) {
   const { path } = useRouter();
   const { load } = useSettlementState();
 
   if (load.phase !== 'loaded') {
     return null;
+  }
+
+  const construction = path.startsWith('/settlement/')
+    ? path.slice('/settlement/'.length)
+    : null;
+
+  if (construction !== null) {
+    return (
+      <Construction
+        state={load.state}
+        kind={kindFromSlug(construction, load.state.buildings)}
+        offline={offline}
+      />
+    );
   }
 
   if (path === '/settlement') {

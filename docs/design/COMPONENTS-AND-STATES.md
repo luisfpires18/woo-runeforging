@@ -56,8 +56,8 @@ the removed components were getting in the way of.
 | `PrimaryAction` | The filled button | **At most one per screen.** See §4 |
 | `SecondaryAction` | Outline button | Any number |
 | `TertiaryAction` | Text link | Quiet alternatives |
-| `ConfirmPanel` | Cost, consequence, irreversibility, confirm | Used by construction and craft |
-| `ShortfallNotice` | "short 20 Timber" | **Replaces** a disabled button — never both |
+| `ConfirmPanel` | Cost, consequence, irreversibility, confirm | Used by construction and craft. Takes a **working state** while a command is in flight, and is disabled for the duration — the second half of the guard against spending twice |
+| `ShortfallNotice` | "short 20 Timber" | **Replaces** a disabled button — never both. Carries the **procure action**: names the exact amounts, the total Gold price and the Gold remaining, and buys every current shortfall in one act (`WIREFRAMES.md` §5.1) |
 
 ### Feedback
 
@@ -149,7 +149,7 @@ What each screen shows. Only the structurally distinct cases are drawn in
 |---|---|---|---|---|---|---|
 | **Outpost** | Placeholder per region | First session — the task card **is** the empty state | Retry; identity and resources stay | — | Site row updates in place | Banner; report readable, actions disabled |
 | **Settlement** | Building list placeholder | Never empty — five plots always | Retry the list | Per row: shortfall notice | Row becomes ▨ | Banner; list readable |
-| **Construction** | Cost placeholder | — | Retry; entered values kept | Confirm replaced by shortfall | Return to settlement, row changed | Confirm disabled with reason |
+| **Construction** | Cost placeholder | — | Retry; entered values kept | Confirm replaced by shortfall; a site that cannot be raised states why and offers none | Return to settlement, plot changed | **Both** commands disabled with the reason |
 | **Forge** | Project placeholder | "No projects. Choose a pattern to begin." | Retry | Steel shown with its requirement | Project appears in progress | Confirm disabled |
 | **Army** | Company placeholder | "No companies yet." | Retry | Equipment slot shows what is missing | Slot fills | Banner; readable |
 | **Battle report** | Report placeholder | "No battles yet." | Retry the report | Replay unavailable → **written report** | Repair choice resolves in place | Banner; report readable, repair disabled |

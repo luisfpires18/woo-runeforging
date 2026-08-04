@@ -1,9 +1,9 @@
 # Implementation status
 
 **Last updated:** 4 August 2026
-**Current stage:** Prompt 5 — the mocked outpost, **committed** (`f6214a6`, `3934729`)
-**Uncommitted:** the settlement terminology migration
-**Next:** Prompt 6 — the mocked construction and forging loop
+**Current stage:** Prompt 6 — **the construction half, uncommitted**
+**Also uncommitted:** the settlement terminology migration
+**Next:** the forging half of Prompt 6, then Prompt 7
 
 This document describes **what is true now**. The history of how it got here is
 in the [change log](#9-change-log).
@@ -42,16 +42,17 @@ a1067a7  validate  completed  success
 | Content | `Content/` — static C# catalogues keyed by the enums |
 | Persistence | The Settlement aggregate: `Settlements`, `Buildings`, `ResourceBalances`, applied by `InitialHouseAggregate` then `MergeHouseIntoSettlement` |
 | API | `/health` and `/api/v1/platform/status` only. **No endpoint exposes the domain** |
-| Tests | 33 backend, 14 frontend |
+| Tests | 33 backend, 33 frontend |
 | CI | `validate.yml` on `master` — backend against a real PostgreSQL service container, frontend, docs |
 | Canon | 12 files in [`project_sources/`](../../project_sources/), **present and read in full** |
 | Design | Seven documents in [`../design/`](../design/), amended twice by Prompt 5 |
-| Web | The outpost and its site over **typed fake data**. No API over the domain, nothing saved |
+| Web | The outpost, its site and the construction commit flow over **typed fake data**. No API over the domain, nothing saved |
 
 **Not built:** forge, smith, crafts, equipment batches · companies, armies,
 battles · runes in any form · markets, contracts, Orders, Warfronts, seasons ·
 settlement stages beyond Outpost · the other six kingdoms · resource accrual,
-storage capacity, procurement · authentication · background jobs, outbox,
+storage capacity · **real** procurement and pricing · authentication ·
+background jobs, outbox,
 idempotency keys · object storage · PixiJS · Azure, deployment, Kubernetes.
 
 ---
@@ -188,6 +189,88 @@ component, and it adds no gameplay.
 Loading and error remain unreachable from a URL by design — they were verified
 by temporarily substituting a slow source and a rejecting source in `main.tsx`,
 and the substitutions were reverted.
+
+---
+
+## 1v. Prompt 6 — the construction half, uncommitted
+
+**Partly done.** Prompt 6 asks for the whole Foundations of Iron economy loop:
+construction *and* forging. The product owner scoped this pass to the
+construction half, so the forging half is deferred and named below rather than
+half-built.
+
+### 1v.1 What was delivered
+
+The loop `review → choose → prepare → commit → resolve` closes for the first
+time. Nothing spent before this; the primary action only navigated.
+
+- **A confirm route**, `/settlement/<site>` — `WIREFRAMES.md` §5 as drawn:
+  breadcrumb, cost beside the balance it leaves, duration with the completion
+  time, the non-cancellable boundary stated **before** the confirm, and
+  `[ Begin construction ] ( Cancel )`. A route rather than a dialog, so it has
+  an address, back works and refresh returns to it.
+- **Spend at confirm.** The whole cost, all-or-nothing, in the same transition
+  that starts the work — what `WIREFRAMES.md` §5, `JOURNEYS.md` and ADR-0004
+  had already decided. `Reservation` stays unbuilt vocabulary: with cancellation
+  forbidden there is nothing to release.
+- **Shortages with mocked procurement.** The shortfall **replaces** the confirm,
+  names the exact amounts, the total Gold price and what is left, and buys every
+  current shortfall in one all-or-nothing act. **Gold is never itself a
+  shortfall** — there is no recursive way to procure it.
+- **Completion resolves on read.** Anything due becomes complete on the next
+  load and appends a change entry, so a settlement left alone resolves its work
+  when it is next looked at rather than on a timer.
+- **The Command Hall unlocks Barracks and Forge.** `previewReason` was a static
+  string that pinned a building to `Previewed` for ever; a prerequisite is now
+  a `BuildingKind`, and a preview ends the moment that building is complete.
+- **Construction telemetry** — a typed sink with a no-op default and no
+  analytics service. Six events, each fired from a **causal transition** rather
+  than a render, and deduplicated by key so rerenders, StrictMode's
+  double-invoke and repeated loads cannot report one twice.
+
+### 1v.2 The seam grew commands
+
+[ADR-0017](../adr/0017-commands-over-the-settlement-state-seam.md). Commands sit
+beside `load` on `SettlementStateSource` and **return the whole resulting
+state** — the shape a `POST` followed by a re-read takes. No optimistic updates,
+no client-side mutation.
+
+**Commands name intent, never amounts.** `procureConstructionShortfalls(kind)`
+takes a building, not a resource and a quantity: the source works out what is
+short, what it costs and what is left. A caller that could choose the quantity
+could choose a wrong one.
+
+**Duplicate confirmation is rejected, never silently ignored.** The control is
+disabled while a command is in flight, and any call that arrives anyway reaches
+the source, which refuses it because the building is no longer `NotBuilt`. Two
+layers, because `Idempotency key` is deferred to Prompt 9.
+
+The fake source is now **stateful** — balances and construction records that
+commands mutate — while the deterministic `FakeClock` and the three scenarios
+are unchanged.
+
+### 1v.3 Deferred, with reasons
+
+| Deferred | Why |
+|---|---|
+| The **forging half** — the kingdom request for 100 infantry swords, pattern, grade, technique, the named smith, the guaranteed quality floor, equipment effect, completing the craft, and one exclusive destination | Scoped out by the product owner. It is as large again as the construction half, and introduces a second state machine plus destination exclusivity |
+| **Worker and specialist assignment** | `Workforce` is glossary-defined as a capacity, not an inventory, and no workforce model exists. Inventing one to satisfy a bullet would have been a design decision made in passing |
+| **Any limit on concurrent construction** | Undecided anywhere in the design package. `JOURNEYS.md` §1 requires a *second decision* right after the first commit, which a one-at-a-time rule would forbid — so the limit needs deciding, not assuming |
+| **Real procurement pricing** | The mock uses one documented placeholder, **1 Gold per missing unit**. Bounded demand against a real economy is Prompt 10 |
+| Forging telemetry — chosen technique, destination choice, time to first craft | With the forging half |
+
+### 1v.4 Two things worth knowing
+
+**Offline disables both commands.** Beginning construction and procuring are
+both unavailable offline, each with the reason beside it. That is the one
+sanctioned disabled control — a shortage still *replaces* the confirm rather
+than greying it out.
+
+**The test suite runs online.** `src/test/setup.ts` rejects every fetch, which
+makes the app offline, which is right for the rest of the suite — but offline
+deliberately disables committing. `Construction.test.tsx` stubs a *successful*
+platform probe instead, still with no network and no non-determinism, and the
+offline cases re-reject it explicitly.
 
 ---
 
@@ -562,7 +645,8 @@ $ bash scripts/check-doc-links.sh
 checked 44 Markdown files — OK
 ```
 
-Re-run in full after the terminology migration, 4 August 2026:
+Re-run in full after the terminology migration and Prompt 6's construction
+half, 4 August 2026:
 
 ```
 $ dotnet format --verify-no-changes
@@ -578,17 +662,17 @@ $ cd web && npm run lint && npm run typecheck
 (no output from either)
 
 $ npm run test          # three consecutive runs
-Test Files  2 passed (2)      Tests  14 passed (14)      stderr: 0 bytes
-Test Files  2 passed (2)      Tests  14 passed (14)      stderr: 0 bytes
-Test Files  2 passed (2)      Tests  14 passed (14)      stderr: 0 bytes
+Test Files  3 passed (3)      Tests  33 passed (33)      stderr: 0 bytes
+Test Files  3 passed (3)      Tests  33 passed (33)      stderr: 0 bytes
+Test Files  3 passed (3)      Tests  33 passed (33)      stderr: 0 bytes
 
 $ npm run build
 ✓ built in 221ms
 
 $ bash scripts/check-adrs.sh
-checked 16 ADR(s) — OK
+checked 17 ADR(s) — OK
 $ bash scripts/check-doc-links.sh
-checked 45 Markdown files — OK
+checked 46 Markdown files — OK
 ```
 
 **The migration was proven the way a deployment meets it.**
@@ -597,6 +681,29 @@ checked 45 Markdown files — OK
 model has no `House` type and could not write them — migrates up, asserts, then
 migrates **back down** and asserts again. Buildings, balances, stage, kingdom
 and the `HouseHall` → `CommandHall` value all survive both directions.
+
+### 4.3 The Prompt 6 visual check
+
+The commit flow was driven in a real browser **against the running backend**,
+because the platform probe decides the offline state and offline deliberately
+disables committing. Captured at **1440 × 900** and **375 × 812**: the confirm
+screen, the settlement immediately after a commit, a real shortage reached by
+spending down, the state after procuring, and each of the four route edge
+cases.
+
+Measured on the construction flow, not eyeballed:
+
+| Check | Result |
+|---|---|
+| `documentElement.scrollWidth` at 1440, 720 (≈200% zoom), 375 and 320 | Equal to `clientWidth` at every width — no horizontal scroll |
+| Tab order on the confirm | Begin → Cancel → testing aid → skip link → rail. Every stop reports a `2px solid` outline |
+| `Esc` | Returns to `/settlement` with focus restored to the plot that was being decided |
+| Interactive targets under 44px | None. *(The breadcrumb link was 80 × 18 and now carries `min-height: var(--target-min)`.)* |
+| Greyscale legibility | A shortfall row carries `⚠` beside the resource name and a negative number, so the shortage reads with no colour at all |
+| `prefers-reduced-motion: reduce` | Duration tokens and the button transition all compute to `0s` |
+
+**Still not run:** axe or any automated a11y tool — deferred to the Prompt 8
+audit, unchanged.
 
 ### 4.2 The visual check
 
@@ -808,3 +915,4 @@ Three things Prompt 6 should know:
 | 2026-08-03 | 5 | The mocked House Seat, from typed fake data: House Seat with first-session and returning shapes, settlement with all seven buildings, six resources, a named smith, seven states. The typed adapter seam with the fake-import boundary enforced by ESLint. Placeholder SVG art with a terminating fallback chain, the Forge asset deliberately absent. 14 frontend tests; Vitest added. **React Router removed on evidence** — every 7.x release carries a high-severity advisory; replaced by a ~40-line History-API router, `npm audit` now clean. **First browser inspection in the repository's history**, which found a clipped site row and an accessibility regression in the mobile resource bar; both fixed and the design package amended. Node floor raised to 22.22.2 for jsdom 30. |
 | 2026-08-03 | 4 | The design package — seven documents in `docs/design/`, no code. Journeys, navigation, wireframes for six screens on both viewports, visual language with computed contrast, components and states, accessibility. Four colours corrected after the first palette failed AA. The first useful action proposed as a **starter-balance hypothesis, not canon**; `accent-sylvara` reserved with no role assigned. |
 | 2026-08-04 | terminology | **"House" retired.** `House` and `Settlement` merged into one aggregate; House Seat → Outpost, House Hall → Command Hall, household → Residents, `HouseState` → `SettlementState`. "House Karrow" and "Ashen Reach" both dropped for `Arkazian Outpost` — no replacement proper noun, and the player names it later. A hand-written `MergeHouseIntoSettlement` migration carries the data, including `Buildings.Kind` from `HouseHall` to `CommandHall` because the enum is stored as a string; an isolated test proves it up and down against a populated database. The Workbase, the prompt sheet and `project_sources/` are untouched. [ADR-0016](../adr/0016-settlement-terminology.md). Behaviour-neutral: 14 frontend tests unchanged but for their vocabulary, backend 32 → 33. |
+| 2026-08-04 | 6 (construction half) | The commit flow closes the loop for the first time: a confirm route at `/settlement/<site>` stating cost, what it leaves, duration with the completion time and the non-cancellable boundary; **spend at confirm**, whole cost, all-or-nothing, in the same transition that starts the work; shortages that **replace** the confirm with an all-or-nothing procure action at a documented placeholder of 1 Gold per missing unit, with Gold itself never procurable; completion resolved on read; and the Command Hall ending the Barracks and Forge previews. The seam grew commands that return the whole resulting state and name intent rather than amounts — [ADR-0017](../adr/0017-commands-over-the-settlement-state-seam.md). Construction telemetry through a typed no-op sink, six events keyed to causal transitions so rerenders and StrictMode cannot duplicate one. 19 new frontend tests (14 → 33). **The forging half, worker assignment, any concurrency limit and real pricing are deferred with reasons** (§1v.3). Making construction possible also exposed a stale claim on the returning outpost — "everything you can start is already under way" while four plots stood empty — so the next task is now the cheapest affordable site rather than always the Lumber Yard. |

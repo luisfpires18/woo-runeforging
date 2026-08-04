@@ -36,7 +36,7 @@ systems that do not exist yet.
 | **Building** | A structure in the settlement. Buildings unlock **capabilities**, not thirty levels of percentage increases. *Implemented: `Building`, `BuildingKind` — Command Hall, Storehouse, Lumber Yard, Quarry, Mine* | Locked |
 | **Construction state** | `NotBuilt → UnderConstruction → Complete`. Driven by stored timestamps read on demand, never by a timer. **A construction cannot complete twice.** *Implemented: `ConstructionStatus`* | — |
 | **Specialist** | A named person who performs work — smith, commander, scholar. The player makes settlement-level decisions; specialists do the work | Foundation |
-| **Workforce** | Labour capacity. **A capacity, not an inventory resource** — it is never a spendable pile of tokens | Foundation |
+| **Workforce** | Labour capacity. **A capacity, not an inventory resource** — it is never a spendable pile of tokens. **Not built.** Worker assignment and any limit on concurrent construction are deferred with the forging half of Prompt 6 | Foundation |
 | **Crest / motto** | The settlement's heraldry. Also the terminal fallback for missing art. The starting outpost carries an Arkazian token and no device of its own — it has no name yet | Foundation |
 
 ## 2. Economy
@@ -51,7 +51,8 @@ systems that do not exist yet.
 | **Material family** | A broad recipe slot — Metal, Wood, Stone, Hide or textile, Fuel or supplies, Reagent, Runic component | Foundation |
 | **Ledger entry** | An append-only record of one resource movement: delta, reason, actor, correlation ID. **Every** gold and goods movement has one | — |
 | **Balance** | Current holding of one resource by one settlement. Carries `accrued_through_utc` — production is computed from elapsed time, never ticked | — |
-| **Reservation** | Resources committed to a project but not yet consumed. Has explicit release and consume transitions | — |
+| **Reservation** | Resources committed to a project but not yet consumed. Has explicit release and consume transitions. **Not built, and not needed yet**: construction spends its whole cost at confirm ([ADR-0004](../adr/0004-consistency-and-durable-work.md), `WIREFRAMES.md` §5), and with cancellation forbidden there is nothing to release | — |
+| **Procurement rate** | What it costs to buy a shortfall rather than gather it. The mock uses **1 Gold per missing unit**, a placeholder like every other starter number, and buys all of a construction's current shortfalls in one all-or-nothing act. Gold itself is never procurable — there is no recursive path. Real pricing arrives with the economy at Prompt 10 | Open |
 | **Bounded demand** | NPC and kingdom purchasing limited by budget, stockpile, deadline and world state. **There is no infinite vendor** | Foundation |
 
 ## 3. The forge

@@ -25,7 +25,7 @@ import { Residents } from '../residents/Residents.tsx';
  */
 export function Outpost({ state }: { readonly state: SettlementState }) {
   const returning = state.changes.length > 0 || state.attention.length > 0;
-  const candidate = nextTask(state.buildings);
+  const candidate = nextTask(state);
 
   return (
     <div className="outpost">
@@ -42,7 +42,11 @@ export function Outpost({ state }: { readonly state: SettlementState }) {
       <div className="theatre">
         <SceneGround />
         <SiteRow state={state} focus={candidate?.kind ?? null} />
-        <PrimaryTask candidate={candidate} firstSession={!returning} />
+        <PrimaryTask
+          candidate={candidate}
+          firstSession={!returning}
+          anythingLeft={anythingLeftToRaise(state)}
+        />
       </div>
 
       {/* Everything below the fold is reference: what happened, who is here,
@@ -59,11 +63,37 @@ export function Outpost({ state }: { readonly state: SettlementState }) {
   );
 }
 
-/** The Lumber Yard, while it is still unbuilt. Nothing else is offered. */
-function nextTask(buildings: readonly Building[]): Building | undefined {
-  return buildings.find(
-    (building) => building.kind === 'LumberYard' && building.status === 'NotBuilt',
-  );
+/**
+ * The one thing worth doing next: the cheapest site that can be raised now.
+ *
+ * On a first session that is the Lumber Yard, which is the point — it is the
+ * cheapest building and timber appears in every other cost, so it is the move
+ * least likely to strand a new player (`JOURNEYS.md` §1). The rule is written as
+ * "cheapest affordable" rather than "the Lumber Yard" so that a returning
+ * session, with the yard already under way, still has something to offer
+ * instead of claiming everything is under way while four plots stand empty.
+ */
+function nextTask(state: SettlementState): Building | undefined {
+  return state.buildings
+    .filter((building) => building.status === 'NotBuilt' && affordable(state, building))
+    .sort((a, b) => totalCost(a) - totalCost(b))[0];
+}
+
+function affordable(state: SettlementState, building: Building): boolean {
+  return building.cost.every((entry) => {
+    const held = state.resources.find((balance) => balance.kind === entry.kind)?.amount ?? 0;
+
+    return held >= entry.amount;
+  });
+}
+
+function totalCost(building: Building): number {
+  return building.cost.reduce((total, entry) => total + entry.amount, 0);
+}
+
+/** Whether anything at all is still unbuilt, however unaffordable. */
+function anythingLeftToRaise(state: SettlementState): boolean {
+  return state.buildings.some((building) => building.status === 'NotBuilt');
 }
 
 function ReturningRegions({ state }: { readonly state: SettlementState }) {
@@ -145,15 +175,17 @@ function AttentionRow({ item }: { readonly item: AttentionItem }) {
 function PrimaryTask({
   candidate,
   firstSession,
+  anythingLeft,
 }: {
   readonly candidate: Building | undefined;
   readonly firstSession: boolean;
+  readonly anythingLeft: boolean;
 }) {
   const { navigate } = useRouter();
 
   if (candidate === undefined) {
-    // Everything available is under way. Say so rather than manufacture a
-    // button to fill the slot — COMPONENTS-AND-STATES.md §4.
+    // Nothing to offer. Say which kind of nothing it is, rather than
+    // manufacture a button to fill the slot — COMPONENTS-AND-STATES.md §4.
     return (
       <section className="orders" aria-labelledby="task-heading">
         <div className="orders__head">
@@ -162,7 +194,11 @@ function PrimaryTask({
           </h2>
         </div>
         <div className="orders__body">
-          <p className="orders__prose">Everything you can start is already under way.</p>
+          <p className="orders__prose">
+            {anythingLeft
+              ? 'Nothing you can raise is affordable yet. Work under way will bring more in.'
+              : 'Everything you can start is already under way.'}
+          </p>
         </div>
       </section>
     );
@@ -179,8 +215,9 @@ function PrimaryTask({
 
       <div className="orders__body">
         <p className="orders__prose">
-          The site has timber within reach. A lumber yard keeps every other project
-          supplied.
+          {candidate.kind === 'LumberYard'
+            ? 'The site has timber within reach. A lumber yard keeps every other project supplied.'
+            : candidate.description}
         </p>
         <p className="orders__terms-line">
           {candidate.cost.map((entry, index) => (
