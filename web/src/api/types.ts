@@ -120,8 +120,213 @@ export interface SettlementState {
   readonly residents: readonly Person[];
   readonly changes: readonly ChangeEntry[];
   readonly attention: readonly AttentionItem[];
+  readonly forge: ForgeState;
   /** The server's notion of now, so nothing derives progress from a local clock. */
   readonly asOfUtc: string;
+}
+
+// ---------------------------------------------------------------------------
+// The forge
+//
+// Ordinary forging only. It is deterministic from end to end: transparent
+// duration, a guaranteed quality floor, and an output that is a pure function
+// of the order plus content. There is no probability model anywhere in this
+// file, and no vocabulary for one.
+// ---------------------------------------------------------------------------
+
+/**
+ * Where a finished batch went. **Exclusive — one only, and forever.**
+ *
+ * The same object cannot be equipped, sold and delivered at once
+ * (Workbase §8, `GLOSSARY.md` §3).
+ */
+export type Destination = 'Equipped' | 'Contracted' | 'Listed' | 'Retained';
+
+/**
+ * How good the work is.
+ *
+ * A PLACEHOLDER ladder of two. `Sound` was deliberately not used: `rune_list.md`
+ * names Sound as a rune — *vibration and silence* — and reusing the word for a
+ * quality tier would collide with rune vocabulary the moment runes arrive.
+ */
+export type QualityGrade = 'Serviceable' | 'Fine';
+
+/** What the player chose. Everything the craft is, derives from this. */
+export interface CraftOrder {
+  readonly patternId: string;
+  readonly gradeId: string;
+  readonly techniqueId: string;
+  readonly smithId: string;
+}
+
+/** Who made it, from what, under which rules. Follows the batch onward. */
+export interface MakerProvenance {
+  readonly smithName: string;
+  readonly smithMastery: string;
+  readonly settlementName: string;
+  readonly forgedAtUtc: string;
+  readonly patternId: string;
+  readonly gradeId: string;
+  readonly techniqueId: string;
+  /** So an old batch can still be explained after the rules change. */
+  readonly contentVersion: string;
+  readonly rulesVersion: string;
+}
+
+/**
+ * A fungible quantity of identical equipment — not a hundred records.
+ *
+ * Every field is a pure function of the {@link CraftOrder} and the catalogue.
+ * `quality` is the craft's quality floor **exactly**: ordinary forging promises
+ * a floor and delivers precisely it, so the player can predict the result. Any
+ * variance above a floor is a question for authoritative forging.
+ */
+export interface EquipmentBatch {
+  readonly id: string;
+  readonly patternName: string;
+  readonly quantity: number;
+  readonly quality: QualityGrade;
+  readonly conditionPercent: number;
+  /** One plain sentence. Never a score. */
+  readonly equipmentEffect: string;
+  /** A bounded tier, for the systems that later have to reason about it. */
+  readonly equipmentEffectTier: number;
+  readonly maker: MakerProvenance;
+}
+
+interface CraftBase {
+  readonly id: string;
+  readonly order: CraftOrder;
+  readonly cost: readonly ResourceCostEntry[];
+  readonly durationMinutes: number;
+  readonly qualityFloor: QualityGrade;
+  readonly startedAtUtc: string;
+  readonly completesAtUtc: string;
+}
+
+interface SettledCraft extends CraftBase {
+  readonly status: 'Settled';
+  readonly batch: EquipmentBatch;
+  readonly destinationChosenAtUtc: string;
+}
+
+/**
+ * One forge project, as a state machine you cannot hold wrongly.
+ *
+ * `InProgress → AwaitingDestination → Settled`, and `Settled` carries the one
+ * destination it reached. The union is the enforcement: a settled craft with two
+ * destinations, an unfinished craft with a batch, or an equipped batch carrying
+ * an asking price are not states this type can express, so no code has to check
+ * for them.
+ */
+export type ForgeCraft =
+  | (CraftBase & { readonly status: 'InProgress'; readonly batch: null })
+  | (CraftBase & { readonly status: 'AwaitingDestination'; readonly batch: EquipmentBatch })
+  | (SettledCraft & { readonly destination: 'Equipped' })
+  | (SettledCraft & { readonly destination: 'Contracted'; readonly feePaidGold: number })
+  | (SettledCraft & { readonly destination: 'Listed'; readonly askingPriceGold: number })
+  | (SettledCraft & { readonly destination: 'Retained' });
+
+/** A standing order from the kingdom. The reason the first craft exists. */
+export interface KingdomRequest {
+  readonly id: string;
+  readonly summary: string;
+  /** Who needs them and why they are exposed. */
+  readonly detail: string;
+  readonly patternId: string;
+  readonly quantity: number;
+  readonly feeGold: number;
+  /**
+   * What the kingdom expects, in words.
+   *
+   * **Informational only.** Nothing expires, nothing is penalised, and no clock
+   * reads it — `COMPONENTS-AND-STATES.md` §5 forbids copy implying urgency the
+   * game does not have.
+   */
+  readonly expectation: string;
+}
+
+export interface PatternOption {
+  readonly id: string;
+  readonly displayName: string;
+  readonly description: string;
+}
+
+export interface GradeOption {
+  readonly id: string;
+  readonly displayName: string;
+  /** `null` when it can be worked. A grade to work toward, never a locked system. */
+  readonly unavailableReason: string | null;
+}
+
+/**
+ * A design or process emphasis, with the terms it implies already resolved.
+ *
+ * The terms travel with the option rather than being recomputed by a screen, for
+ * the same reason `quoteFor` derives from state: a client that could work out
+ * its own cost could work out a wrong one.
+ */
+export interface TechniqueOption {
+  readonly id: string;
+  readonly displayName: string;
+  readonly description: string;
+  /** The whole cost of the requested quantity, worked this way. */
+  readonly cost: readonly ResourceCostEntry[];
+  readonly durationMinutes: number;
+  /** Guaranteed, and in ordinary forging exactly what comes out. */
+  readonly qualityFloor: QualityGrade;
+  readonly equipmentEffect: string;
+}
+
+export interface SmithOption {
+  readonly id: string;
+  readonly name: string;
+  readonly mastery: string;
+  /** `null` when the smith can take the work. */
+  readonly unavailableReason: string | null;
+}
+
+/** The forge, its catalogue, and the one project it may hold. */
+export interface ForgeState {
+  /** Whether the Forge building stands. Nothing can be forged without it. */
+  readonly available: boolean;
+  readonly unavailableReason: string | null;
+  readonly request: KingdomRequest;
+  readonly patterns: readonly PatternOption[];
+  readonly grades: readonly GradeOption[];
+  readonly techniques: readonly TechniqueOption[];
+  readonly smiths: readonly SmithOption[];
+  /**
+   * At most one craft, ever, in this slice — and it is never replaced. A second
+   * project would overwrite the batch and lose the provenance and destination
+   * that later systems read.
+   */
+  readonly craft: ForgeCraft | null;
+}
+
+/**
+ * Everything the craft screen needs, derived from a state it already holds.
+ *
+ * For reading only, exactly like {@link ConstructionQuote}: the source
+ * recomputes all of it at command time.
+ */
+export interface CraftQuote {
+  readonly order: CraftOrder;
+  readonly patternName: string;
+  readonly gradeName: string;
+  readonly techniqueName: string;
+  readonly smithName: string;
+  readonly quantity: number;
+  readonly cost: readonly ResourceCostEntry[];
+  readonly durationMinutes: number;
+  readonly completesAtUtc: string;
+  /** The guaranteed floor, which is also exactly what the batch will be. */
+  readonly qualityFloor: QualityGrade;
+  readonly equipmentEffect: string;
+  readonly after: readonly ResourceBalance[];
+  readonly shortfalls: readonly Shortfall[];
+  readonly totalGoldPrice: number;
+  readonly goldAfterProcurement: number;
 }
 
 /** One resource a construction is short of, and what buying it would cost. */
@@ -197,6 +402,35 @@ export interface SettlementStateSource {
    */
   procureConstructionShortfalls(
     kind: BuildingKind,
+    signal?: AbortSignal,
+  ): Promise<SettlementState>;
+
+  /**
+   * Spends the whole cost, assigns the smith and starts the craft in one
+   * transition, or changes nothing and rejects.
+   *
+   * **No quantity.** How many swords is the kingdom request's business, not the
+   * player's — the same reasoning that keeps amounts out of procurement.
+   */
+  beginCraft(order: CraftOrder, signal?: AbortSignal): Promise<SettlementState>;
+
+  /**
+   * Buys everything this craft is currently short of, in one all-or-nothing
+   * act. Rejects when there is no shortfall, when Gold is insufficient, or when
+   * the craft could not be begun anyway.
+   */
+  procureCraftShortfalls(order: CraftOrder, signal?: AbortSignal): Promise<SettlementState>;
+
+  /**
+   * Sends the finished batch to exactly one destination, for good.
+   *
+   * Rejects unless that craft is awaiting a destination — so a second call, with
+   * the same destination or a different one, changes nothing. `craftId` is
+   * carried so a stale screen cannot retarget a later craft.
+   */
+  chooseCraftDestination(
+    craftId: string,
+    destination: Destination,
     signal?: AbortSignal,
   ): Promise<SettlementState>;
 }

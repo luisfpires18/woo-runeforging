@@ -25,7 +25,8 @@ import { Residents } from '../residents/Residents.tsx';
  */
 export function Outpost({ state }: { readonly state: SettlementState }) {
   const returning = state.changes.length > 0 || state.attention.length > 0;
-  const candidate = nextTask(state);
+  const forgeTask = forgeTaskOf(state);
+  const candidate = forgeTask === null ? nextTask(state) : undefined;
 
   return (
     <div className="outpost">
@@ -42,11 +43,15 @@ export function Outpost({ state }: { readonly state: SettlementState }) {
       <div className="theatre">
         <SceneGround />
         <SiteRow state={state} focus={candidate?.kind ?? null} />
-        <PrimaryTask
-          candidate={candidate}
-          firstSession={!returning}
-          anythingLeft={anythingLeftToRaise(state)}
-        />
+        {forgeTask === null ? (
+          <PrimaryTask
+            candidate={candidate}
+            firstSession={!returning}
+            anythingLeft={anythingLeftToRaise(state)}
+          />
+        ) : (
+          <ForgeTask task={forgeTask} />
+        )}
       </div>
 
       {/* Everything below the fold is reference: what happened, who is here,
@@ -60,6 +65,73 @@ export function Outpost({ state }: { readonly state: SettlementState }) {
         <p className="outpost__lore">{state.settlement.loreHint}</p>
       </div>
     </div>
+  );
+}
+
+/**
+ * When the forge has the more pressing claim on the player's attention.
+ *
+ * Two cases outrank raising anything, in this order:
+ *
+ * 1. **A finished batch with nowhere to go.** It is the only thing in the
+ *    settlement waiting on a decision rather than on time, and it is
+ *    irreversible, so it should not be discovered later by accident.
+ * 2. **A standing forge with the request unanswered.** The swords are why the
+ *    forge was raised; offering another building instead would bury the reason.
+ *
+ * Work already under way is *not* a task — it needs nothing from the player, and
+ * it is reported under what needs attention like any other running work.
+ */
+function forgeTaskOf(state: SettlementState): ForgeTaskKind | null {
+  const { forge } = state;
+
+  if (!forge.available) {
+    return null;
+  }
+
+  if (forge.craft === null) {
+    return 'begin';
+  }
+
+  return forge.craft.status === 'AwaitingDestination' ? 'destination' : null;
+}
+
+type ForgeTaskKind = 'begin' | 'destination';
+
+function ForgeTask({ task }: { readonly task: ForgeTaskKind }) {
+  const destination = task === 'destination';
+
+  return (
+    <section className="orders orders--task" aria-labelledby="task-heading">
+      <div className="orders__head">
+        <h2 id="task-heading" className="orders__heading">
+          Next
+        </h2>
+        <p className="orders__title">
+          {destination ? 'The swords are finished' : 'The kingdom has asked for swords'}
+        </p>
+      </div>
+
+      <div className="orders__body">
+        <p className="orders__prose">
+          {destination
+            ? 'They can go to one place only, and the choice is final. Nothing else in the settlement is waiting on you.'
+            : 'A Bastion company on the pass is holding the border with worn blades. The forge is standing and the smith is at the anvil.'}
+        </p>
+      </div>
+
+      <div className="task__actions">
+        <Link
+          to={destination ? '/forge/destination' : '/forge/new'}
+          className="button button--primary"
+        >
+          {destination ? 'Choose where they go' : 'Begin the swords'}
+        </Link>
+        <Link to="/forge" className="link">
+          See the forge
+        </Link>
+      </div>
+    </section>
   );
 }
 

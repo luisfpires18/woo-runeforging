@@ -35,8 +35,8 @@ systems that do not exist yet.
 | **Outpost (the stage)** | The founding stage: survival and claim. A Command Hall, a storehouse, basic production, and later a militia and basic forge. Village, Town and City are **possible** later stages and nothing more — none is implemented, and Fort, Castle and Capital describe strategic roles rather than tiers | Foundation |
 | **Building** | A structure in the settlement. Buildings unlock **capabilities**, not thirty levels of percentage increases. *Implemented: `Building`, `BuildingKind` — Command Hall, Storehouse, Lumber Yard, Quarry, Mine* | Locked |
 | **Construction state** | `NotBuilt → UnderConstruction → Complete`. Driven by stored timestamps read on demand, never by a timer. **A construction cannot complete twice.** *Implemented: `ConstructionStatus`* | — |
-| **Specialist** | A named person who performs work — smith, commander, scholar. The player makes settlement-level decisions; specialists do the work | Foundation |
-| **Workforce** | Labour capacity. **A capacity, not an inventory resource** — it is never a spendable pile of tokens. **Not built.** Worker assignment and any limit on concurrent construction are deferred with the forging half of Prompt 6 | Foundation |
+| **Specialist** | A named person who performs work — smith, commander, scholar. The player makes settlement-level decisions; specialists do the work. *Implemented: `SmithOption`, mocked — one named smith, assignable to a craft, with an availability reason when he cannot take it* | Foundation |
+| **Workforce** | Labour capacity. **A capacity, not an inventory resource** — it is never a spendable pile of tokens. **Not built**, and not to be confused with specialist availability, which is: a smith who cannot take a job says why, and no labour is counted. Worker assignment and any limit on concurrent construction remain deferred, and need deciding rather than assuming | Foundation |
 | **Crest / motto** | The settlement's heraldry. Also the terminal fallback for missing art. The starting outpost carries an Arkazian token and no device of its own — it has no name yet | Foundation |
 
 ## 2. Economy
@@ -52,22 +52,24 @@ systems that do not exist yet.
 | **Ledger entry** | An append-only record of one resource movement: delta, reason, actor, correlation ID. **Every** gold and goods movement has one | — |
 | **Balance** | Current holding of one resource by one settlement. Carries `accrued_through_utc` — production is computed from elapsed time, never ticked | — |
 | **Reservation** | Resources committed to a project but not yet consumed. Has explicit release and consume transitions. **Not built, and not needed yet**: construction spends its whole cost at confirm ([ADR-0004](../adr/0004-consistency-and-durable-work.md), `WIREFRAMES.md` §5), and with cancellation forbidden there is nothing to release | — |
-| **Procurement rate** | What it costs to buy a shortfall rather than gather it. The mock uses **1 Gold per missing unit**, a placeholder like every other starter number, and buys all of a construction's current shortfalls in one all-or-nothing act. Gold itself is never procurable — there is no recursive path. Real pricing arrives with the economy at Prompt 10 | Open |
+| **Procurement rate** | What it costs to buy a shortfall rather than gather it. The mock uses **1 Gold per missing unit**, a placeholder like every other starter number, and buys all of a construction's *or a craft's* current shortfalls in one all-or-nothing act. Gold itself is never procurable — there is no recursive path. The maths is shared by both, so a shortage of 20 Timber means the same thing and costs the same wherever the player meets it. Real pricing arrives with the economy at Prompt 10 | Open |
 | **Bounded demand** | NPC and kingdom purchasing limited by budget, stockpile, deadline and world state. **There is no infinite vendor** | Foundation |
 
 ## 3. The forge
 
 | Term | Meaning | Label |
 |---|---|---|
-| **Equipment batch** | A fungible quantity of identical equipment arming a company — quantity, quality, condition, maker mark. Not hundreds of individual records | Locked |
+| **Equipment batch** | A fungible quantity of identical equipment arming a company — quantity, quality, condition, maker mark. Not hundreds of individual records. *Implemented: `EquipmentBatch`, mocked — one batch of 100 infantry swords* | Locked |
 | **Named weapon / named item** | An individual object with identity, materials, maker, owners, repairs, scars and deeds. **A distinct aggregate from a batch, with no conversion path** | Locked |
-| **`ForgeCraft`** | Ordinary crafting. **Deterministic**: transparent duration, guaranteed quality floor, no probability model anywhere | Foundation |
-| **Guaranteed result floor** | Ordinary forging cannot destroy client materials through hidden random quality. Destructive chance belongs to Runeforging alone | Foundation |
-| **Technique** | A design or process emphasis chosen per craft. Part of smith identity and reputation | Foundation |
-| **Pattern** | An authored weapon design — `pattern.sword.infantry.arkazian` | — |
-| **Grade** | Material quality tier: improvised → bronze or low-grade iron → reliable iron → tempered → steel → rare-material masterwork → rune vessel | Foundation |
-| **Maker mark / provenance** | The record of who made an object and from what. Follows it into equipment records, battle history and the settlement's history | Foundation |
-| **Destination** | Where a finished craft goes: equip, kingdom contract, market listing, player commission, Order supply, export, retain. **Exclusive — one only** | Locked |
+| **`ForgeCraft`** | Ordinary crafting. **Deterministic**: transparent duration, guaranteed quality floor, no probability model anywhere. *Implemented: `ForgeCraft`, mocked — a discriminated union, `InProgress → AwaitingDestination → Settled`* | Foundation |
+| **Guaranteed result floor** | Ordinary forging cannot destroy client materials through hidden random quality. Destructive chance belongs to Runeforging alone. **In the built slice the batch is *exactly* the floor** — nothing lands above it, because an unstated upside teaches the player to expect what the screen never promised ([ADR-0018](../adr/0018-forging-state-machine-and-exclusive-destination.md)) | Foundation |
+| **Quality** | How good a finished batch is. **`Serviceable` → `Fine`**, a placeholder ladder of two. **`Sound` is deliberately not a quality tier**: `rune_list.md` names Sound as a rune — *vibration and silence* — and the word is reserved for it. *Implemented: `QualityGrade`, mocked* | Open (the real ladder) |
+| **Technique** | A design or process emphasis chosen per craft. Part of smith identity and reputation. *Implemented: `TechniqueOption`, mocked — standard pattern, hardened edge, quick turnaround, each shifting cost, duration and the floor deterministically* | Foundation |
+| **Pattern** | An authored weapon design — `pattern.sword.infantry.arkazian`. *Implemented: `PatternOption`, mocked* | — |
+| **Grade** | Material quality tier: improvised → bronze or low-grade iron → reliable iron → tempered → steel → rare-material masterwork → rune vessel. *Implemented: `GradeOption`, mocked — Iron workable, Steel shown with its requirement* | Foundation |
+| **Maker mark / provenance** | The record of who made an object and from what. Follows it into equipment records, battle history and the settlement's history. *Implemented: `MakerProvenance`, mocked — smith, mastery, settlement, pattern, grade, technique, content and rules versions* | Foundation |
+| **Destination** | Where a finished craft goes: equip, kingdom contract, market listing, player commission, Order supply, export, retain. **Exclusive — one only**. *Implemented: `Destination`, mocked — four of them, as terminal members of the craft union, so a second is unrepresentable rather than merely forbidden* | Locked |
+| **Kingdom request** | A standing order from the kingdom that gives a craft its reason: goods, quantity, recipient, fee. *Implemented: `KingdomRequest`, mocked — 100 infantry swords for a Bastion company attached to the Red Bastion, 400 Gold.* **Its deadline is informational**: nothing reads it, nothing expires and nothing is penalised, because nothing in Foundations of Iron expires while the player sleeps | Foundation |
 | **Smith mastery** | Apprentice → Weaponsmith → Master Weaponsmith → Vessel Smith → Runeforger → Legendary Runeforger. Advanced by varied meaningful work, never by producing thousands of useless daggers | Foundation |
 
 ## 4. Runes

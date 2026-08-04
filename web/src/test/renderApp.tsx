@@ -1,7 +1,13 @@
 import { render } from '@testing-library/react';
 
 import { SettlementStateProvider } from '../api/SettlementStateProvider.tsx';
-import type { BuildingKind, SettlementState, SettlementStateSource } from '../api/types.ts';
+import type {
+  BuildingKind,
+  CraftOrder,
+  Destination,
+  SettlementState,
+  SettlementStateSource,
+} from '../api/types.ts';
 import { CommandRejection } from '../api/types.ts';
 import { FakeSettlementStateSource, type Scenario } from '../api/fake/fakeSettlementStateSource.ts';
 import { App } from '../app/App.tsx';
@@ -52,6 +58,9 @@ export function renderScenario(scenario: Scenario = 'firstSession', latencyMs = 
 export interface Primer {
   begin(kind: BuildingKind): Promise<void>;
   procure(kind: BuildingKind): Promise<void>;
+  craft(order: CraftOrder): Promise<void>;
+  procureCraft(order: CraftOrder): Promise<void>;
+  send(craftId: string, destination: Destination): Promise<void>;
   advance(minutes: number): void;
 }
 
@@ -75,6 +84,15 @@ export function renderPrimed(
       procure: async (kind) => {
         await source.procureConstructionShortfalls(kind);
       },
+      craft: async (order) => {
+        await source.beginCraft(order);
+      },
+      procureCraft: async (order) => {
+        await source.procureCraftShortfalls(order);
+      },
+      send: async (craftId, destination) => {
+        await source.chooseCraftDestination(craftId, destination);
+      },
       advance: (minutes) => {
         source.advance(minutes);
       },
@@ -84,38 +102,34 @@ export function renderPrimed(
   };
 }
 
+/** Every command refuses the same way, so the reason reads the same everywhere. */
+const closed = (): Promise<SettlementState> =>
+  Promise.reject(new CommandRejection('The ridge road is closed.'));
+
+const pending = (): Promise<SettlementState> =>
+  new Promise<SettlementState>(() => {
+    // deliberately never settles
+  });
+
 /** A source that always fails, for the error state. */
 export class FailingSource implements SettlementStateSource {
   load(): Promise<SettlementState> {
     return Promise.reject(new Error('The ridge road is closed.'));
   }
 
-  beginConstruction(): Promise<SettlementState> {
-    return Promise.reject(new CommandRejection('The ridge road is closed.'));
-  }
-
-  procureConstructionShortfalls(): Promise<SettlementState> {
-    return Promise.reject(new CommandRejection('The ridge road is closed.'));
-  }
+  beginConstruction = closed;
+  procureConstructionShortfalls = closed;
+  beginCraft = closed;
+  procureCraftShortfalls = closed;
+  chooseCraftDestination = closed;
 }
 
 /** A source that never settles, for the loading state. */
 export class NeverResolvingSource implements SettlementStateSource {
-  load(): Promise<SettlementState> {
-    return new Promise<SettlementState>(() => {
-      // deliberately never settles
-    });
-  }
-
-  beginConstruction(): Promise<SettlementState> {
-    return new Promise<SettlementState>(() => {
-      // deliberately never settles
-    });
-  }
-
-  procureConstructionShortfalls(): Promise<SettlementState> {
-    return new Promise<SettlementState>(() => {
-      // deliberately never settles
-    });
-  }
+  load = pending;
+  beginConstruction = pending;
+  procureConstructionShortfalls = pending;
+  beginCraft = pending;
+  procureCraftShortfalls = pending;
+  chooseCraftDestination = pending;
 }

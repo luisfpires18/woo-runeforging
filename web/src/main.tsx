@@ -21,12 +21,16 @@ if (!container) {
  * `?scenario=returning` opens the construction demo: the Lumber Yard is already
  * under way and the development time control can carry it to completion.
  * `?scenario=empty` opens a settlement with nobody in it, so the empty state can be
- * looked at rather than only asserted. Swapping to real endpoints later means
- * constructing a different `SettlementStateSource` here and changing nothing else.
+ * looked at rather than only asserted. `?scenario=smith-away` opens a standing
+ * forge whose only smith cannot take the work, which is the one lifecycle state
+ * that cannot be reached by playing forward. Swapping to real endpoints later
+ * means constructing a different `SettlementStateSource` here and changing
+ * nothing else.
  */
 const scenarios: Readonly<Record<string, Scenario>> = {
   returning: 'returningConstruction',
   empty: 'empty',
+  'smith-away': 'smithUnavailable',
 };
 
 const requested = new URLSearchParams(window.location.search).get('scenario') ?? '';

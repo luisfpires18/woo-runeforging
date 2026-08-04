@@ -150,7 +150,8 @@ What each screen shows. Only the structurally distinct cases are drawn in
 | **Outpost** | Placeholder per region | First session — the task card **is** the empty state | Retry; identity and resources stay | — | Site row updates in place | Banner; report readable, actions disabled |
 | **Settlement** | Building list placeholder | Never empty — five plots always | Retry the list | Per row: shortfall notice | Row becomes ▨ | Banner; list readable |
 | **Construction** | Cost placeholder | — | Retry; entered values kept | Confirm replaced by shortfall; a site that cannot be raised states why and offers none | Return to settlement, plot changed | **Both** commands disabled with the reason |
-| **Forge** | Project placeholder | "No projects. Choose a pattern to begin." | Retry | Steel shown with its requirement | Project appears in progress | Confirm disabled |
+| **Forge** | Project placeholder | "The anvil is clear. Choose a pattern to begin." | Retry | Steel shown with its requirement; an unavailable smith says why | Project appears in progress | Confirm disabled |
+| **Destination** | — | — | Retry | Not finished yet, or already decided — **stated, with no options rendered** | Becomes the record of where they went | Confirm disabled |
 | **Army** | Company placeholder | "No companies yet." | Retry | Equipment slot shows what is missing | Slot fills | Banner; readable |
 | **Battle report** | Report placeholder | "No battles yet." | Retry the report | Replay unavailable → **written report** | Repair choice resolves in place | Banner; report readable, repair disabled |
 
@@ -172,7 +173,8 @@ slot.
 | Outpost — **first session** | **Exactly one.** The whole job is making the first move unmissable |
 | Outpost — returning, work available | **One**, and it may differ — collect a completion, resolve an attention item |
 | Outpost — returning, everything under way and nothing affordable | **None.** Say so: *"Everything you can start is under way."* |
-| Confirm screens | One — `Begin construction`, `Begin the craft` |
+| Confirm screens | One — `Begin construction`, `Begin the craft`, `Confirm — <destination>` |
+| Destination, nothing selected yet | **None.** A primary action that cannot yet say what it would do is a slot being filled |
 | Error | **None.** A retry, not a next move |
 | Offline | **None.** Committing is what is unavailable |
 | Empty | One **only if** acting is genuinely the next step |

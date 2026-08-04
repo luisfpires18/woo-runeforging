@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 import { quoteFor } from '../../api/construction.ts';
-import { useSettlementState } from '../../api/SettlementStateProvider.tsx';
+import { isConstructionOf, useSettlementState } from '../../api/SettlementStateProvider.tsx';
 import type {
   BuildingKind,
   ConstructionQuote,
@@ -98,8 +98,11 @@ export function Construction({
     );
   }
 
-  const working = commit.phase === 'working' && commit.kind === kind;
-  const failed = commit.phase === 'failed' && commit.kind === kind ? commit.message : null;
+  const working = commit.phase === 'working' && isConstructionOf(commit.subject, kind);
+  const failed =
+    commit.phase === 'failed' && isConstructionOf(commit.subject, kind)
+      ? commit.message
+      : null;
   const short = quote.shortfalls.length > 0;
 
   return (

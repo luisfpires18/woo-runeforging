@@ -25,7 +25,7 @@ export default tseslint.config(
   },
 
   // The adapter boundary, enforced at lint time rather than by a test that
-  // greps source. Components and features consume `HouseState` through the
+  // greps source. Components and features consume `SettlementState` through the
   // provider; they must never reach for a fixture or the fake clock, because
   // the whole point of the seam is that swapping in real endpoints touches one
   // file. A violation fails in the editor, not three steps later in CI.
@@ -40,8 +40,8 @@ export default tseslint.config(
               group: ['**/api/fake/**', '**/fake/**'],
               message:
                 'Features and shared components must not import fake fixtures or the fake clock. ' +
-                'Consume HouseState through the provider (src/api/HouseStateProvider.tsx) so that ' +
-                'replacing fake state with real endpoints stays a change in one file.',
+                'Consume SettlementState through the provider (src/api/SettlementStateProvider.tsx) ' +
+                'so that replacing fake state with real endpoints stays a change in one file.',
             },
           ],
         },

@@ -359,7 +359,15 @@ describe('Construction — the Command Hall unlocks Barracks and Forge', () => {
     expect(screen.getByText(/once begun, this cannot be cancelled/i)).toBeInTheDocument();
   });
 
-  it('completing the Forge introduces no forging, and the Barracks no recruitment', async () => {
+  /**
+   * This test used to assert that a standing Forge introduced *no* forging.
+   * The forging half has since been built, so that claim is no longer true and
+   * keeping it would have been a passing test that lies. What it still
+   * guards is real and narrower: the settlement screen commits nothing but
+   * construction, and the Barracks still unlocks nothing, because recruitment
+   * is a later prompt.
+   */
+  it('completing the Forge adds the forge area and nothing to the settlement screen', async () => {
     const user = userEvent.setup();
     await renderPrimed(async (settlement) => {
       await settlement.begin('CommandHall');
@@ -379,15 +387,18 @@ describe('Construction — the Command Hall unlocks Barracks and Forge', () => {
     });
     expect(plot('Barracks')).toHaveAttribute('data-status', 'Complete');
 
-    // A standing Forge is a standing building and nothing else. Crafting,
-    // patterns, techniques and the smith's work are the forging half, and a
-    // completed building must not quietly advertise them.
-    for (const forbidden of [/craft/i, /pattern/i, /technique/i, /forge a /i, /smith at work/i]) {
+    // The forge is an area of its own, reached from the rail — not a control
+    // grafted onto the site it was raised at.
+    expect(rail().getByRole('link', { name: 'Forge' })).toBeInTheDocument();
+
+    // The settlement screen still commits construction and nothing else.
+    for (const forbidden of [/craft/i, /pattern/i, /technique/i, /begin the swords/i]) {
       expect(screen.queryByRole('button', { name: forbidden })).not.toBeInTheDocument();
       expect(screen.queryByRole('link', { name: forbidden })).not.toBeInTheDocument();
     }
 
-    // The same for the Barracks and recruitment, which is Prompt 7.
+    // The Barracks unlocks nothing yet: recruitment is a later prompt, and a
+    // completed building must not quietly advertise it.
     for (const forbidden of [/recruit/i, /company/i, /train/i, /muster/i]) {
       expect(screen.queryByRole('button', { name: forbidden })).not.toBeInTheDocument();
       expect(screen.queryByRole('link', { name: forbidden })).not.toBeInTheDocument();

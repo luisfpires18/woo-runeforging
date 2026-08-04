@@ -716,6 +716,10 @@
   font: inherit;
   letter-spacing: 0.04em;
   cursor: pointer;
+  /* Several primary actions are anchors — a route is the right thing to link
+     to when it has an address. Without this they carried the anchor's default
+     underline and read as links wearing a button, which is neither. */
+  text-decoration: none;
   transition:
     background var(--duration-fast) var(--easing-standard),
     border-color var(--duration-fast) var(--easing-standard),
@@ -1331,6 +1335,135 @@
   .ledger-table th,
   .ledger-table td {
     padding-right: var(--space-2);
+  }
+}
+
+/* ---------- the forge ---------- */
+
+/* The forge has no world above it, so its panels stack inside the same frame
+   and the ledge welds to the bottom edge — the settlement's grammar without the
+   scene. Nothing here is a new visual level. */
+.forge .terms-panel + .terms-panel {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.request__summary {
+  color: var(--text-primary);
+  font-size: var(--text-subheading);
+  font-weight: 600;
+}
+
+/* Pattern, grade, technique and smith. Radio groups rather than selects, so
+   every option and every reason is readable without opening anything. */
+.choice {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-5);
+  padding: 0;
+  border: 0;
+}
+
+.choice:last-child {
+  margin-bottom: 0;
+}
+
+.choice__legend {
+  margin-bottom: var(--space-2);
+  padding: 0;
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+}
+
+.choice__option {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0 var(--space-3);
+  align-items: baseline;
+  min-height: var(--target-min);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.choice__option:hover {
+  border-color: var(--border-interactive);
+}
+
+.choice__option:has(input:checked) {
+  border-color: var(--accent-forge);
+  background: rgb(232 151 74 / 8%);
+}
+
+.choice__option:has(input:focus-visible) {
+  outline: 2px solid var(--accent-forge);
+  outline-offset: 2px;
+}
+
+/* An unavailable option keeps its reason and its shape: a grade to work toward
+   is a different thing from a row that has been taken away. */
+.choice__option[data-unavailable='true'] {
+  cursor: not-allowed;
+  opacity: 0.65;
+  border-style: dashed;
+}
+
+.choice__name {
+  grid-column: 2;
+  color: var(--text-primary);
+}
+
+.choice__detail {
+  grid-column: 2;
+  color: var(--text-secondary);
+  font-size: var(--text-small);
+}
+
+.choice__option input {
+  grid-row: 1 / span 2;
+  align-self: center;
+  accent-color: var(--accent-forge);
+}
+
+/* Who made it, from what, under which catalogue. */
+.provenance {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.provenance__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: var(--space-2) 0 0;
+}
+
+.provenance__row {
+  display: grid;
+  grid-template-columns: minmax(7rem, 10rem) minmax(0, 1fr);
+  gap: var(--space-3);
+  font-size: var(--text-small);
+}
+
+.provenance__row dt {
+  color: var(--text-muted);
+}
+
+.provenance__row dd {
+  margin: 0;
+  color: var(--text-secondary);
+  overflow-wrap: anywhere;
+}
+
+@media (width < 48rem) {
+  .provenance__row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
   }
 }
 

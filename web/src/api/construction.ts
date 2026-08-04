@@ -1,11 +1,10 @@
+import { balancesAfter, shortfallsFrom, totalGoldPriceOf } from './procurement.ts';
 import type {
   Building,
   BuildingKind,
   ConstructionQuote,
   Ineligibility,
-  ResourceBalance,
   SettlementState,
-  Shortfall,
 } from './types.ts';
 
 /**
@@ -21,9 +20,6 @@ import type {
  * ([ADR-0017](../../../docs/adr/0017-commands-over-the-settlement-state-seam.md)).
  */
 
-/** What buying a shortfall costs per missing unit. Mirrors the fake content. */
-const goldPerMissingUnit = 1;
-
 export function quoteFor(
   state: SettlementState,
   kind: BuildingKind,
@@ -34,29 +30,11 @@ export function quoteFor(
     return null;
   }
 
-  const spend = new Map(building.cost.map((entry) => [entry.kind, entry.amount]));
-
-  const after: ResourceBalance[] = state.resources.map((balance) => ({
-    ...balance,
-    amount: balance.amount - (spend.get(balance.kind) ?? 0),
-  }));
-
-  // Gold is never a shortfall: there is no recursive way to procure the thing
-  // procurement is paid in. A Gold shortage is reported as a Gold shortage by
-  // the ordinary affordability check instead.
-  const shortfalls: Shortfall[] = after
-    .filter((balance) => balance.kind !== 'Gold' && balance.amount < 0)
-    .map((balance) => ({
-      kind: balance.kind,
-      displayName: balance.displayName,
-      short: -balance.amount,
-      goldPrice: -balance.amount * goldPerMissingUnit,
-    }));
-
-  const totalGoldPrice = shortfalls.reduce(
-    (total, shortfall) => total + shortfall.goldPrice,
-    0,
-  );
+  // The shortfall maths is shared with forging, so a shortage of 20 Timber
+  // means the same thing and costs the same wherever the player meets it.
+  const after = balancesAfter(state.resources, building.cost);
+  const shortfalls = shortfallsFrom(after);
+  const totalGoldPrice = totalGoldPriceOf(shortfalls);
 
   const gold = state.resources.find((balance) => balance.kind === 'Gold')?.amount ?? 0;
 

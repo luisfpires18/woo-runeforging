@@ -320,7 +320,8 @@ Barracks and Forge are previewed only while the Command Hall is unbuilt.
 
 ## 6. Forge — desktop
 
-**Not built by Prompt 3.** Mocked at Prompt 6. Drawn so the design exists first.
+**Built, mocked, as the forging half of Prompt 6.** The drawing below is what was
+designed; §6.2 records the four places the build departed from it and why.
 
 ```
 ┌───────────────────────────────────────────────────────────────────────────┐
@@ -332,8 +333,9 @@ Barracks and Forge are previewed only while the Command Hall is unbuilt.
 │ ▸ Forge      │                                                            │
 │              │  ┌──────────────────────────────────────────────────┐      │
 │              │  │  KINGDOM REQUEST                                 │      │
-│              │  │  100 infantry swords for the Red Bastion         │      │
-│              │  │  Pays 400 Gold · due in 3 days                   │      │
+│              │  │  100 infantry swords for a Bastion company       │      │
+│              │  │  attached to the Red Bastion                     │      │
+│              │  │  Pays 400 Gold · expected within 3 days          │      │
 │              │  └──────────────────────────────────────────────────┘      │
 │              │                                                            │
 │              │  NEW PROJECT                                               │
@@ -362,6 +364,72 @@ Barracks and Forge are previewed only while the Command Hall is unbuilt.
   can work toward is different from a locked system they cannot.
 - The destination choice comes **after** completion, on its own — one batch, one
   exclusive destination.
+
+### 6.1 What was built — amendments from the forging half
+
+| Drawn | Built | Why |
+|---|---|---|
+| `Quantity [ 100 ]` as a field | **Quantity is stated, not entered** | 100 is the kingdom request's number. A field the player can edit is a number they can get wrong, and the command carries no quantity at all |
+| One screen holding request *and* form | **`/forge` and `/forge/new`** | Confirming spends resources irreversibly, so it gets its own address — the same rule the construction confirm follows. Back works, refresh returns |
+| `Technique [ Standard pattern ▾ ]` | **Three techniques as radios** | One option would make the control decoration. Radios show every option and every reason at once; a select hides the comparison the choice is made on |
+| "for the Red Bastion" | **"a Bastion company attached to the Red Bastion"** | `arkazia.md` §1: Red Bastion is the *barracks*; Bastion is the *unit* it raises. The original conflated them |
+| `Quality  Serviceable or better` | **Serviceable or Fine, and the batch is exactly that** | "or better" left the result ambiguous, which is the shape a hidden roll takes even when there is none. [ADR-0018](../adr/0018-forging-state-machine-and-exclusive-destination.md) |
+
+**The `%` rule became mechanical.** No figure with a percent sign appears
+anywhere in the forge — batch condition is said in a word — and a test asserts
+it along with *chance*, *odds*, *risk*, *roll*, *probability* and *likelihood*.
+
+**The kingdom's three days are context, not a timer.** Nothing counts down,
+nothing expires, and nothing is penalised — `COMPONENTS-AND-STATES.md` §5.
+
+### 6.2 Destination — desktop
+
+Its own route, `/forge/destination`, reached from the forge or straight from a
+*needs attention* item. One batch, one destination, and no way back.
+
+```
+┌───────────────────────────────────────────────────────────────────────────┐
+│  Forge › Destination                                                      │
+├───────────────────────────────────────────────────────────────────────────┤
+│   Where do the swords go?                                                 │
+│   One batch, one destination. Whatever you choose, the swords cannot also  │
+│   go anywhere else, and the choice cannot be taken back.                   │
+│                                                                           │
+│   ( ) Equip your own company                                              │
+│       Set aside for the company you raise.                                │
+│   ( ) Fulfil the kingdom contract                                         │
+│       They go to the Bastion company, and the kingdom pays 400 Gold.      │
+│   ( ) List them for sale                                                  │
+│       Offered at market price. Nothing is paid until a buyer takes them.  │
+│   (•) Retain them                                                         │
+│       They stay in the settlement, unpromised.                            │
+│                                                                           │
+│   ┌───────────────────────────────────────────────────────────────┐       │
+│   │  Retain them. This cannot be undone, and the swords cannot     │       │
+│   │  go anywhere else afterwards.                                  │       │
+│   └───────────────────────────────────────────────────────────────┘       │
+│                                                                           │
+│   [ Confirm — Retain them ]      ( Cancel )                               │
+└───────────────────────────────────────────────────────────────────────────┘
+```
+
+- **Select, then confirm — on one screen.** Two steps, no nested sheet, so the
+  mobile two-tap rule holds (`NAVIGATION.md` §3).
+- **The consequence is stated per option, before the choice**, not after it.
+- **No confirm exists until something is selected.** A primary action that
+  cannot say what it would do is a slot being filled.
+- **Afterwards it is a record**: what was chosen, and the Gold it moved or
+  quoted. No options, and nothing to press.
+
+### 6.3 Arriving when there is nothing to do
+
+Both routes are addressable in every state, so each states what is true and
+renders **no control it could not honour** — the forge's version of §5.3.
+
+| At | State | Screen |
+|---|---|---|
+| `/forge/new` | No forge · work under way · batch waiting · request answered · smith unavailable | The case, and the way onward. **No confirm** |
+| `/forge/destination` | No craft · not finished · already chosen | The case. **No options**, so none can be chosen early or changed late |
 
 ---
 
@@ -444,7 +512,7 @@ Barracks and Forge are previewed only while the Command Hall is unbuilt.
 
 | Commitment | Where it shows |
 |---|---|
-| Cost, duration and consequence are visible **before** confirming | §5, §6 |
+| Cost, duration and consequence are visible **before** confirming | §5, §6, §6.2 |
 | Growth is legible at a glance | §1 → §2 site row; §4 building list |
 | Forging is a decision, not a timer | §6 — pattern, grade, technique, smith |
 | Consequence returns to the loop | §8 ends in a repair choice |

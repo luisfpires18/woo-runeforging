@@ -1,9 +1,8 @@
 # Implementation status
 
 **Last updated:** 4 August 2026
-**Current stage:** Prompt 6 — **the construction half, uncommitted**
-**Also uncommitted:** the settlement terminology migration
-**Next:** the forging half of Prompt 6, then Prompt 7
+**Current stage:** Prompt 6B — **the forging half, delivered**
+**Next:** Prompt 7 — recruitment, equipment, the local battle and its replay
 
 This document describes **what is true now**. The history of how it got here is
 in the [change log](#9-change-log).
@@ -18,10 +17,18 @@ in the [change log](#9-change-log).
 | 4 | `f084304` | The design package — documents only |
 | 5 | `f6214a6` | The mocked outpost screen, from typed fake data |
 | 5 | `3934729` | The two visual passes over that presentation |
+| — | `21d6310` | The settlement terminology migration — House merged into Settlement |
+| 6 | `f35f797` | The construction half — the commit flow |
+| 6B | *this change* | The forging half — the ordinary forging loop and the exclusive destination |
+
+**Correcting three documents that had gone stale.** Until this change,
+`AGENTS.md` §8, this file's header and `SLICES.md` all described `21d6310` and
+`f35f797` as uncommitted work sitting on top of Prompt 5. Both were committed and
+pushed on 4 August. All three are corrected here.
 
 **CI is green on every pushed commit**, verified against the GitHub Actions API
-on 3 August 2026. `3934729` was committed locally on 4 August and its CI result
-is not recorded here:
+on 3 August 2026. `3934729`, `21d6310` and `f35f797` were committed on 4 August
+and their CI results are not recorded here:
 
 ```
 f6214a6  validate  completed  success   run 30835450898
@@ -42,20 +49,143 @@ a1067a7  validate  completed  success
 | Content | `Content/` — static C# catalogues keyed by the enums |
 | Persistence | The Settlement aggregate: `Settlements`, `Buildings`, `ResourceBalances`, applied by `InitialHouseAggregate` then `MergeHouseIntoSettlement` |
 | API | `/health` and `/api/v1/platform/status` only. **No endpoint exposes the domain** |
-| Tests | 33 backend, 33 frontend |
+| Tests | 33 backend, 89 frontend |
 | CI | `validate.yml` on `master` — backend against a real PostgreSQL service container, frontend, docs |
 | Canon | 12 files in [`project_sources/`](../../project_sources/), **present and read in full** |
 | Design | Seven documents in [`../design/`](../design/), amended twice by Prompt 5 |
-| Web | The outpost, its site and the construction commit flow over **typed fake data**. No API over the domain, nothing saved |
+| Web | The outpost, its site, the construction commit flow and the whole ordinary forging loop over **typed fake data**. No API over the domain, nothing saved |
 
-**Not built:** forge, smith, crafts, equipment batches · companies, armies,
-battles · runes in any form · markets, contracts, Orders, Warfronts, seasons ·
-settlement stages beyond Outpost · the other six kingdoms · resource accrual,
-storage capacity · **real** procurement and pricing · authentication ·
-background jobs, outbox,
-idempotency keys · object storage · PixiJS · Azure, deployment, Kubernetes.
+**Not built:** companies, armies, battles · runes in any form · markets, Orders,
+Warfronts, seasons · settlement stages beyond Outpost · the other six kingdoms ·
+resource accrual, storage capacity · **real** procurement and pricing ·
+authentication · background jobs, outbox, idempotency keys · object storage ·
+PixiJS · Azure, deployment, Kubernetes.
+
+**Mocked only, in the client:** the forge, the smith, the craft, the equipment
+batch and its destination. **Nothing about them exists in `src/` or the
+database** — the authoritative forge is Prompt 12.
 
 ---
+
+## 1u. Prompt 6B — the forging half
+
+**An intermediate step that completes Prompt 6. It does not change the official
+29-prompt numbering.** Prompt 6 asks for construction *and* forging; the product
+owner scoped the previous pass to construction and named the forging half as
+deferred rather than half-building it (§1v.3). This closes it.
+
+Prompt 7 could not start without it: it assigns "the forged 100-sword batch" to a
+company, and requires that the destination change battle readiness and that maker
+provenance reach the battle history. Neither a batch nor a destination existed.
+
+### 1u.1 What was delivered
+
+The loop the forge exists for: **read the request → choose → see the terms →
+commit → the work completes → decide where it goes, once.**
+
+- **A Forge area that arrives with its building.** `/forge` joins the rail when
+  the Forge is complete, and is absent before that rather than disabled. The
+  route stays addressable and states why there is no forge yet.
+- **The kingdom request, with its reason.** 100 infantry swords for a Bastion
+  company attached to the Red Bastion, holding the far end of the pass. Pays
+  **400 Gold**; expected within three days.
+- **Pattern, material grade, technique and the named smith**, at `/forge/new`.
+  Steel is shown with its requirement and cannot be chosen. Three techniques,
+  each shifting cost, duration, quality floor and equipment effect
+  deterministically — one would have made the control decoration.
+- **Everything stated before the confirm:** cost beside the balance it leaves,
+  duration with the completion time, the guaranteed quality floor, what the
+  swords do in the line, and **the destination decision named as still to come**,
+  so it is an expected step rather than an ambush.
+- **Spend and craft creation in one transition.** All-or-nothing, every check
+  ahead of every balance change, exactly as construction does it.
+- **Completion resolves on read**, in the same settlement pass that completes
+  buildings, and records the change dated when the work actually finished.
+- **One irreversible destination** at `/forge/destination` — equip your own
+  company, fulfil the kingdom contract, list for sale, or retain.
+
+### 1u.2 The model makes the rule unrepresentable
+
+[ADR-0018](../adr/0018-forging-state-machine-and-exclusive-destination.md).
+`ForgeCraft` is a **discriminated union**, not a record with flags:
+
+```
+InProgress ──(resolved on read)──► AwaitingDestination ──(chosen)──► Settled
+                                                                     + Equipped
+                                                                     + Contracted
+                                                                     + Listed
+                                                                     + Retained
+```
+
+A settled batch in two places, an unfinished craft that has already produced one,
+and an equipped batch carrying an asking price are **states the type cannot
+express**. "The same batch never reaches two destinations" is therefore a
+property of the model rather than a rule to police, and `Settled` has no outgoing
+transition to write. A `@ts-expect-error` test states the guarantee where a
+reader will find it; `npm run typecheck` proves it.
+
+**Three of Prompt 3's six rules are now met**, having had nothing to apply to:
+
+| # | Rule | State |
+|---|---|---|
+| 3 | A craft cannot complete twice | **Met** — a guarded read-time transition from `InProgress` only |
+| 4 | One equipment batch has one current destination | **Met** — structurally |
+| 5 | A batch cannot be equipped and sold simultaneously | **Met** — structurally |
+
+### 1u.3 Four things worth knowing
+
+**The batch is exactly the quality floor.** Not "at least" it. An ambiguous
+output has the shape a hidden roll would take even when there is none, and an
+unstated upside teaches the player to expect what the screen never promised.
+Variance above a floor is a Prompt 12 question.
+
+**No probability vocabulary exists in the feature, and a test proves it** across
+all three forge screens: no `%`, and none of *chance*, *odds*, *risk*, *roll*,
+*probability*, *likelihood*. Batch condition is a number in the data and a word
+on the screen precisely so no rate is ever printed here. This is what makes the
+eventual Runeforging risk panel land as a change in kind.
+
+**One craft, ever, in this slice.** `beginCraft` refuses whenever a craft exists
+in any state, terminal included — a second would overwrite the one stored batch
+and destroy the provenance and destination Prompt 7 reads. The settled Forge says
+the request has been answered and offers no new project.
+
+**The three days are context, not a timer.** Nothing reads the deadline, nothing
+expires and nothing is penalised. Asserted from the two states where the passing
+of time cannot be mistaken for progress — before any craft, and after the batch
+has settled — because advancing three days *with a craft in flight* legitimately
+completes it and would mask what is being tested.
+
+### 1u.4 Deferred, with reasons
+
+| Deferred | Why |
+|---|---|
+| **Repeat crafting** | Needs somewhere to keep more than one batch. Authoritative forging owns that; here a second craft would overwrite the first |
+| **Worker and specialist assignment** | Unchanged from §1v.3. `Workforce` is a capacity, not an inventory, and no workforce model exists. Specialist *availability* — a smith saying he cannot take a job — is not the same thing and counts no labour |
+| **Any limit on concurrent construction** | Unchanged from §1v.3. Still undecided anywhere in the design package |
+| **Real procurement pricing, and a market** | The mock keeps the documented **1 Gold per missing unit**, and listing a batch pays nothing because there is no buyer. Bounded demand against a real economy is Prompt 10 |
+| **Forging telemetry** — chosen technique, destination choice, time to first craft | Scoped out by the product owner and **retargeted to Prompt 8's playtest package**, which defines what the numbers are for. §1v.3 previously deferred it "with the forging half"; that pointer is corrected |
+| **Steel, and any grade beyond Iron** | Shown with its requirement. A furnace is a building nobody has designed |
+
+### 1u.5 What Prompt 7 reads
+
+| Need | Field |
+|---|---|
+| Is there a batch, and is it free to equip? | `craft.status === 'Settled' && craft.destination === 'Equipped'` |
+| Equipment summary | `batch.quantity`, `batch.quality`, `batch.conditionPercent` |
+| The lever that changes readiness and outcome | `batch.equipmentEffectTier` (bounded 1–2) and `craft.destination` — a batch sold, contracted or retained is **not** available to the company, which is how the destination changes the battle |
+| Maker provenance | `batch.maker` — smith, mastery, settlement, pattern, grade, technique, content and rules versions |
+
+Only one craft is possible, so the batch is unambiguous: there is no "which one
+did they mean" for Prompt 7 to resolve.
+
+### 1u.6 Three corrections to committed work
+
+| # | Correction |
+|---|---|
+| 1 | **A passing test that had become a lie.** `Construction.test.tsx` asserted that completing the Forge introduced *no* forging. That is exactly what 6B changes, so the test was rewritten around what it still guards: the settlement screen commits construction and nothing else, and the Barracks still unlocks nothing |
+| 2 | **The duplicated procurement rate is gone.** `goldPerMissingUnit` sat in both `api/construction.ts` and `api/fake/content.ts`. The shortfall maths now lives once, in `api/procurement.ts`, shared by construction and forging |
+| 3 | **`eslint.config.js` still said `HouseState` and `HouseStateProvider.tsx`** in the comment explaining the adapter fence — a file the ADR-0016 rename missed. Corrected |
 
 ## 1y. The visual-polish pass — committed in `3934729`
 
@@ -251,13 +381,17 @@ are unchanged.
 
 ### 1v.3 Deferred, with reasons
 
+> **Read with §1u.** Three of the five rows below have since been resolved or
+> retargeted: the forging half is delivered, real pricing is unchanged, and
+> forging telemetry now defers to Prompt 8 rather than to work that has shipped.
+
 | Deferred | Why |
 |---|---|
-| The **forging half** — the kingdom request for 100 infantry swords, pattern, grade, technique, the named smith, the guaranteed quality floor, equipment effect, completing the craft, and one exclusive destination | Scoped out by the product owner. It is as large again as the construction half, and introduces a second state machine plus destination exclusivity |
+| ~~The **forging half**~~ — **delivered as Prompt 6B**, §1u | Scoped out by the product owner at the time. It was as large again as the construction half, and introduced a second state machine plus destination exclusivity |
 | **Worker and specialist assignment** | `Workforce` is glossary-defined as a capacity, not an inventory, and no workforce model exists. Inventing one to satisfy a bullet would have been a design decision made in passing |
 | **Any limit on concurrent construction** | Undecided anywhere in the design package. `JOURNEYS.md` §1 requires a *second decision* right after the first commit, which a one-at-a-time rule would forbid — so the limit needs deciding, not assuming |
 | **Real procurement pricing** | The mock uses one documented placeholder, **1 Gold per missing unit**. Bounded demand against a real economy is Prompt 10 |
-| Forging telemetry — chosen technique, destination choice, time to first craft | With the forging half |
+| Forging telemetry — chosen technique, destination choice, time to first craft | ~~With the forging half~~ — **retargeted to Prompt 8's playtest package**, which defines what the numbers are for. The forging half shipped without it, by the product owner's decision |
 
 ### 1v.4 Two things worth knowing
 
@@ -675,12 +809,114 @@ $ bash scripts/check-doc-links.sh
 checked 46 Markdown files — OK
 ```
 
+Re-run in full after Prompt 6B, the forging half, 4 August 2026:
+
+```
+$ docker compose -f docker/docker-compose.yml up -d
+Container woo-db  Running
+
+$ dotnet format --verify-no-changes
+(no output, exit code 0)
+
+$ dotnet build -c Release
+Build succeeded.  0 Warning(s)  0 Error(s)
+
+$ dotnet test -c Release --no-build
+Passed!  - Failed: 0, Passed: 33, Skipped: 0, Total: 33, Duration: 2 s
+
+$ dotnet ef migrations list --project src/Woo.Api
+20260803111510_InitialHouseAggregate
+20260804095831_MergeHouseIntoSettlement          # two, unchanged — no backend change
+
+$ cd web && npm run lint && npm run typecheck
+(no output from either)
+
+$ npm run test          # three consecutive runs
+Test Files  5 passed (5)      Tests  89 passed (89)      stderr: 0 bytes
+Test Files  5 passed (5)      Tests  89 passed (89)      stderr: 0 bytes
+Test Files  5 passed (5)      Tests  89 passed (89)      stderr: 0 bytes
+
+$ npm run build
+✓ built in 225ms
+
+$ npm audit
+found 0 vulnerabilities
+
+$ bash scripts/check-adrs.sh
+checked 18 ADR(s) — OK
+$ bash scripts/check-doc-links.sh
+checked 47 Markdown files — OK
+```
+
+The browser sweep that went with it is §4.4: **111 assertions, all passing**,
+and two defects it found that nothing else did.
+
 **The migration was proven the way a deployment meets it.**
 `MergeHouseIntoSettlementTests` creates its own database, migrates it to
 `InitialHouseAggregate`, inserts House-era rows with raw SQL — the current EF
 model has no `House` type and could not write them — migrates up, asserts, then
 migrates **back down** and asserts again. Buildings, balances, stage, kingdom
 and the `HouseHall` → `CommandHall` value all survive both directions.
+
+### 4.4 The Prompt 6B visual check
+
+Driven with `playwright-core` against the installed Edge, from a scratch
+directory outside the repository — no dependency was added to `web/`. **The whole
+run is client-side navigation**: the fake source lives for one page load, so a
+`goto` would silently reset the settlement and test nothing.
+
+Captured at **1440 × 900** and **375 × 812**: the forge with nothing forged, the
+craft form short and then affordable, work under way, the finished batch, the
+destination decision, each state after it, the settled record revisited, all four
+direct-arrival states, the primed unavailable smith, and offline. 24 screenshots.
+
+**111 automated assertions, all passing.** Measured, not eyeballed:
+
+| Check | Result |
+|---|---|
+| `documentElement.scrollWidth` at 1440, 720, 375 and 320, on every forge route and in every lifecycle state | Equal to `clientWidth` everywhere — no horizontal scroll |
+| Tab order on the craft form | Every stop reports a `solid` outline |
+| Interactive targets under 44px | None *(the radio input itself is exempt: its 44px label is the target)* |
+| `Esc` | Leaves the craft form and the destination, spending nothing |
+| The shortfall replaces the confirm | `.shortfall` present, **zero** "Begin the craft" buttons, exact amounts and price named |
+| Gold as a shortfall | Never — asserted against the shortfall summary |
+| Probability vocabulary | None on the craft form under any technique, nor on the settled record: no `%`, chance, odds, risk, roll, probability, likelihood |
+| The contract fee | Lands in the stores exactly once |
+| A settled batch | No radios and no confirm, revisited by going back |
+| `prefers-reduced-motion: reduce` | All three duration tokens and every transition part compute to `0s` |
+| Requests the app makes | All succeed |
+
+#### 4.4.1 Two defects only visible by looking
+
+Neither was caught by a passing build or a green test run, and **one of them a
+test was actively asserting**.
+
+**The maker record printed identifiers at the player.** `Pattern
+pattern.sword.infantry.arkazian`, `Grade grade.iron`, `Technique
+technique.standard` — codebase jargon on screen, which `COMPONENTS-AND-STATES.md`
+§5 forbids outright. The test asserted those exact strings were present, so it
+encoded the defect rather than catching it. The record now reads *Arkazian
+infantry sword*, *Iron*, *Standard pattern*; the identifiers stay on the batch,
+where later systems reconstruct the craft from them, and the test now asserts
+both halves of that.
+
+**Every button-styled link was underlined.** `.button` never reset
+`text-decoration`, so an `<a class="button">` carried the anchor default and read
+as a link wearing a button. **This is pre-existing from Prompt 6** — "Raise the
+Lumber Yard" on the settlement screen has the same markup — and the one-line fix
+in `.button` corrects both.
+
+#### 4.4.2 One pre-existing finding, not fixed
+
+**`/favicon.ico` returns 404 on every cold load.** `index.html` has declared no
+icon since the platform bootstrap (`c1b3c98`), so the browser asks for the
+default and Vite has none. Confirmed with `curl`: `/favicon.ico` → 404,
+`/vite.svg` → 200. It is unrelated to forging, has no consequence beyond a blank
+tab icon, and is **left for the product owner to schedule** rather than fixed
+inside this prompt.
+
+**Still not run:** axe or any automated a11y tool — deferred to the Prompt 8
+audit, unchanged. The sweep above is mechanical, not a substitute.
 
 ### 4.3 The Prompt 6 visual check
 
@@ -870,35 +1106,42 @@ process.
 
 ---
 
-## 8. Readiness for Prompt 6
+## 8. Readiness for Prompt 7
 
 **Ready.**
 
 | Criterion | Status |
 |---|---|
-| Backend green | Yes — 32 tests, format, build |
-| Frontend green | Yes — 14 tests, lint, typecheck, build |
+| Backend green | Yes — 33 tests, format, build |
+| Frontend green | Yes — 89 tests, lint, typecheck, build |
 | `npm audit` | **Zero vulnerabilities** |
-| App inspected in a browser at both widths | Yes — three defects found and fixed |
+| The whole mocked economy loop closes | Yes — raise → craft → complete → one destination |
 | The adapter seam is enforced, not merely intended | Yes — ESLint rule, verified to fire |
-| Design package matches what was built | Yes — amended in two places |
+| Design package matches what was built | Yes — `WIREFRAMES.md` §6.1–6.3, `NAVIGATION.md`, `COMPONENTS-AND-STATES.md` §3 |
 | Documentation links resolve | Yes |
 
-**Prompt 6 builds the mocked construction and forging loop:** reserving
-resources, understanding shortages, completing a construction, choosing a
-pattern, grade, technique and smith, and one exclusive destination.
+**Prompt 7 builds the mocked army and battle:** one Arkazian Bastion company,
+recruitment and equipment summaries, assignment of the forged batch, one local
+conflict against a Sylvaran force, a deterministic event log, a PixiJS replay,
+and a post-battle report ending in a repair choice.
 
-Three things Prompt 6 should know:
+Four things Prompt 7 should know:
 
-- **The commit flow does not exist.** Prompt 5 shows buildings and their costs;
-  nothing spends, and the primary action only navigates. Prompt 6 owns confirm.
+- **The batch is at `state.forge.craft`**, and `craft.destination` decides
+  whether the company can have it. A batch that was contracted, listed or
+  retained is **not** available to equip — that is how "changing the destination
+  changes battle readiness and outcome" is already wired.
+- **`batch.maker` is the provenance** that must reach the battle history.
+  `batch.equipmentEffectTier` is bounded 1–2 and is the intended lever; it exists
+  so combat maths did not have to be decided in the forging prompt.
 - **Extend the seam, do not bypass it.** New state joins `SettlementState` and
-  arrives through the provider. The ESLint rule will stop a fixture import.
-- **The construction confirm screen is already designed** —
-  `WIREFRAMES.md` §5, including the "after" column and the non-cancellable
-  boundary. Build that rather than inventing one.
+  arrives through the provider; commands return the whole resulting state and
+  name intent, never amounts (ADR-0017).
+- **Army and Reports are designed but not built** — `WIREFRAMES.md` §7 and §8.
+  Build those rather than inventing screens, and add each area to the rail only
+  when it exists, the way the Forge does.
 
-> **Do not begin Prompt 6 without the product owner's instruction.**
+> **Do not begin Prompt 7 without the product owner's instruction.**
 
 ---
 
@@ -915,4 +1158,5 @@ Three things Prompt 6 should know:
 | 2026-08-03 | 5 | The mocked House Seat, from typed fake data: House Seat with first-session and returning shapes, settlement with all seven buildings, six resources, a named smith, seven states. The typed adapter seam with the fake-import boundary enforced by ESLint. Placeholder SVG art with a terminating fallback chain, the Forge asset deliberately absent. 14 frontend tests; Vitest added. **React Router removed on evidence** — every 7.x release carries a high-severity advisory; replaced by a ~40-line History-API router, `npm audit` now clean. **First browser inspection in the repository's history**, which found a clipped site row and an accessibility regression in the mobile resource bar; both fixed and the design package amended. Node floor raised to 22.22.2 for jsdom 30. |
 | 2026-08-03 | 4 | The design package — seven documents in `docs/design/`, no code. Journeys, navigation, wireframes for six screens on both viewports, visual language with computed contrast, components and states, accessibility. Four colours corrected after the first palette failed AA. The first useful action proposed as a **starter-balance hypothesis, not canon**; `accent-sylvara` reserved with no role assigned. |
 | 2026-08-04 | terminology | **"House" retired.** `House` and `Settlement` merged into one aggregate; House Seat → Outpost, House Hall → Command Hall, household → Residents, `HouseState` → `SettlementState`. "House Karrow" and "Ashen Reach" both dropped for `Arkazian Outpost` — no replacement proper noun, and the player names it later. A hand-written `MergeHouseIntoSettlement` migration carries the data, including `Buildings.Kind` from `HouseHall` to `CommandHall` because the enum is stored as a string; an isolated test proves it up and down against a populated database. The Workbase, the prompt sheet and `project_sources/` are untouched. [ADR-0016](../adr/0016-settlement-terminology.md). Behaviour-neutral: 14 frontend tests unchanged but for their vocabulary, backend 32 → 33. |
+| 2026-08-04 | 6B (forging half) | The ordinary forging loop, mocked, closing Prompt 6. A Forge area that appears with its building and is absent rather than disabled before it; the kingdom request for 100 infantry swords for a Bastion company attached to the Red Bastion, paying 400 Gold, its three days stated as context and read by nothing; pattern, grade, technique and the named smith, with cost, duration, the **guaranteed** quality floor, the equipment effect and the coming destination decision all stated before the confirm; spend and craft creation in one transition; completion resolved on read; and **exactly one irreversible destination**. `ForgeCraft` is a discriminated union, so a batch in two places, an unfinished craft holding a batch, and an equipped batch with an asking price are states the type cannot express — [ADR-0018](../adr/0018-forging-state-machine-and-exclusive-destination.md). The batch is **exactly** the guaranteed floor, never above it, and no probability vocabulary exists in the feature — no `%`, no chance, odds, risk, roll or probability — asserted mechanically across all three screens. One craft only, because a second would overwrite the batch Prompt 7 reads. The unavailable-specialist case got its own primed scenario, since a smith busy at the anvil only ever proves that a second craft is refused. `Sound` was rejected as a quality tier because `rune_list.md` names Sound as a rune. Three stale documents corrected — `AGENTS.md`, this file and `SLICES.md` all still described `21d6310` and `f35f797` as uncommitted — along with a Prompt 6 test that asserted the Forge introduced no forging, a duplicated procurement rate, and an `eslint.config.js` comment the ADR-0016 rename had missed. Frontend only: 33 → 89 tests, no backend change, no migration. |
 | 2026-08-04 | 6 (construction half) | The commit flow closes the loop for the first time: a confirm route at `/settlement/<site>` stating cost, what it leaves, duration with the completion time and the non-cancellable boundary; **spend at confirm**, whole cost, all-or-nothing, in the same transition that starts the work; shortages that **replace** the confirm with an all-or-nothing procure action at a documented placeholder of 1 Gold per missing unit, with Gold itself never procurable; completion resolved on read; and the Command Hall ending the Barracks and Forge previews. The seam grew commands that return the whole resulting state and name intent rather than amounts — [ADR-0017](../adr/0017-commands-over-the-settlement-state-seam.md). Construction telemetry through a typed no-op sink, six events keyed to causal transitions so rerenders and StrictMode cannot duplicate one. 19 new frontend tests (14 → 33). **The forging half, worker assignment, any concurrency limit and real pricing are deferred with reasons** (§1v.3). Making construction possible also exposed a stale claim on the returning outpost — "everything you can start is already under way" while four plots stood empty — so the next task is now the cheapest affordable site rather than always the Lumber Yard. |

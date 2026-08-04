@@ -7,10 +7,25 @@ import { Art } from '../components/Art.tsx';
 import { ResourceBar } from '../components/ResourceBar.tsx';
 import { Link, useRouter } from './router.tsx';
 
-const areas = [
-  { path: '/', label: 'Outpost' },
-  { path: '/settlement', label: 'Settlement' },
-] as const;
+/**
+ * The areas the settlement currently has.
+ *
+ * The Forge joins the rail the moment the building stands, and is **absent**
+ * before that rather than disabled — a greyed-out tab teases a system the player
+ * cannot reach. The route stays addressable regardless and explains itself.
+ */
+function areasFor(state: SettlementState | null) {
+  const areas = [
+    { path: '/', label: 'Outpost' },
+    { path: '/settlement', label: 'Settlement' },
+  ];
+
+  if (state?.forge.available === true) {
+    areas.push({ path: '/forge', label: 'Forge' });
+  }
+
+  return areas;
+}
 
 /**
  * The command frame: one HUD band, and a rail joined to it.
@@ -83,7 +98,7 @@ export function AppShell({
       <div className="shell__body">
         <nav className="rail" aria-label="Areas">
           <ul className="rail__list">
-            {areas.map((area) => {
+            {areasFor(state).map((area) => {
               const current = path === area.path;
 
               return (

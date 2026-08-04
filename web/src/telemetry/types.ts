@@ -1,11 +1,13 @@
 import type { BuildingKind, ResourceKind } from '../api/types.ts';
 
 /**
- * What Prompt 6 instruments, and nothing more.
+ * What the construction loop instruments, and nothing more.
  *
- * The prompt asks for time to first building, confirmation, abandon points,
- * shortage resolution — plus craft and destination events that belong with the
- * forging half and are deferred with it.
+ * The prompt also asks for chosen technique, destination choice and time to
+ * first craft. Those shipped **without** instrumentation by the product owner's
+ * decision, and are deferred to the playtest package that defines what the
+ * numbers are for — not, as an earlier note here said, to "the forging half",
+ * which has since shipped.
  *
  * **Events follow causal transitions, not renders.** Each one is emitted from
  * the outcome of a command or from an explicit exit, never from a component

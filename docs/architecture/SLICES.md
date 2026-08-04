@@ -134,7 +134,7 @@ rather than collapsing to bare numbers.
 **Not built:** the construction commit flow — reserving resources, resolving
 shortages and confirming — which is Prompt 6.
 
-### Prompt 6 — the construction half · **delivered, uncommitted**
+### Prompt 6 — the construction half · **complete**, `f35f797`
 
 The commit flow: a confirm route stating cost, what it leaves, duration and the
 non-cancellable boundary; spend at confirm, all-or-nothing; shortages replaced
@@ -146,16 +146,34 @@ The seam grew commands — [ADR-0017](../adr/0017-commands-over-the-settlement-s
 They sit beside `load`, return the whole resulting state, and name intent rather
 than amounts.
 
-**Deferred with reasons** (`../implementation/STATUS.md` §1v.3): the forging
-half, worker assignment, any concurrency limit, real pricing, and forging
+### Prompt 6B — the forging half · **complete**
+
+An intermediate step that finishes Prompt 6. **It does not change the 29-prompt
+numbering.**
+
+The ordinary forging loop, mocked: a kingdom request for 100 infantry swords;
+pattern, grade, technique and named smith; cost, duration, guaranteed quality
+floor, equipment effect and the coming destination decision all stated **before**
+the confirm; spend and craft creation in one transition; completion resolved on
+read; and exactly one irreversible destination.
+
+[ADR-0018](../adr/0018-forging-state-machine-and-exclusive-destination.md).
+`ForgeCraft` is a discriminated union, so a batch in two places is
+unrepresentable rather than merely forbidden; the batch is **exactly** the
+guaranteed floor; and there is no probability vocabulary in the feature, checked
+mechanically.
+
+**Still deferred, with reasons** (`../implementation/STATUS.md` §1u.4): worker
+assignment, any concurrency limit, real pricing, repeat crafting, and forging
 telemetry.
 
 | Prompt | Deliverable | Lands in |
 |---|---|---|
 | 6 ✓ | Confirm, spend, resolve shortages, complete construction | `web/src/` |
-| 6 | Iron sword pattern, grade, technique, smith; cost, duration and guaranteed quality floor before confirming | `web/src/` |
-| 6 | **Exactly one destination** — equip, contract, sell, retain | Destination state machine |
-| 6 | Worker or specialist assignment, and any limit on concurrent construction | Undecided — see STATUS §1v.3 |
+| 6B ✓ | Iron sword pattern, grade, technique, smith; cost, duration and guaranteed quality floor before confirming | `web/src/api/`, `web/src/features/forge/` |
+| 6B ✓ | **Exactly one destination** — equip, contract, sell, retain | The `ForgeCraft` union's terminal members |
+| 6B ✓ | Maker provenance, content and rules versions on the batch | `web/src/api/types.ts` |
+| — | Worker or specialist assignment, and any limit on concurrent construction | Undecided — see STATUS §1u.4 |
 | 7 | Bastion company, recruitment, morale, equipment summary | `web/src/` |
 | 7 | Formation plan and a mocked deterministic event log | `web/src/` |
 | 7 | Battle replay — **PixiJS enters the repository here** | `web/src/` |

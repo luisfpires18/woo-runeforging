@@ -10,12 +10,31 @@ import {
 } from 'react';
 
 import { useTelemetry } from '../telemetry/TelemetryProvider.tsx';
-import type { BuildingKind, SettlementState, SettlementStateSource } from './types.ts';
+import type {
+  BuildingKind,
+  CraftOrder,
+  Destination,
+  SettlementState,
+  SettlementStateSource,
+} from './types.ts';
 
 export type LoadPhase =
   | { readonly phase: 'loading' }
   | { readonly phase: 'loaded'; readonly state: SettlementState }
   | { readonly phase: 'error'; readonly message: string };
+
+/**
+ * Which command is in flight, so a screen can tell whether the working or failed
+ * phase is about the thing it is showing.
+ *
+ * A discriminated subject rather than a building: construction is no longer the
+ * only thing that commits, and a craft rejection must not disable a
+ * construction button somewhere else on the page.
+ */
+export type CommitSubject =
+  | { readonly of: 'construction'; readonly kind: BuildingKind }
+  | { readonly of: 'craft' }
+  | { readonly of: 'destination'; readonly destination: Destination };
 
 /**
  * What a command is doing right now.
@@ -26,8 +45,17 @@ export type LoadPhase =
  */
 export type CommitPhase =
   | { readonly phase: 'idle' }
-  | { readonly phase: 'working'; readonly kind: BuildingKind }
-  | { readonly phase: 'failed'; readonly kind: BuildingKind; readonly message: string };
+  | { readonly phase: 'working'; readonly subject: CommitSubject }
+  | {
+      readonly phase: 'failed';
+      readonly subject: CommitSubject;
+      readonly message: string;
+    };
+
+/** Whether a commit phase is about construction of this building. */
+export function isConstructionOf(subject: CommitSubject, kind: BuildingKind): boolean {
+  return subject.of === 'construction' && subject.kind === kind;
+}
 
 interface SettlementStateContextValue {
   readonly load: LoadPhase;
@@ -41,6 +69,18 @@ interface SettlementStateContextValue {
   readonly beginConstruction: (kind: BuildingKind) => Promise<boolean>;
   /** Buys every current shortfall for one site, all or nothing. */
   readonly procureShortfalls: (kind: BuildingKind) => Promise<boolean>;
+  /**
+   * Spends the cost, assigns the smith and starts the craft, or rejects and
+   * changes nothing. The quantity is the kingdom's, not the caller's.
+   */
+  readonly beginCraft: (order: CraftOrder) => Promise<boolean>;
+  /** Buys every current shortfall for one craft, all or nothing. */
+  readonly procureCraftShortfalls: (order: CraftOrder) => Promise<boolean>;
+  /** Sends the finished batch to exactly one destination, irreversibly. */
+  readonly chooseCraftDestination: (
+    craftId: string,
+    destination: Destination,
+  ) => Promise<boolean>;
   /** Clears a rejection once the player has seen it. */
   readonly dismissCommitFailure: () => void;
   /**
@@ -144,11 +184,11 @@ export function SettlementStateProvider({
    */
   const run = useCallback(
     async (
-      kind: BuildingKind,
+      subject: CommitSubject,
       command: () => Promise<SettlementState>,
       onSuccess?: () => void,
     ): Promise<boolean> => {
-      setCommit({ phase: 'working', kind });
+      setCommit({ phase: 'working', subject });
 
       try {
         const next = await command();
@@ -164,7 +204,7 @@ export function SettlementStateProvider({
       } catch (error: unknown) {
         setCommit({
           phase: 'failed',
-          kind,
+          subject,
           message:
             error instanceof Error ? error.message : 'The settlement refused that.',
         });
@@ -178,7 +218,7 @@ export function SettlementStateProvider({
   const beginConstruction = useCallback(
     (kind: BuildingKind) =>
       run(
-        kind,
+        { of: 'construction', kind },
         () => source.beginConstruction(kind),
         () => {
           telemetry.record({ name: 'construction.confirmed', kind });
@@ -199,13 +239,35 @@ export function SettlementStateProvider({
   const procureShortfalls = useCallback(
     (kind: BuildingKind) =>
       run(
-        kind,
+        { of: 'construction', kind },
         () => source.procureConstructionShortfalls(kind),
         () => {
           telemetry.record({ name: 'shortage.procured', kind, goldPrice: goldSpent.current });
         },
       ),
     [run, source, telemetry],
+  );
+
+  // The forge commands carry no telemetry. Forging events — chosen technique,
+  // destination choice, time to first craft — are deferred to the playtest
+  // package that defines what the numbers are for.
+  const beginCraft = useCallback(
+    (order: CraftOrder) => run({ of: 'craft' }, () => source.beginCraft(order)),
+    [run, source],
+  );
+
+  const procureCraftShortfalls = useCallback(
+    (order: CraftOrder) =>
+      run({ of: 'craft' }, () => source.procureCraftShortfalls(order)),
+    [run, source],
+  );
+
+  const chooseCraftDestination = useCallback(
+    (craftId: string, destination: Destination) =>
+      run({ of: 'destination', destination }, () =>
+        source.chooseCraftDestination(craftId, destination),
+      ),
+    [run, source],
   );
 
   const dismissCommitFailure = useCallback(() => {
@@ -233,6 +295,9 @@ export function SettlementStateProvider({
       commit,
       beginConstruction,
       procureShortfalls,
+      beginCraft,
+      procureCraftShortfalls,
+      chooseCraftDestination,
       dismissCommitFailure,
       advanceTime,
     }),
@@ -242,6 +307,9 @@ export function SettlementStateProvider({
       commit,
       beginConstruction,
       procureShortfalls,
+      beginCraft,
+      procureCraftShortfalls,
+      chooseCraftDestination,
       dismissCommitFailure,
       advanceTime,
     ],

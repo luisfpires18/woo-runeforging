@@ -213,27 +213,30 @@ There is no content validator yet; it arrives with authored content.
 
 ## 8. Current stage
 
-**Prompt 5 (the mocked Outpost) is complete, committed and reviewed** —
-`f6214a6`, pushed, CI green (validate run `30835450898`). The web client shows the
-outpost and its site for a new Arkazian settlement, built from **typed fake
-data**. No API over the domain, nothing saved.
+**Prompt 6 is complete, in two halves.**
 
-**Two visual passes** over that presentation are committed as `3934729` —
-styling, artwork and layout only.
+| Commit | What |
+|---|---|
+| `f6214a6` | **Prompt 5** — the mocked Outpost, from typed fake data. Pushed, CI green (validate run `30835450898`) |
+| `3934729` | Two visual passes over that presentation — styling, artwork and layout only |
+| `21d6310` | **The settlement terminology migration** — "House" retired, `House` and `Settlement` merged into one aggregate, the outpost left without a proper name. [ADR-0016](docs/adr/0016-settlement-terminology.md) |
+| `f35f797` | **Prompt 6, the construction half** — the confirm route, spending at confirm, shortages with mocked procurement, completion on read, and the Command Hall unlocking Barracks and Forge. [ADR-0017](docs/adr/0017-commands-over-the-settlement-state-seam.md) |
+| *this change* | **Prompt 6B, the forging half** — the ordinary forging loop and the exclusive destination. [ADR-0018](docs/adr/0018-forging-state-machine-and-exclusive-destination.md) |
 
-Two further changes sit on top, **both uncommitted**:
+The Workbase, the prompt sheet and `project_sources/` keep their own wording, so
+**later prompt text saying "House" means the Settlement**.
 
-- **The settlement terminology migration** — "House" retired, `House` and
-  `Settlement` merged into one aggregate, the outpost left without a proper
-  name. [ADR-0016](docs/adr/0016-settlement-terminology.md). The Workbase, the
-  prompt sheet and `project_sources/` keep their own wording, so **later prompt
-  text saying "House" means the Settlement**.
-- **Prompt 6, the construction half** — the confirm route, spending at confirm,
-  shortages with mocked procurement, completion on read, and the Command Hall
-  unlocking Barracks and Forge.
-  [ADR-0017](docs/adr/0017-commands-over-the-settlement-state-seam.md). The
-  forging half, worker assignment and any concurrency limit are **deferred with
-  reasons** in `docs/implementation/STATUS.md` §1v.3.
+**Prompt 6B is an intermediate step that finishes Prompt 6. It does not change
+the official 29-prompt numbering.** It adds a Forge area that appears with its
+building, a kingdom request for 100 infantry swords, pattern/grade/technique/smith
+selection with every term stated before the confirm, atomic spend-and-craft,
+completion on read, and exactly one irreversible destination. **Frontend only —
+`src/` and the database are untouched**, because the authoritative forge is
+Prompt 12.
+
+Worker assignment, any concurrency limit, real pricing, repeat crafting and
+forging telemetry are **deferred with reasons** in
+`docs/implementation/STATUS.md` §1u.4.
 
 **Prompt 4 (UX and visual design) is committed** — `f084304`. The design package
 lives in [`docs/design/`](docs/design/) and Prompt 5 amended it in two places
@@ -247,18 +250,21 @@ Settlement aggregate persisted through the `InitialHouseAggregate` migration; on
 test project; a React/Vite shell; Docker Compose for PostgreSQL; CI on `master`;
 and the 12 canon files in [`project_sources/`](project_sources/), read in full.
 
-There is **no forge, no army, no battle, no rune, no authentication, no API
-surface over the domain, and no deployed infrastructure.**
+There is **no army, no battle, no rune, no authentication, no API surface over
+the domain, and no deployed infrastructure.** The forge, the smith, the craft
+and the equipment batch exist **only in the client, as typed fake state** —
+nothing about them is in `src/` or the database.
 
 **Prompt 3 was deliberately narrowed by the product owner** — smith, forge
 capability, equipment batches, companies and battle contracts were deferred to
 the prompts that mock and then build them, along with four of the prompt's six
-rules. See
-[`docs/implementation/STATUS.md §2.1`](docs/implementation/STATUS.md).
+rules. Three of those four rules are now met by the mocked forging loop; see
+[`docs/implementation/STATUS.md §2.1` and §1u.2](docs/implementation/STATUS.md).
 
-Next: **Prompt 6 — the mocked construction and forging loop**: reserving
-resources, resolving shortages, completing a construction, and the first craft.
-Do not begin it without the product owner's instruction.
+Next: **Prompt 7 — mocked recruitment, equipment, the local battle and its
+replay.** It reads the forged batch and its destination from
+`SettlementState.forge.craft`. Do not begin it without the product owner's
+instruction.
 
 Two standing rules the frontend now depends on:
 

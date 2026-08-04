@@ -5,6 +5,10 @@ import { kindFromSlug } from '../api/construction.ts';
 import { useSettlementState } from '../api/SettlementStateProvider.tsx';
 import { ErrorRegion, LoadingRegion } from '../components/StateRegion.tsx';
 import { Construction } from '../features/construction/Construction.tsx';
+import { CraftProject } from '../features/forge/CraftProject.tsx';
+import { Destination } from '../features/forge/Destination.tsx';
+import { Forge } from '../features/forge/Forge.tsx';
+import { NotFound } from '../features/forge/NotFound.tsx';
 import { Outpost } from '../features/outpost/Outpost.tsx';
 import { Settlement } from '../features/settlement/Settlement.tsx';
 import { AppShell } from './AppShell.tsx';
@@ -30,9 +34,13 @@ export function App() {
 /**
  * Route dispatch.
  *
- * `/settlement/<site>` is parsed here rather than in the router: a single
- * prefix match is not "loaders, params or nested layouts", which is the trigger
- * `router.tsx` names for reconsidering React Router.
+ * `/settlement/<site>` and the three forge paths are parsed here rather than in
+ * the router: prefix matches and a fixed set of literals are not "loaders,
+ * params or nested layouts", which is the trigger `router.tsx` names for
+ * reconsidering React Router.
+ *
+ * Every forge route is addressable in every lifecycle state, so each screen is
+ * responsible for stating what is true when it cannot offer what it is for.
  */
 function Screen({ offline }: { readonly offline: boolean }) {
   const { path } = useRouter();
@@ -58,6 +66,24 @@ function Screen({ offline }: { readonly offline: boolean }) {
 
   if (path === '/settlement') {
     return <Settlement state={load.state} />;
+  }
+
+  if (path === '/forge') {
+    return <Forge state={load.state} />;
+  }
+
+  if (path === '/forge/new') {
+    return <CraftProject state={load.state} offline={offline} />;
+  }
+
+  if (path === '/forge/destination') {
+    return <Destination state={load.state} offline={offline} />;
+  }
+
+  // A mistyped forge address is a stated not-found with a way back, never a
+  // silent fall-through to the home screen.
+  if (path.startsWith('/forge/')) {
+    return <NotFound />;
   }
 
   return <Outpost state={load.state} />;

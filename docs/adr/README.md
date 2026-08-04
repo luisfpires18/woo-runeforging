@@ -29,6 +29,7 @@ one without reading the others.
 | [0014](0014-local-development-and-ci.md) | **Local development and CI** — Compose for PostgreSQL only on host port 5433, GitHub Actions for build/test/lint/typecheck, no deployment or infrastructure code | Accepted |
 | [0016](0016-settlement-terminology.md) | **Settlement terminology** — the player's domain is a Settlement, not a House; `House` and `Settlement` merge into one aggregate; the outpost carries no proper name; the Workbase and prompt sheet keep their own wording | Accepted |
 | [0017](0017-commands-over-the-settlement-state-seam.md) | **Commands over the settlement state seam** — commands sit beside `load` and return the whole resulting state; no optimistic updates; the source re-checks and is authoritative; commands name intent, never amounts; duplicates are rejected, not ignored | Accepted |
+| [0018](0018-forging-state-machine-and-exclusive-destination.md) | **The forging state machine and the exclusive destination** — `ForgeCraft` is a discriminated union, so a batch in two places is unrepresentable; completion resolves on read and the destination is the decision; the batch is exactly the guaranteed quality floor, with no probability vocabulary anywhere; one craft in this slice, because a second would overwrite the batch | Accepted |
 
 ## Superseded by the Prompt 2 correction
 

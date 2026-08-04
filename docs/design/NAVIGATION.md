@@ -44,13 +44,25 @@ to act on the thing the screen just told the player about.
 | Area | Prompt | Until then |
 |---|---|---|
 | Outpost, Settlement, Construction | 5–6 | — |
-| Forge, Craft | 6 | Not present. **Not shown as locked** |
+| Forge, Craft, Destination | 6 | Not present. **Not shown as locked** |
 | Army | 7 | Not present |
 | Reports, Battle report | 7 | Not present |
 
 **Absent, not disabled.** A greyed-out tab teases a system the player cannot
 reach and cannot work toward. Navigation shows what exists; it grows as the game
 does.
+
+**The Forge grows in with its building.** The rail entry appears the moment the
+Forge is complete, and is absent before that — a settlement that has not raised
+one has no forge, and saying so with a disabled tab would be advertising. The
+routes stay addressable regardless: arriving early states why there is no forge
+and links to the site where it is raised, exactly as arriving at a construction
+site that cannot be raised does (`WIREFRAMES.md` §5.3, §6.3).
+
+**The craft has two detail views, not one.** `/forge/new` confirms the craft and
+`/forge/destination` settles the batch. They are separate because each commits
+something that cannot be taken back, and one address per irreversible act is what
+makes back, refresh and a shared link behave.
 
 ---
 
